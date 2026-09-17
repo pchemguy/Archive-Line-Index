@@ -1412,3 +1412,331 @@ On Windows, close all mappings before replacing or deleting the binary index fil
 > 
 > Raw little-endian `uint64` is OK. For now, mmap is out of scope. Do we have a complete architecture (not implementation details, but key algos, data structures, etc.)?
 
+We have the core architecture, but it was not fully closed until defining index invariants, metadata, persistence authority, and failure semantics. With the defaults below, it is architecturally complete enough to write a specification and implementation plan.
+
+#### 1. System boundaries
+
+```mermaid
+flowchart TD
+    A["Path or BinaryIO"] --> B["Content stream"]
+    B --> C["Byte line scanner"]
+    C --> D["array('Q') offsets"]
+    D --> E["SQLite index"]
+    D --> F["Raw little-endian uint64 file"]
+```
+
+There are two public features:
+
+1. A sequential, read-only binary stream over the plain file or sole archive member.
+2. A line-index builder consuming that stream.
+
+The indexing layer depends only on a readable binary stream. It has no knowledge of archives or decompression.
+
+#### 2. Content-stream layer
+
+##### Contract
+
+The stream:
+
+* returns the original decompressed bytes;
+* includes any BOM;
+* performs no decoding;
+* performs no newline normalization;
+* is readable and non-seekable;
+* supports deterministic closing;
+* counts actual decompressed bytes;
+* enforces an optional maximum decompressed size;
+* exposes archive/member metadata separately from its byte interface.
+
+##### Inputs
+
+```python
+Source = str | PathLike[str] | BinaryIO
+```
+
+Ownership:
+
+* paths are opened and closed by the package;
+* caller-provided streams remain caller-owned;
+* processing starts at the stream’s current position;
+* the original position is not restored.
+
+##### Archive policy
+
+Inherited from the reference SPEC:
+
+* plain, ZIP, TAR variants, and 7z;
+* content-first detection;
+* recognized but invalid archive suffixes fail;
+* exactly one regular-file member;
+* directories do not count;
+* links and other special entries cause rejection;
+* no filesystem extraction;
+* no encrypted archives or password interface;
+* terminal CRC/decompression errors remain observable.
+
+##### Backends
+
+* Plain, ZIP, and TAR use pull-based readers.
+* 7z adapts `py7zr`’s push-based extraction using one extraction thread and a bounded byte queue.
+* A common wrapper supplies buffering, byte counting, size-limit enforcement, error translation, and cleanup.
+
+Successful EOF means all available archive integrity checks completed. Early closure does not prove archive integrity.
+
+#### 3. Index semantics
+
+Offsets address the original decompressed member byte space.
+
+The scanner:
+
+* optionally recognizes and excludes only an initial UTF-8 BOM;
+* treats byte `0x0A` as the sole line terminator;
+* includes the LF, and any preceding CR, in the line’s byte range;
+* treats a lone CR as ordinary data;
+* includes a final unterminated line;
+* does not create an empty line after a terminal LF;
+* uses `bytes.find(b"\n")`, not a Python per-byte loop.
+
+No text decoding is involved.
+
+#### 4. Offset-array invariant
+
+For `N` lines, the array contains exactly `N + 1` offsets:
+
+```text
+offsets[0]     start of line 0
+offsets[1]     start of line 1
+...
+offsets[N - 1] start of line N - 1
+offsets[N]     decompressed EOF sentinel
+```
+
+Therefore:
+
+```python
+line_count = len(offsets) - 1
+
+start = offsets[line_number]
+end = offsets[line_number + 1]
+length = end - start
+```
+
+The offsets are strictly increasing except that an index with no lines consists only of the EOF sentinel.
+
+Examples:
+
+| Content          | Offset array |
+| ---------------- | ------------ |
+| `b""`            | `[0]`        |
+| UTF-8 BOM only   | `[3]`        |
+| `b"abc"`         | `[0, 3]`     |
+| `b"abc\n"`       | `[0, 4]`     |
+| `b"\n"`          | `[0, 1]`     |
+| `b"\n\n"`        | `[0, 1, 2]`  |
+| `BOM + b"abc\n"` | `[3, 7]`     |
+
+The in-memory representation is:
+
+```python
+array("Q")
+```
+
+Offsets must fit both:
+
+* unsigned 64-bit storage;
+* SQLite’s signed 64-bit `INTEGER`.
+
+Therefore the package’s effective maximum decompressed offset is:
+
+```text
+2^63 − 1
+```
+
+That is not a practical limitation, but it should be explicit.
+
+#### 5. Scanner algorithm
+
+At a high level:
+
+1. Read enough initial bytes to determine whether the UTF-8 BOM is present.
+2. Set the first candidate line start to `0` or `3`.
+3. Read bounded byte blocks.
+4. Locate every LF using `bytes.find()`.
+5. When an LF completes a line, append that line’s starting offset.
+6. Set the next candidate start to the byte following the LF.
+7. At EOF, append the final start only if an unterminated line remains.
+8. Append the decompressed EOF offset as the sentinel.
+9. Return the array only after successful terminal archive validation.
+
+The scanner retains only:
+
+* the offset array;
+* the current input block;
+* a small BOM prefix;
+* integer position state.
+
+Memory is therefore approximately:
+
+```text
+8 × (line_count + 1) bytes
++ stream/decompressor buffers
+```
+
+#### 6. SQLite representation
+
+The requested index table remains:
+
+```sql
+CREATE TABLE line_index (
+    offset INTEGER PRIMARY KEY
+);
+```
+
+It contains line starts and the EOF sentinel.
+
+A separate singleton metadata table is necessary. Without it, SQLite cannot distinguish the EOF sentinel from an ordinary line start or validate that the index belongs to the current archive.
+
+Conceptual metadata:
+
+* schema/index format version;
+* line count;
+* decompressed size;
+* BOM length;
+* archive format;
+* selected member name;
+* source archive size;
+* source archive modification time;
+* binary companion filename or generation identity;
+* build-complete state if persistence is not performed atomically.
+
+The invariant is:
+
+```text
+COUNT(line_index) = line_count + 1
+MAX(line_index.offset) = decompressed_size
+```
+
+SQLite provides:
+
+* canonical structured persistence;
+* range queries by decompressed byte offset;
+* index metadata;
+* validation of the companion binary representation.
+
+It is not intended for efficient lookup by line ordinal because `offset`—not line number—is its primary key.
+
+#### 7. Raw binary representation
+
+The binary companion is headerless and contains exactly the same `N + 1` offsets:
+
+```text
+uint64 little-endian offset 0
+uint64 little-endian offset 1
+...
+uint64 little-endian EOF sentinel
+```
+
+Its required size is:
+
+```python
+(line_count + 1) * 8
+```
+
+The format is always little-endian. `array("Q")` is native-endian in memory, so persistence performs a byte swap on a big-endian system.
+
+For now, the binary file can be:
+
+* written from `array("Q")`;
+* read completely back into `array("Q")`;
+* consumed directly by another language.
+
+`mmap` is explicitly outside the current scope, but the selected format remains compatible with adding it later without changing the file.
+
+#### 8. Persistence authority
+
+SQLite should be the authoritative index representation. The raw file should be a derived binary representation that can be regenerated from either:
+
+```python
+array("Q")
+```
+
+during construction, or:
+
+```sql
+SELECT offset
+FROM line_index
+ORDER BY offset;
+```
+
+later.
+
+This avoids requiring an impossible cross-file transaction between SQLite and the filesystem.
+
+Persistence sequence:
+
+1. Build the complete array in memory.
+2. Reach successful stream EOF and archive validation.
+3. Write the raw binary file to a temporary path.
+4. Populate SQLite within a transaction.
+5. Commit the SQLite index and metadata.
+6. Atomically publish the completed raw file.
+7. Treat a missing or invalid raw file as a rebuildable condition, not corruption of the canonical SQLite index.
+
+At minimum, validate the raw companion by checking:
+
+* expected file size;
+* final value equals `decompressed_size`;
+* filename/generation metadata matches SQLite.
+
+A generation-specific binary filename referenced by SQLite would provide stronger crash consistency than continually replacing one fixed binary filename, but that can be settled in the persistence specification.
+
+#### 9. Failure semantics
+
+No index is published unless:
+
+* format detection succeeds;
+* archive structure is valid;
+* decompression succeeds;
+* size limits are respected;
+* scanning completes;
+* terminal integrity checks pass.
+
+Because construction is currently in memory, a failed build simply discards the `array("Q")`.
+
+Failures during persistence must leave:
+
+* the previous complete index intact, if one exists;
+* or no valid published index.
+
+Temporary database or binary files must never be mistaken for complete indexes.
+
+#### 10. Source identity and staleness
+
+The database needs enough information to determine whether it still corresponds to the archive.
+
+The baseline identity should be:
+
+* archive path or filename;
+* archive byte size;
+* modification time with nanosecond resolution;
+* member name;
+* declared member size, when available;
+* decompressed size after scanning.
+
+This is fast but not cryptographically certain. An archive or decompressed-content digest can be added later if strong content identity is required. Digesting decompressed bytes can be integrated into the scan without another decompression pass.
+
+#### 11. Remaining specification work
+
+The architecture itself is complete. The specification still needs exact decisions for:
+
+* public API and type names;
+* exception hierarchy;
+* default read-block and 7z queue sizes;
+* SQLite database and binary-file naming;
+* metadata table DDL;
+* whether rebuilding replaces or preserves an existing index;
+* exact source-staleness policy;
+* CLI scope, if any;
+* binary publication strategy: fixed filename or generation-specific filename.
+
+Those are interface and persistence-policy details rather than unresolved architectural structure.
