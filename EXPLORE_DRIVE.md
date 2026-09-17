@@ -1406,7 +1406,7 @@ On Windows, close all mappings before replacing or deleting the binary index fil
 ---
 ---
 
-### 📗 mmap
+### 📗 Architecture Summary 
 
 > [!NOTE] Prompt
 > 
@@ -1740,3 +1740,103 @@ The architecture itself is complete. The specification still needs exact decisio
 * binary publication strategy: fixed filename or generation-specific filename.
 
 Those are interface and persistence-policy details rather than unresolved architectural structure.
+
+---
+---
+
+### 📗 Architecture Refinement
+
+> [!NOTE] Prompt
+> Metadata/identity are out of scope.
+
+Understood. Remove all metadata and source-identity machinery from the architecture.
+
+The complete persisted index is only the ordered offsets, including the EOF sentinel.
+
+#### SQLite representation
+
+```sql
+CREATE TABLE line_index (
+    offset INTEGER PRIMARY KEY
+);
+```
+
+Because offsets are strictly increasing:
+
+* the final/highest offset is always the EOF sentinel;
+* `COUNT(*) - 1` is the line count;
+* rows ordered by `offset` reconstruct the `array("Q")`.
+
+```sql
+SELECT offset
+FROM line_index
+ORDER BY offset;
+```
+
+Examples:
+
+| Content       | SQLite offsets |
+| ------------- | -------------- |
+| Empty file    | `0`            |
+| BOM-only file | `3`            |
+| `abc`         | `0, 3`         |
+| `abc\n`       | `0, 4`         |
+| `\n\n`        | `0, 1, 2`      |
+
+No separate BOM value is needed. The first stored offset is the first line start, while the final stored offset is always EOF.
+
+#### Raw binary representation
+
+The companion file contains the identical sequence as headerless little-endian `uint64` values:
+
+```text
+offset[0]
+offset[1]
+...
+offset[N]  # EOF sentinel
+```
+
+The number of lines is:
+
+```python
+binary_file_size // 8 - 1
+```
+
+Structural validation requires only:
+
+```python
+file_size >= 8
+file_size % 8 == 0
+```
+
+Optionally, readers can also verify that offsets are strictly increasing.
+
+#### Persistence model
+
+Both formats are generated from the same completed in-memory `array("Q")`:
+
+```text
+decompressed stream
+        ↓
+LF scanner
+        ↓
+array("Q") with EOF sentinel
+        ├── SQLite rows
+        └── raw little-endian uint64 file
+```
+
+Neither representation is authoritative metadata for the other. The package does not determine whether either index belongs to a particular archive; selecting and associating the appropriate index files is the caller’s responsibility.
+
+This removes:
+
+* the metadata table;
+* archive fingerprints;
+* modification-time checks;
+* member identity;
+* generation identifiers;
+* stale-index detection;
+* stored BOM length;
+* stored line count and decompressed size.
+
+All required structural information is derivable directly from the offset sequence. The core architecture is now complete; what remains is API naming, error contracts, and persistence/overwrite policy.
+
