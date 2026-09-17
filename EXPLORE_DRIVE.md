@@ -1747,6 +1747,7 @@ Those are interface and persistence-policy details rather than unresolved archit
 ### 📗 Architecture Refinement
 
 > [!NOTE] Prompt
+> 
 > Metadata/identity are out of scope.
 
 Understood. Remove all metadata and source-identity machinery from the architecture.
@@ -1839,4 +1840,13 @@ This removes:
 * stored line count and decompressed size.
 
 All required structural information is derivable directly from the offset sequence. The core architecture is now complete; what remains is API naming, error contracts, and persistence/overwrite policy.
+
+---
+---
+
+### 📗 `docs/architecture.md`
+
+> [!NOTE] Prompt
+> 
+> Let's start with `docs/architecture.md`
 
