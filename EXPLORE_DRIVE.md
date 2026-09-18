@@ -1850,3 +1850,55 @@ All required structural information is derivable directly from the offset sequen
 > 
 > Let's start with `docs/architecture.md`
 
+---
+---
+
+### 📗 SPEC and PLAN Trees Raediness
+
+> [!NOTE] Prompt
+> 
+> Are you ready for SPEC and PLAN generation?
+
+Yes. The architecture and physical layout are sufficiently settled to generate the complete SPEC and PLAN trees.
+
+Remaining items are specification-level decisions, not architectural blockers:
+
+* Exact public function/class names and signatures.
+* Whether persistence is invoked separately or through convenience orchestration functions.
+* Destination replacement and failure behavior.
+* Buffer and queue defaults.
+* Detailed exception hierarchy.
+* Argument-validation rules.
+* Exact acceptance-test matrix.
+
+I can select conservative, coherent defaults for these, expose them clearly for review, and create:
+
+```text
+docs/dev/
+├── SPEC.md
+├── spec/
+│   ├── public-api.md
+│   ├── content-stream.md
+│   ├── archive-handling.md
+│   ├── line-index.md
+│   └── persistence.md
+├── PLAN.md
+├── plan/
+│   ├── plain-stream-index-mvp.md
+│   ├── archive-streams.md
+│   ├── index-persistence.md
+│   └── package-integration.md
+└── layout.md
+```
+
+The existing `docs/architecture.md` will be treated as design input; the generated SPEC tree will become the normative system definition.
+
+---
+---
+
+### 📗 SPEC and PLAN Trees
+
+> [!NOTE] Prompt
+> 
+> Select conservative, coherent defaults  and proceed
+
