@@ -63,12 +63,14 @@ archive-line-index/
     ├── fixtures/
     │   └── README.md
     ├── unit/
+    │   ├── test_errors.py
     │   ├── test_sources.py
     │   ├── test_formats.py
     │   ├── test_stream.py
     │   ├── test_offsets.py
     │   ├── test_scanner.py
     │   ├── backends/
+    │   │   ├── test_registry.py
     │   │   ├── test_plain.py
     │   │   ├── test_zip.py
     │   │   ├── test_tar.py
@@ -335,11 +337,12 @@ Marks the persistence package and may expose internal persistence protocols used
 
 Owns SQLite persistence of the complete offset sequence:
 
-- creation and validation of the `line_index` table;
-- transactional replacement or population;
+- creation and strict validation of the dedicated `line_index` database;
+- transactional population of a temporary sibling database;
 - insertion of line starts and the EOF sentinel;
 - reconstruction in ascending offset order;
-- SQLite-specific error handling and rollback.
+- atomic whole-file publication when replacement is authorized;
+- SQLite-specific error handling, rollback, and temporary-file cleanup.
 
 The canonical schema remains small enough to be defined beside its owning code; no separate SQL schema file is required unless the persistence specification later expands substantially.
 
@@ -383,20 +386,20 @@ flowchart TD
 
 The graph is intentionally acyclic. The following import constraints are normative for physical organization:
 
-| Location | May depend on | Must not depend on |
-| --- | --- | --- |
-| `errors.py` | Python standard library | Any project module |
-| `sources.py` | `errors.py` | Formats, backends, stream, scanner, persistence, API |
-| `formats.py` | Errors and source abstractions | Concrete backends, stream, scanner, persistence, API |
-| `backends/base.py` | Errors and minimal source types | Concrete backends, stream, scanner, persistence, API |
-| Concrete backends | Errors, sources, formats, backend base, their archive library | Stream, scanner, offsets, persistence, API |
-| `backends/registry.py` | Formats and concrete backends | Scanner, offsets, persistence, API |
-| `stream.py` | Errors and backend base | Detection, concrete backends, scanner, offsets, persistence, API |
-| `offsets.py` | Python standard library | Sources, formats, backends, stream, scanner, persistence, API |
-| `scanner.py` | Offsets and binary-I/O protocols | Sources, formats, backends, concrete stream, persistence, API |
-| Persistence adapters | Errors and offsets | Sources, formats, backends, stream, scanner, API |
-| `api.py` | All required lower-level components | Package `__init__.py` |
-| Package `__init__.py` | Public API and public errors | Backend and persistence implementation modules |
+| Location               | May depend on                                                 | Must not depend on                                               |
+| ---------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `errors.py`            | Python standard library                                       | Any project module                                               |
+| `sources.py`           | `errors.py`                                                   | Formats, backends, stream, scanner, persistence, API             |
+| `formats.py`           | Errors and source abstractions                                | Concrete backends, stream, scanner, persistence, API             |
+| `backends/base.py`     | Errors and minimal source types                               | Concrete backends, stream, scanner, persistence, API             |
+| Concrete backends      | Errors, sources, formats, backend base, their archive library | Stream, scanner, offsets, persistence, API                       |
+| `backends/registry.py` | Formats and concrete backends                                 | Scanner, offsets, persistence, API                               |
+| `stream.py`            | Errors and backend base                                       | Detection, concrete backends, scanner, offsets, persistence, API |
+| `offsets.py`           | Python standard library                                       | Sources, formats, backends, stream, scanner, persistence, API    |
+| `scanner.py`           | Offsets and binary-I/O protocols                              | Sources, formats, backends, concrete stream, persistence, API    |
+| Persistence adapters   | Errors and offsets                                            | Sources, formats, backends, stream, scanner, API                 |
+| `api.py`               | All required lower-level components                           | Package `__init__.py`                                            |
+| Package `__init__.py`  | Public API and public errors                                  | Backend and persistence implementation modules                   |
 
 When two modules appear to need one another, shared definitions must move to a lower-level owner such as `backends/base.py` or `offsets.py`; reciprocal imports are not permitted.
 
@@ -432,11 +435,13 @@ Unit tests correspond directly to production ownership:
 
 | Production owner        | Primary unit tests                |
 | ----------------------- | --------------------------------- |
+| `errors.py`             | `unit/test_errors.py`             |
 | `sources.py`            | `unit/test_sources.py`            |
 | `formats.py`            | `unit/test_formats.py`            |
 | `stream.py`             | `unit/test_stream.py`             |
 | `offsets.py`            | `unit/test_offsets.py`            |
 | `scanner.py`            | `unit/test_scanner.py`            |
+| `backends/registry.py`  | `unit/backends/test_registry.py`  |
 | `backends/plain.py`     | `unit/backends/test_plain.py`     |
 | `backends/zip.py`       | `unit/backends/test_zip.py`       |
 | `backends/tar.py`       | `unit/backends/test_tar.py`       |
@@ -462,15 +467,16 @@ Index outputs are runtime artifacts, not repository content. Callers may place t
 
 The relevant artifact classes are:
 
-| Artifact                                       | Ownership                                 | Repository status              |
-| ---------------------------------------------- | ----------------------------------------- | ------------------------------ |
-| SQLite database containing `line_index`        | Caller-selected destination               | Ignored                        |
-| Raw little-endian `uint64` offset file         | Caller-selected destination               | Ignored                        |
-| Temporary raw output                           | Raw persistence adapter until publication | Ignored and cleaned on failure |
-| Temporary SQLite journal/WAL files             | SQLite during persistence                 | Ignored                        |
-| Generated test archives and indexes            | Individual test via `tmp_path`            | Never committed                |
-| `build/`, `dist/`, and wheel metadata          | Packaging tools                           | Ignored                        |
-| `.pytest_cache/`, coverage data, HTML coverage | Test tools                                | Ignored                        |
+| Artifact                                       | Ownership                                    | Repository status              |
+| ---------------------------------------------- | -------------------------------------------- | ------------------------------ |
+| SQLite database containing `line_index`        | Caller-selected destination                  | Ignored                        |
+| Raw little-endian `uint64` offset file         | Caller-selected destination                  | Ignored                        |
+| Temporary raw output                           | Raw persistence adapter until publication    | Ignored and cleaned on failure |
+| Temporary SQLite index database                | SQLite persistence adapter until publication | Ignored and cleaned on failure |
+| Temporary SQLite journal/WAL files             | SQLite during persistence                    | Ignored                        |
+| Generated test archives and indexes            | Individual test via `tmp_path`               | Never committed                |
+| `build/`, `dist/`, and wheel metadata          | Packaging tools                              | Ignored                        |
+| `.pytest_cache/`, coverage data, HTML coverage | Test tools                                   | Ignored                        |
 
 The raw-file extension and database filename are not architectural identifiers. Examples such as `.u64` or `.sqlite3` may be used in documentation, but public operations accept explicit destinations unless a later specification adds a naming policy.
 
