@@ -27,8 +27,7 @@ The system shall support:
 - LF byte-line scanning without text decoding;
 - optional exclusion of an initial UTF-8 BOM from the first line;
 - an in-memory unsigned 64-bit offset array with an EOF sentinel;
-- dedicated SQLite index files containing `line_index(offset INTEGER PRIMARY
-  KEY)`;
+- dedicated SQLite index files containing `line_index(offset INTEGER PRIMARY KEY)`;
 - raw headerless little-endian `uint64` index files;
 - independent reading and writing of both persistence formats.
 
