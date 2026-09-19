@@ -2,11 +2,7 @@
 
 ## 1. Scope
 
-This node owns the complete intended repository tree, repository-root files,
-and genuinely repository-wide physical conventions. Documentation subtree
-ownership is defined in [docs.md](docs.md), production ownership in
-[src.md](src.md), test ownership in [tests.md](tests.md), and artifact and
-installed-distribution rules in [packaging-runtime.md](packaging-runtime.md).
+This node owns the complete repository tree, root files, and repository-wide physical conventions. Sibling nodes own documentation, source, tests, and packaging/runtime detail.
 
 ## 2. Complete repository layout
 
@@ -91,48 +87,30 @@ archive-line-index/
         └── test_resource_lifecycle.py
 ```
 
-The SPEC, PLAN, and LAYOUT trees may be decomposed further when a node becomes
-too broad, but new files must correspond to a meaningful architectural,
-implementation, or physical-ownership boundary. Production modules follow the
-same rule: a module is split only when it acquires multiple independently
-understandable responsibilities.
+The SPEC, PLAN, and LAYOUT trees may be decomposed further when a node becomes too broad, but new files must correspond to a meaningful architectural, implementation, or physical-ownership boundary. Production modules follow the same rule: a module is split only when it acquires multiple independently understandable responsibilities.
 
 ## 3. Repository-root files
 
 ### `pyproject.toml`
 
-Owns build-system configuration, distribution metadata, the minimum supported
-Python version, runtime and development dependencies, package discovery, and
-tool configuration.
+Owns build-system configuration, distribution metadata, the minimum supported Python version, runtime and development dependencies, package discovery, and tool configuration.
 
-The distribution name is hyphenated for packaging, while the import package
-uses underscores:
+The distribution name is hyphenated for packaging, while the import package uses underscores:
 
 ```text
 distribution: archive-line-index
 import:       archive_line_index
 ```
 
-The project uses a `src` layout. Test execution must therefore exercise the
-installed package or an equivalent editable installation rather than relying
-on the repository root accidentally appearing on `sys.path`.
+The project uses a `src` layout. Test execution must therefore exercise the installed package or an equivalent editable installation rather than relying on the repository root accidentally appearing on `sys.path`.
 
-`py7zr` is the only required third-party runtime dependency unless the
-specification is deliberately expanded. ZIP, TAR, SQLite, binary arrays,
-threading, queues, and codecs used for fixed binary serialization come from the
-Python standard library.
+`py7zr` is the only required third-party runtime dependency unless the specification is deliberately expanded. ZIP, TAR, SQLite, binary arrays, threading, queues, and codecs used for fixed binary serialization come from the Python standard library.
 
-Tool settings that apply to the entire repository belong here when supported
-by the tool, including pytest discovery and optional coverage, formatting, or
-static-analysis configuration. Tool-specific standalone files should be added
-only when `pyproject.toml` cannot express the required configuration clearly.
+Tool settings that apply to the entire repository belong here when supported by the tool, including pytest discovery and optional coverage, formatting, or static-analysis configuration. Tool-specific standalone files should be added only when `pyproject.toml` cannot express the required configuration clearly.
 
 ### `README.md`
 
-Provides the user-facing package overview, installation instructions, short
-examples, supported input formats, and links into the detailed development
-documentation. It does not duplicate the normative behavioral detail in the
-SPEC tree.
+Provides the user-facing package overview, installation instructions, short examples, supported input formats, and links into the detailed development documentation. It does not duplicate the normative behavioral detail in the SPEC tree.
 
 ### `LICENSE`
 
@@ -140,7 +118,4 @@ Contains the project license and has no runtime role.
 
 ### `.gitignore`
 
-Excludes build output, virtual environments, test caches, coverage output,
-editor state, generated archives, temporary persistence files, and local index
-databases or raw offset files. It must not ignore source fixtures intentionally
-kept under `tests/fixtures/`.
+Excludes build output, virtual environments, test caches, coverage output, editor state, generated archives, temporary persistence files, and local index databases or raw offset files. It must not ignore source fixtures intentionally kept under `tests/fixtures/`.
