@@ -1,5 +1,7 @@
 ---
-url: https://chatgpt.com/c/6aabc504-9a74-83ed-865c-b336f49811f8
+urls:
+  - https://chatgpt.com/c/6aabc504-9a74-83ed-865c-b336f49811f8
+  - https://chatgpt.com/c/6aae4e2c-90b0-83eb-b73e-38f96f57f349
 ---
 
 ## 📗 Prior Art
@@ -1853,7 +1855,7 @@ All required structural information is derivable directly from the offset sequen
 ---
 ---
 
-### 📗 SPEC and PLAN Trees Raediness
+## 📗 SPEC and PLAN Trees Raediness
 
 > [!NOTE] Prompt
 > 
@@ -1896,9 +1898,449 @@ The existing `docs/architecture.md` will be treated as design input; the generat
 ---
 ---
 
-### 📗 SPEC and PLAN Trees
+## 📗 SPEC and PLAN Trees
 
 > [!NOTE] Prompt
 > 
 > Select conservative, coherent defaults  and proceed
 
+---
+---
+
+## 📗 Layout Refactor
+
+> [!NOTE] Prompt
+> 
+> layout.md needs splitting. I do not want to drop any info, but I want to optimize its organization for better AI context use.
+> 
+> I have this section stats
+> 
+> |Bytes Heading| |
+> |---|---|
+> |802|1. Purpose and authority|
+> |2,709|2. Repository layout|
+> |1,787|3. Repository-root files|
+> |3,844|4. Development-document tree|
+> |4,524|5. Production package|
+> |2,538|6. Archive backends|
+> |1,518|7. Persistence package|
+> |2,298|8. Dependency rules|
+> |3,792|9. Test organization|
+> |1,842|10. Generated and runtime artifacts|
+> |878|11. Packaging and installed behavior|
+> |1,114|12. Change rules|
+> 
+> Propose split aligned with architecture/SPEC/PLAN/implementation
+
+I would split `layout.md` into a compact root plus **four children**. That gives a good balance between architectural coherence and AI context locality without fragmenting the layout tree too aggressively.
+
+The key principle is to split by **physical ownership domain**, not by current heading size alone. In particular, I would avoid making separate documents for every existing section such as “generated artifacts” or “packaging”; those subjects are too tightly coupled to broader repository/package ownership.
+
+### Recommended tree
+
+```text
+docs/dev/
+├── layout.md
+└── layout/
+    ├── repository.md
+    ├── production.md
+    ├── tests.md
+    └── packaging-runtime.md
+```
+
+I would distribute the current content as follows:
+
+| Current section                      | Destination                   | Rationale                                                                  |
+| ------------------------------------ | ----------------------------- | -------------------------------------------------------------------------- |
+| 1. Purpose and authority             | `layout.md`                   | Governs the entire layout tree                                             |
+| 2. Repository layout                 | `layout.md`                   | Root physical map and navigation entry point                               |
+| 3. Repository-root files             | `layout/repository.md`        | Repository-level ownership                                                 |
+| 4. Development-document tree         | `layout/repository.md`        | Repository documentation structure; closely tied to SPEC/PLAN organization |
+| 5. Production package                | `layout/production.md`        | Core implementation-module ownership                                       |
+| 6. Archive backends                  | `layout/production.md`        | Subtree of the production architecture                                     |
+| 7. Persistence package               | `layout/production.md`        | Subtree of the production architecture                                     |
+| 8. Dependency rules                  | `layout/production.md`        | Defines allowed dependency direction among those production modules        |
+| 9. Test organization                 | `layout/tests.md`             | Cohesive independent test-tree ownership                                   |
+| 10. Generated and runtime artifacts  | `layout/packaging-runtime.md` | Runtime/repository boundary                                                |
+| 11. Packaging and installed behavior | `layout/packaging-runtime.md` | Distribution/runtime installation boundary                                 |
+| 12. Change rules                     | `layout.md`                   | Governs evolution of the complete layout tree                              |
+
+That would reduce the current roughly 27 KB monolith into context units roughly like this:
+
+```text
+layout.md
+    purpose / authority
+    complete tree
+    child scope map
+    cross-tree relationships
+    change rules
+
+layout/repository.md
+    repository-root files
+    development-document tree
+
+layout/production.md
+    production package
+    archive backends
+    persistence package
+    dependency graph and import rules
+
+layout/tests.md
+    complete test organization
+
+layout/packaging-runtime.md
+    generated/runtime artifacts
+    packaging and installed behavior
+```
+
+#### Why this split aligns well with the SPEC architecture
+
+The strongest natural boundary is `production.md`.
+
+Your SPEC already decomposes the implementation into:
+
+```text
+public API
+content stream
+archive handling
+line index
+persistence
+```
+
+Those conceptual components map physically to:
+
+```text
+api.py
+sources.py / formats.py / stream.py
+backends/*
+offsets.py / scanner.py
+persistence/*
+```
+
+The present sections 5–8 collectively describe that mapping. Keeping them together means a coding agent working on production architecture can load **one layout child** and get:
+
+* every production module's canonical responsibility;
+* backend and persistence package boundaries;
+* the complete dependency DAG;
+* normative import restrictions.
+
+That is much better than separating `backends.md`, `persistence.md`, and `dependencies.md`. Such a split would force agents doing ordinary production work to load several layout files and would duplicate context already decomposed semantically by the SPEC tree.
+
+In other words:
+
+```text
+SPEC tree
+    decomposes behavioral/architectural contracts
+
+layout/production.md
+    maps that architecture onto implementation files
+```
+
+They should be complementary rather than structurally identical.
+
+#### `repository.md` is also a coherent boundary
+
+Current sections 3 and 4 belong together.
+
+They answer essentially one question:
+
+> What does each important non-production location in the repository own?
+
+That includes:
+
+```text
+pyproject.toml
+README.md
+LICENSE
+.gitignore
+docs/dev/SPEC.md
+docs/dev/spec/*
+docs/dev/PLAN.md
+docs/dev/plan/*
+docs/dev/layout.md
+```
+
+This is also where the correspondence among SPEC, PLAN, and physical documentation layout belongs.
+
+I would probably rename the existing section concept from **Repository-root files** to something slightly broader, because this child now also owns `docs/dev`:
+
+```markdown
+# Repository organization
+
+## Repository-root files
+...
+
+## Development documentation
+...
+```
+
+#### `tests.md` should stand alone
+
+At ~3.8 KB already, section 9 has a very clean responsibility and is likely to grow.
+
+More importantly, it is useful context independently of production internals. A coding agent modifying tests needs:
+
+* test-tree conventions;
+* helper ownership;
+* fixture policy;
+* production-to-unit-test mapping;
+* integration-test responsibilities.
+
+It normally does **not** need the detailed ownership prose for every backend or persistence implementation.
+
+That makes this an especially useful context boundary.
+
+#### Why combine artifacts and packaging
+
+I would not create:
+
+```text
+layout/artifacts.md
+layout/packaging.md
+```
+
+at their current sizes.
+
+Sections 10 and 11 together define the boundary between the source repository and things produced or consumed outside the source tree:
+
+* runtime index files;
+* temporary persistence files;
+* generated test data;
+* build outputs;
+* wheel contents;
+* installed-package behavior;
+* absence of a CLI;
+* isolation from repository-local paths.
+
+Conceptually that is one domain:
+
+```text
+source tree → build/install/runtime artifacts
+```
+
+So something like `packaging-runtime.md` is cohesive.
+
+If this later grows significantly, it can itself become an overview:
+
+```text
+layout/
+├── packaging-runtime.md
+└── packaging-runtime/
+    ├── packaging.md
+    └── artifacts.md
+```
+
+That follows your governing recursive-decomposition rule rather than prematurely creating tiny leaf files. 
+
+### What I would keep in `layout.md`
+
+The root should remain a genuine compact architectural entry point rather than a TOC.
+
+I would structure it approximately as:
+
+```
+# Project layout
+
+## 1. Purpose and authority
+
+## 2. Repository overview
+    complete repository tree
+
+## 3. Layout decomposition
+
+### Repository organization
+    → layout/repository.md
+
+### Production implementation
+    → layout/production.md
+
+### Test organization
+    → layout/tests.md
+
+### Packaging and runtime artifacts
+    → layout/packaging-runtime.md
+
+## 4. Cross-tree mapping
+    concise mapping of:
+    SPEC responsibility
+        ↓
+    production ownership
+        ↓
+    tests
+        ↓
+    PLAN implementation phase
+
+## 5. Global physical invariants
+    src layout
+    tests are not package
+    no circular dependencies
+    generated artifacts not source
+    docs/dev authoritative tree
+    etc.
+
+## 6. Change rules
+```
+
+The important addition is **Cross-tree mapping**.
+
+That would make the root considerably more useful to an AI agent than simply retaining the giant repository tree plus links.
+
+For example:
+
+| Architectural area | SPEC                       | Production layout                    | Tests                                            | Principal PLAN phase            |
+| ------------------ | -------------------------- | ------------------------------------ | ------------------------------------------------ | ------------------------------- |
+| Public composition | `spec/public-api.md`       | `api.py`, `__init__.py`, `errors.py` | integration + focused units                      | MVP / persistence / integration |
+| Sequential stream  | `spec/content-stream.md`   | `sources.py`, `stream.py`            | source/stream units + content-stream integration | MVP                             |
+| Archive handling   | `spec/archive-handling.md` | `formats.py`, `backends/`            | backend units + stream integration               | archive streams                 |
+| Line indexing      | `spec/line-index.md`       | `offsets.py`, `scanner.py`           | offset/scanner units + index integration         | MVP                             |
+| Persistence        | `spec/persistence.md`      | `persistence/`                       | persistence units + equivalence integration      | index persistence               |
+
+This should remain **mapping only**, not restate the contracts. It gives an agent an immediate routing table for which documents need loading.
+
+That is precisely the kind of information that belongs in the parent node under your governing strategy: child scopes, relationships, dependency context, and canonical ownership. 
+
+### I would not split it according to PLAN phases
+
+A tempting alternative would be something like:
+
+```text
+layout/plain-stream-index.md
+layout/archive-streams.md
+layout/persistence.md
+layout/package-integration.md
+```
+
+I would avoid that.
+
+PLAN phases describe **construction order**. Physical layout describes **final ownership**. For example, `api.py` participates in several phases, and test infrastructure cuts across the plan phases. Making layout follow the PLAN would introduce precisely the ownership ambiguity your governing document warns against.
+
+Similarly, I would not make the layout tree identical to the SPEC tree:
+
+```text
+layout/public-api.md
+layout/content-stream.md
+layout/archive-handling.md
+...
+```
+
+That would cause the physical layout documentation to shadow the behavioral specification too closely and increase duplication.
+
+The three decompositions should deliberately answer different questions:
+
+```text
+SPEC
+    What components/contracts constitute the final system?
+
+PLAN
+    In what functionality slices is the system built?
+
+LAYOUT
+    Where do implementation, tests, docs, and artifacts physically live?
+```
+
+### Suggested final organization
+
+My preferred result is therefore:
+
+```text
+docs/dev/
+├── SPEC.md
+├── spec/
+│   ├── public-api.md
+│   ├── content-stream.md
+│   ├── archive-handling.md
+│   ├── line-index.md
+│   └── persistence.md
+│
+├── PLAN.md
+├── plan/
+│   ├── plain-stream-index-mvp.md
+│   ├── archive-streams.md
+│   ├── index-persistence.md
+│   └── package-integration.md
+│
+├── layout.md
+└── layout/
+    ├── repository.md
+    ├── production.md
+    ├── tests.md
+    └── packaging-runtime.md
+```
+
+This is coarse enough that an AI agent will usually need only **one relevant layout child**, while `layout.md` remains sufficient to determine which child is relevant.
+
+I would also preserve **all existing normative prose**, moving rather than summarizing it. The only substantive rewriting needed during the split should be parent/child boundary prose, links, and removal of now-redundant phrases such as "`layout.md` is this file." The actual ownership constraints, module descriptions, tables, artifact policies, packaging rules, and change rules should remain intact. 
+
+---
+---
+
+### 📗 Layout Refactor Cont
+
+> [!NOTE] Prompt
+> 
+> That's fine, except docs/src/tests probably should not be mixed?
+
+Yes. I would separate them. Mixing `docs/`, `src/`, and `tests/` under one `repository.md` weakens the physical-ownership model.
+
+A cleaner split is:
+
+```text
+docs/dev/
+├── layout.md
+└── layout/
+    ├── repository.md
+    ├── docs.md
+    ├── src.md
+    ├── tests.md
+    └── packaging-runtime.md
+```
+
+with ownership like this:
+
+| File                          | Owns                                                                                          |
+| ----------------------------- | --------------------------------------------------------------------------------------------- |
+| `layout.md`                   | purpose/authority, top-level repo tree, child scope map, cross-tree invariants, change rules  |
+| `layout/repository.md`        | repository-root files and repository-wide conventions only                                    |
+| `layout/docs.md`              | `docs/dev/`, SPEC tree, PLAN tree, layout tree, documentation ownership and relationships     |
+| `layout/src.md`               | `src/archive_line_index/`, production modules, backends, persistence, import/dependency rules |
+| `layout/tests.md`             | `tests/`, helpers, fixtures, unit/integration organization, production-to-test mapping        |
+| `layout/packaging-runtime.md` | generated/runtime artifacts, packaging, installed behavior                                    |
+
+That maps your current sections approximately as:
+
+```text
+1  Purpose and authority             → layout.md
+2  Repository layout                 → layout.md
+3  Repository-root files             → layout/repository.md
+4  Development-document tree         → layout/docs.md
+5  Production package                → layout/src.md
+6  Archive backends                  → layout/src.md
+7  Persistence package               → layout/src.md
+8  Dependency rules                  → layout/src.md
+9  Test organization                 → layout/tests.md
+10 Generated and runtime artifacts   → layout/packaging-runtime.md
+11 Packaging and installed behavior  → layout/packaging-runtime.md
+12 Change rules                      → layout.md
+```
+
+I prefer `src.md` over `production.md` here because the layout documentation is explicitly about **physical organization**. `src.md`, `tests.md`, and `docs.md` then correspond directly to the three major repository subtrees and are immediately obvious to an agent deciding what context to load.
+
+The resulting conceptual separation is strong:
+
+```text
+layout/docs.md
+    documentation architecture and canonical ownership
+
+layout/src.md
+    production implementation structure and dependency DAG
+
+layout/tests.md
+    verification structure
+
+layout/packaging-runtime.md
+    artifacts beyond the authored source/test/doc trees
+```
+
+`repository.md` should stay small: root-level files such as `pyproject.toml`, `README.md`, `.gitignore`, and `LICENSE`, plus any genuinely repository-wide physical conventions. It should not become a catch-all for everything outside `src/`.
+
+This is more consistent with the governing rule that decomposition should follow meaningful ownership boundaries, while keeping `layout.md` as the compact parent that defines those children and their relationships. 
