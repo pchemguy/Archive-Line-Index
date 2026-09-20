@@ -55,7 +55,7 @@ exclude = [
 packages = ["src/archive_line_index"]
 
 [tool.pytest]
-addopts = ["-ra", "-q", "--strict-markers"]
+addopts = ["-ra", "-q", "--strict-config", "--strict-markers"]
 pythonpath = ["src"]
 testpaths = ["tests"]
 asyncio_mode = "strict"

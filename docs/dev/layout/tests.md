@@ -32,21 +32,22 @@ Contains only small immutable files that are impractical or unreliable to genera
 
 Unit tests correspond directly to production ownership:
 
-| Production owner        | Primary unit tests                |
-| ----------------------- | --------------------------------- |
-| `errors.py`             | `unit/test_errors.py`             |
-| `sources.py`            | `unit/test_sources.py`            |
-| `formats.py`            | `unit/test_formats.py`            |
-| `stream.py`             | `unit/test_stream.py`             |
-| `offsets.py`            | `unit/test_offsets.py`            |
-| `scanner.py`            | `unit/test_scanner.py`            |
-| `backends/registry.py`  | `unit/backends/test_registry.py`  |
-| `backends/plain.py`     | `unit/backends/test_plain.py`     |
-| `backends/zip.py`       | `unit/backends/test_zip.py`       |
-| `backends/tar.py`       | `unit/backends/test_tar.py`       |
-| `backends/sevenzip.py`  | `unit/backends/test_sevenzip.py`  |
-| `persistence/sqlite.py` | `unit/persistence/test_sqlite.py` |
-| `persistence/raw.py`    | `unit/persistence/test_raw.py`    |
+| Production owner                     | Primary unit tests                |
+| ------------------------------------ | --------------------------------- |
+| Package discovery and initialization | `unit/test_package.py`            |
+| `errors.py`                          | `unit/test_errors.py`             |
+| `sources.py`                         | `unit/test_sources.py`            |
+| `formats.py`                         | `unit/test_formats.py`            |
+| `stream.py`                          | `unit/test_stream.py`             |
+| `offsets.py`                         | `unit/test_offsets.py`            |
+| `scanner.py`                         | `unit/test_scanner.py`            |
+| `backends/registry.py`               | `unit/backends/test_registry.py`  |
+| `backends/plain.py`                  | `unit/backends/test_plain.py`     |
+| `backends/zip.py`                    | `unit/backends/test_zip.py`       |
+| `backends/tar.py`                    | `unit/backends/test_tar.py`       |
+| `backends/sevenzip.py`               | `unit/backends/test_sevenzip.py`  |
+| `persistence/sqlite.py`              | `unit/persistence/test_sqlite.py` |
+| `persistence/raw.py`                 | `unit/persistence/test_raw.py`    |
 
 `api.py` is intentionally thin; its meaningful behavior is verified primarily through integration tests. A focused unit test file may be added if it acquires nontrivial argument-validation or cleanup branches, but API composition should not be mocked into a duplicate implementation.
 

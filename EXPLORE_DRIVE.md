@@ -2344,3 +2344,170 @@ layout/packaging-runtime.md
 `repository.md` should stay small: root-level files such as `pyproject.toml`, `README.md`, `.gitignore`, and `LICENSE`, plus any genuinely repository-wide physical conventions. It should not become a catch-all for everything outside `src/`.
 
 This is more consistent with the governing rule that decomposition should follow meaningful ownership boundaries, while keeping `layout.md` as the compact parent that defines those children and their relationships. 
+
+---
+---
+
+## 📗 Implementation
+
+> [!NOTE] Prompt
+> 
+> Proceed to complete implementation according to the following Implementation and Recovery Protocol.
+
+---
+---
+
+### 📗 Progress Update
+
+> [!NOTE] Prompt
+> 
+> Give me implementation progress update
+
+Implementation is in progress.
+
+* Completed: 10 of 11 Plain Stream/Index MVP tasks.
+* Overall PLAN: 10 of 36 tasks completed.
+* Verified components:
+    * package/test baseline
+    * public exceptions
+    * source ownership and prefix replay
+    * format detection
+    * backend reader contract
+    * plain backend
+    * MVP backend dispatch
+    * `ContentStream`
+    * `array("Q")` offset representation
+    * byte-line scanner
+* Latest scanner verification: 174 tests passed.
+* No Git repository is present, so completion is recorded in `IMPLEMENTATION_LOG.jsonl` rather than commits.
+
+Current task: compose the MVP public API and integration tests. It is at `STARTED`, not yet `PREPARED`; its manifest and `__init__.py` backup exist, but none of its declared targets have been modified. Recovery can therefore restart this task safely.
+
+After the MVP task and phase verification, remaining phases are:
+
+* Archive streams: 11 tasks
+* Index persistence: 7 tasks
+* Package integration: 7 tasks
+
+---
+---
+
+### 📗 MVP
+
+> [!NOTE] Prompt
+> 
+> Resume implementation  
+> Break as soon as MVP is complete and return updated source archive before proceeding further
+
+Understood. I’ll stop at the plain-stream/index MVP boundary—after this final API task and its full phase verification—and won’t start archive-backend or persistence phases. I’ll then package the complete updated repository as a downloadable archive. I’m using the Library workflow only to preserve that requested archive once verification passes.
+
+The MVP behavior is now implemented and the full in-repository suite is green: 293 tests pass. I’m at the phase-verification gate now—wheel/install smoke, installed public imports, large-input bounded-memory check, and archive-signature rejection. I’ll stop once these pass and the transaction is durably closed.
+
+The MVP boundary is complete and closed: the final verification rerun is 293/293 passing, the installed-wheel smoke passed, and the 16 MiB long-line scan peaked at about 262 KiB of traced memory. I have not started the archive-stream phase. I’m now creating and validating the requested source archive from this exact MVP state.
+
+MVP implementation is complete. Work stopped before archive backends and persistence.
+
+* Plain read-only sequential `ContentStream`
+* `array("Q")` line-offset index with EOF sentinel
+* UTF-8 BOM handling
+* Public composition API
+* Size limits and ownership/cleanup behavior
+* 293 tests passing
+* Wheel build and clean-install smoke passed
+* 16 MiB long-line scan peak traced memory: 268,148 bytes
+* Archive signatures currently reject as unsupported, as intended for MVP
+
+SHA-256: `86270db11770e0fecab301557a8f099d2908c227e5c0b89fbee89f6ace04d814`
+
+---
+---
+
+### 📗 Remaining Work
+
+> [!NOTE] Prompt
+> 
+> How may phases/milestones are/can be defined for the rest of the process?
+
+There are **3 remaining top-level phases**, containing **25 implementation tasks**. The current phase structure is already coherent and does not need further top-level splitting.
+
+| Remaining phase     |  Tasks | Suggested milestones |
+| ------------------- | -----: | -------------------: |
+| Archive streams     |     11 |                    5 |
+| Index persistence   |      7 |                    4 |
+| Package integration |      7 |                    3 |
+| **Total**           | **25** |               **12** |
+
+#### Recommended milestone structure
+
+##### Phase 2: Archive streams
+
+1. **Archive test foundation**
+    * Shared generated archive fixtures and failure cases.
+2. **ZIP support**
+    * ZIP streaming backend.
+    * Registry/public API integration.
+    * ZIP stream and index verification.
+3. **TAR support**
+    * Seekable TAR handling.
+    * Non-seekable streaming TAR completion.
+    * Registry/public API integration.
+    * TAR, TGZ, TBZ, and related filter verification.
+4. **7z support**
+    * Bounded queue protocol.
+    * `py7zr` extraction destination.
+    * Inspection and public error translation.
+    * Registry/public API integration.
+5. **Archive lifecycle certification**
+    * Cross-format cleanup, early close, failure, ownership, integrity, and thread-lifecycle tests.
+    * Full archive-phase verification.
+
+##### Phase 3: Index persistence
+
+6. **Persistence validation foundation**
+    * Finalize offset validation shared by both formats.
+7. **SQLite persistence**
+    * Atomic writing.
+    * Strict reading and validation.
+    * Existing-destination protection.
+8. **Raw `uint64` persistence**
+    * Headerless little-endian writing.
+    * Strict reading, alignment checks, and validation.
+    * Atomic publication.
+9. **Persistence API integration**
+    * Public exports.
+    * SQLite/raw equivalence.
+    * Persistence of indexes produced from every supported source format.
+    * Full persistence-phase verification.
+
+##### Phase 4: Package integration
+
+10. **Distribution surface**
+     * Final exports.
+     * `py7zr` dependency constraints.
+     * Build metadata.
+     * User README and examples.
+11. **Operational hardening**
+     * Large-input and backpressure verification.
+     * Cross-platform filesystem and cleanup behavior.
+12. **Release acceptance**
+     * Wheel and source-distribution builds.
+     * Clean installed-package workflows.
+     * Plain, ZIP, TAR, 7z, SQLite, and raw end-to-end tests.
+     * Documentation reconciliation and complete SPEC acceptance review.
+
+So the useful hierarchy is:
+
+* **3 phases** — major architectural capabilities.
+* **12 milestones** — meaningful stopping/review points.
+* **25 task transactions** — the individually backed-up, tested, logged units required by the implementation protocol.
+
+The next natural stopping point would be **Milestone 2: ZIP support**, rather than waiting for the entire archive phase.
+
+---
+---
+
+### 📗 Implement Phase 2: Archive streams 
+
+> [!NOTE] Prompt
+> 
+> Implement the next phase
