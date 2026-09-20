@@ -2511,3 +2511,41 @@ The next natural stopping point would be **Milestone 2: ZIP support**, rather th
 > [!NOTE] Prompt
 > 
 > Implement the next phase
+
+The **Archive streams phase is complete**. Persistence has not been started.
+
+Implemented:
+
+* ZIP streaming and validation
+* Seekable and non-seekable TAR streaming
+* gzip, bzip2, and xz TAR variants
+* 7z streaming through a bounded one-slot queue
+* Encryption, structure, corruption, and truncation errors
+* Caller/source ownership and deterministic cleanup
+* Cross-format byte and line-index equivalence
+* `py7zr>=1.1,<1.2` dependency constraint
+
+Verification:
+
+* **502 tests passed**
+* Lifecycle suite passed five consecutive runs
+* Clean wheel installation and plain/ZIP/TAR/7z workflows passed
+* 32 MiB 7z bounded-read test passed without extraction artifacts
+* Package-retained traced memory after close: approximately 759 KiB
+* `py7zr` may temporarily supply a large dependency-owned callback buffer; the package subdivides it into queue blocks of at most 1 MiB
+
+SHA-256: `c1664911edf28b1adf8122765498b53495f80666731daace76565ce8ac9e3329`
+
+---
+---
+
+### 📗 Revise Phase 2: Archive streams 
+
+> [!NOTE] Prompt
+> 
+
+* Encryption, structure, corruption, and truncation errors
+
+```
+Seekable TAR support is complete across seven suffix/compression forms, with 87 focused tests passing. I’m now adding true non-seekable TAR streaming, where the accepted member may be delivered before trailing headers are known and terminal EOF is withheld until those headers validate.
+```
