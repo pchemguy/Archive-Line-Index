@@ -2,7 +2,7 @@
 
 ## 1. Purpose and authority
 
-This is the compact root of the Archive Line Index LAYOUT tree. The tree is the canonical map of physical project organization: locations, ownership boundaries, import constraints, tests, and artifacts. SPEC owns behavior and contracts; PLAN owns construction order; LAYOUT maps both onto the repository.
+This is the compact root of the Archive Line Index LAYOUT tree. The tree is the canonical map of physical project organization: locations, ownership boundaries, import constraints, tests, and artifacts. SPEC owns behavior and contracts; PLAN owns construction order; ROADMAP projects durable PLAN progress; LAYOUT maps these views onto the repository.
 
 If an implementation does not fit cleanly, reconsider the architecture and LAYOUT rather than introduce circular imports or duplicate logic.
 
@@ -11,7 +11,7 @@ If an implementation does not fit cleanly, reconsider the architecture and LAYOU
 ```text
 archive-line-index/
 ├── repository-root files
-├── docs/dev/{SPEC.md,spec/,PLAN.md,plan/,layout.md,layout/}
+├── docs/dev/{SPEC.md,spec/,PLAN.md,plan/,ROADMAP.md,layout.md,layout/}
 ├── src/archive_line_index/
 └── tests/{helpers/,fixtures/,unit/,integration/}
 ```
@@ -20,14 +20,14 @@ The complete tree is defined in [layout/repository.md](layout/repository.md).
 
 ## 3. LAYOUT decomposition
 
-| Node                                                | Canonical responsibility                                                                   |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| This root                                           | Authority, high-level map, routing, global invariants, and change rules                    |
-| [repository.md](layout/repository.md)               | Complete tree, root files, package naming, `src` layout, and repository-wide configuration |
-| [docs.md](layout/docs.md)                           | Documentation locations and SPEC/PLAN/LAYOUT ownership                                     |
-| [src.md](layout/src.md)                             | Production packages, modules, backends, persistence, and imports                           |
-| [tests.md](layout/tests.md)                         | Test locations, infrastructure, fixtures, and production-to-test mapping                   |
-| [packaging-runtime.md](layout/packaging-runtime.md) | Runtime/generated artifacts, distributions, installed behavior, and CLI absence            |
+| Node | Canonical responsibility |
+| --- | --- |
+| This root | Authority, high-level map, routing, global invariants, and change rules |
+| [repository.md](layout/repository.md) | Complete tree, root files, package naming, `src` layout, and repository-wide configuration |
+| [docs.md](layout/docs.md) | Documentation locations and SPEC/PLAN/LAYOUT ownership |
+| [src.md](layout/src.md) | Production packages, modules, backends, persistence, and imports |
+| [tests.md](layout/tests.md) | Test locations, infrastructure, fixtures, and production-to-test mapping |
+| [packaging-runtime.md](layout/packaging-runtime.md) | Runtime/generated artifacts, distributions, installed behavior, and CLI absence |
 
 For an ordinary change, load this root and the child owning the affected location. These boundaries follow physical ownership; they do not mirror SPEC components or PLAN phases.
 
@@ -43,6 +43,8 @@ For an ordinary change, load this root and the child owning the affected locatio
 | Packaging       | [system acceptance](SPEC.md#11-system-acceptance-conditions) | [repository](layout/repository.md), [packaging/runtime](layout/packaging-runtime.md) | installed workflows                     | integration                             |
 
 PLAN phase links and order are canonical in [PLAN.md](PLAN.md). This table is only a routing map; detailed behavior, sequencing, and physical ownership stay in their respective trees.
+
+[ROADMAP.md](ROADMAP.md) is the PLAN-derived durable progress view. It owns no behavior, implementation order, or physical-layout requirement.
 
 ## 5. Global physical invariants
 

@@ -16,7 +16,7 @@ This phase completes project-wide requirements from:
 - [../spec/archive-handling.md](../spec/archive-handling.md);
 - [../spec/line-index.md](../spec/line-index.md);
 - [../spec/persistence.md](../spec/persistence.md);
-- [../layout.md](../layout.md).
+- [../layout.md](../layout.md) and its focused LAYOUT children.
 
 ## 3. Prerequisites
 
@@ -26,7 +26,9 @@ This phase completes project-wide requirements from:
 
 ## 4. Ordered implementation tasks
 
-### Task: finalize package exports
+### Milestone: distribution surface
+
+#### Task: finalize package exports
 
 Review `src/archive_line_index/__init__.py` against `spec/public-api.md`. Export exactly the supported aliases, constants, class, functions, and exception hierarchy.
 
@@ -39,7 +41,7 @@ Add an installed/import-surface test that:
 
 Run import-surface tests plus the full unit suite.
 
-### Task: finalize dependency and build metadata
+#### Task: finalize dependency and build metadata
 
 Update `pyproject.toml` with complete distribution metadata, Python classifiers, platform-independent wheel settings, package discovery, license/readme inclusion, test extras, and the tested lower/upper `py7zr` bounds.
 
@@ -47,7 +49,7 @@ Verify the chosen dependency range by running the archive suite against the olde
 
 Build source and wheel artifacts, inspect their contents, and install each into a clean environment outside the repository.
 
-### Task: write the user README
+#### Task: write the user README
 
 Create or complete `README.md` using the stable public API.
 
@@ -65,7 +67,9 @@ Include:
 
 Run every code example as a documentation test or equivalent executable smoke test against the installed wheel.
 
-### Task: complete large-input and backpressure verification
+### Milestone: operational verification
+
+#### Task: complete large-input and backpressure verification
 
 Add slow/integration tests or test markers for:
 
@@ -81,7 +85,7 @@ Measure process memory with a robust platform-appropriate technique where availa
 
 Run slow tests separately, then the normal full suite.
 
-### Task: complete cross-platform filesystem verification
+#### Task: complete cross-platform filesystem verification
 
 Exercise path, temporary-sibling, atomic replacement, open-file, and cleanup behavior on Windows, Linux, and macOS environments available to the project.
 
@@ -97,7 +101,7 @@ Pay particular attention to:
 
 Keep platform-specific assertions conditional only when the operating-system contract genuinely differs; do not skip portable behavior.
 
-### Task: run installed-package end-to-end workflows
+#### Task: run installed-package end-to-end workflows
 
 In a clean environment outside the checkout:
 
@@ -112,13 +116,15 @@ In a clean environment outside the checkout:
 
 Record commands in project development instructions only if they are durable and generally useful; do not add generated artifacts to the repository.
 
-### Task: reconcile documentation and acceptance coverage
+### Milestone: documentation and acceptance
+
+#### Task: reconcile documentation and acceptance coverage
 
 Review the complete implementation against every normative section and acceptance condition in the SPEC tree.
 
 For each condition, identify its automated test or explicit manual verification. Resolve omissions in the owning module/test/document rather than adding a central catch-all test.
 
-Remove `docs/architecture.md` once all unique settled content has been integrated into `docs/dev/SPEC.md`, its subspecifications, and `layout.md`. Do not retain it as a second normative architecture description.
+Remove `docs/architecture.md` once all unique settled content has been integrated into `docs/dev/SPEC.md`, its subspecifications, and the LAYOUT tree rooted at `layout.md`. Do not retain it as a second normative architecture description.
 
 Run link/path checks across `docs/dev/`, README example tests, the complete pytest suite, and configured quality checks.
 

@@ -17,10 +17,6 @@ class ArchiveStructureError(ArchiveLineIndexError):
     """Archive entries violate the single-regular-member policy."""
 
 
-class EncryptedArchiveError(ArchiveLineIndexError):
-    """An archive or selected member requires decryption."""
-
-
 class SizeLimitExceededError(ArchiveLineIndexError):
     """Declared or actual decompressed content exceeds its configured limit."""
 

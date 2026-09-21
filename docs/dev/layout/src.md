@@ -127,18 +127,17 @@ Adapts an uncompressed source to the internal reader protocol. It preserves any 
 
 ### `src/archive_line_index/backends/zip.py`
 
-Owns ZIP inspection, exactly-one-regular-member validation, encrypted-member rejection, member opening, bounded decompressed reads, ZIP error translation, and ZIP resource cleanup. It uses `zipfile` and never extracts to a filesystem path.
+Owns ZIP inspection, exactly-one-regular-member validation, member opening, bounded decompressed reads, ZIP error translation, and ZIP resource cleanup. It uses `zipfile` and never extracts to a filesystem path.
 
 ### `src/archive_line_index/backends/tar.py`
 
-Owns TAR and supported compressed-TAR inspection, member validation, member streaming, TAR error translation, and cleanup. It uses `tarfile` without filesystem extraction. It also owns the backend-specific distinction between validation possible before content delivery and validation completed only at terminal EOF.
+Owns TAR and supported compressed-TAR member validation, sequential streaming, TAR error translation, and cleanup. It uses one `tarfile` streaming path for all sources without filesystem extraction and completes trailing-member validation before terminal EOF.
 
 ### `src/archive_line_index/backends/sevenzip.py`
 
 Owns all `py7zr`-specific behavior:
 
 - archive inspection and member validation;
-- encrypted-archive rejection when distinguishable;
 - the custom `WriterFactory` and `Py7zIO` destination;
 - the extraction worker thread;
 - the bounded byte-block queue;

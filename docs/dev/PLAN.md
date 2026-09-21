@@ -4,7 +4,7 @@
 
 This plan defines how to implement the complete system specified by [SPEC.md](SPEC.md) from scratch in bounded, dependency-ordered, independently verifiable increments.
 
-It is an executable blueprint rather than a chronology. Tasks describe the current required implementation, not abandoned approaches or later migrations. The physical file ownership and import constraints in [layout.md](layout.md) apply to every phase.
+It is an executable blueprint rather than a chronology. Tasks describe the current required implementation, not abandoned approaches or later migrations. The physical-ownership map rooted at [layout.md](layout.md) applies to every phase. Detailed production-module ownership and import constraints are defined in [layout/src.md](layout/src.md).
 
 ## 2. Implementation principles
 
@@ -12,7 +12,7 @@ It is an executable blueprint rather than a chronology. Tasks describe the curre
 2. Keep each task as small as possible while leaving the repository internally consistent and testable.
 3. Normally change one production module plus its directly associated tests and documentation. Span multiple files only when an atomic contract declaration and implementation cannot be separated safely.
 4. Test through public behavior where practical; use implementation-level unit tests for boundary algorithms, backend translation, and failure paths.
-5. Generate archive fixtures during tests unless an immutable malformed or encrypted sample cannot be constructed reliably.
+5. Generate archive fixtures during tests unless an immutable malformed sample cannot be constructed reliably.
 6. Preserve ordinary Python exceptions required by the public contract and verify chained causes for translated errors.
 7. Do not add metadata, a CLI, mmap access, random decompressed seeking, or other non-goals while implementing adjacent functionality.
 
@@ -25,7 +25,7 @@ The top-level implementation phases are:
 3. [Index persistence](plan/index-persistence.md)
 4. [Package integration](plan/package-integration.md)
 
-Each phase depends on completion of every preceding phase.
+Each phase depends on completion of every preceding phase. Each phase plan decomposes its ordered tasks into named milestones. The derived [ROADMAP.md](ROADMAP.md) mirrors this phase/milestone/task hierarchy and records durable completion; it does not redefine order or scope.
 
 ```mermaid
 flowchart LR
@@ -46,7 +46,7 @@ At completion, callers can stream and index plain paths or binary streams with a
 
 ### Archive streams
 
-Implements ZIP, TAR, and 7z backends, completes dispatch for every supported format, and verifies identical public byte/index behavior across formats. The threaded 7z adapter is built last because it depends on the stable pull reader and stream lifecycle contracts.
+Implements unencrypted ZIP, TAR, and 7z backends, completes dispatch for every supported format, and verifies identical public byte/index behavior across formats. The threaded 7z adapter is built last because it depends on the stable pull reader and stream lifecycle contracts. TAR uses one sequential streaming strategy for paths and caller streams.
 
 ### Index persistence
 
@@ -74,7 +74,7 @@ public API → package exports and installed-package verification
 
 The scanner can be developed after the offset representation without waiting for archive backends. Persistence can be developed after offsets but is scheduled after archive integration so the public source-to-index pipeline is stable before adding output formats.
 
-No task may introduce a reverse dependency prohibited by `layout.md`.
+No task may introduce a reverse dependency prohibited by [layout/src.md](layout/src.md).
 
 ## 6. Task verification protocol
 

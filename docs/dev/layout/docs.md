@@ -2,7 +2,7 @@
 
 ## 1. Scope
 
-This node owns locations and document responsibilities under `docs/`; it does not redefine SPEC behavior, PLAN sequencing, or global LAYOUT rules.
+This node owns locations and document responsibilities under `docs/`; it does not redefine SPEC behavior, PLAN sequencing, ROADMAP status semantics, or global LAYOUT rules.
 
 ## 2. SPEC tree
 
@@ -29,7 +29,7 @@ Owns the common sequential binary-stream contract, including read behavior, buff
 
 ### `docs/dev/spec/archive-handling.md`
 
-Owns input-format detection, recognized suffix behavior, exactly-one-member validation, special-entry rejection, encryption policy, backend-specific constraints, and 7z push-to-pull adaptation.
+Owns input-format detection, recognized suffix behavior, exactly-one-member validation, special-entry rejection, supported source capabilities, backend-specific constraints, and 7z push-to-pull adaptation.
 
 ### `docs/dev/spec/line-index.md`
 
@@ -47,13 +47,17 @@ It explicitly does not own source identity, index metadata, stale-index detectio
 
 The compact authoritative entry point for implementing the complete system from scratch. It declares the top-level phase order, phase dependencies, SPEC-to-plan mapping, and project-wide verification and completion rules.
 
+### `docs/dev/ROADMAP.md`
+
+Provides the compact, PLAN-derived progress projection. Every phase, milestone, and task links to its canonical PLAN heading. Checkboxes and summary counts reflect only durable journal and recovery evidence; ROADMAP owns no scope, order, dependency, or verification requirement.
+
 ### `docs/dev/plan/plain-stream-index-mvp.md`
 
 Describes the smallest useful testable product: plain-source ownership and streaming, byte-line scanning, the in-memory offset representation, and a thin public composition path. It excludes archive decoding and persistence.
 
 ### `docs/dev/plan/archive-streams.md`
 
-Adds content detection and the ZIP, TAR, and 7z backends to the already tested stream/index pipeline. It orders the pull-based backends before the threaded 7z adapter and includes cross-format behavioral verification.
+Adds content detection and the unencrypted ZIP, TAR, and 7z backends to the already tested stream/index pipeline. TAR uses one sequential streaming strategy for every source. The plan orders pull-based backends before the threaded 7z adapter and includes cross-format behavioral verification.
 
 ### `docs/dev/plan/index-persistence.md`
 

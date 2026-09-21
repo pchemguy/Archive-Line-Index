@@ -92,20 +92,20 @@ Validation cannot prove that offsets correspond to a particular external payload
 
 ## 7. Required examples
 
-| Indexed bytes | `skip_utf8_bom` | Offsets | Lines |
-| --- | ---: | --- | ---: |
-| `b""` | either | `[0]` | 0 |
-| `EF BB BF` | `True` | `[3]` | 0 |
-| `EF BB BF` | `False` | `[0, 3]` | 1 |
-| `b"abc"` | either | `[0, 3]` | 1 |
-| `b"abc\n"` | either | `[0, 4]` | 1 |
-| `b"abc\r\n"` | either | `[0, 5]` | 1 |
-| `b"abc\rdef"` | either | `[0, 7]` | 1 |
-| `b"\n"` | either | `[0, 1]` | 1 |
-| `b"\n\n"` | either | `[0, 1, 2]` | 2 |
-| `b"a\n\nb"` | either | `[0, 2, 3, 4]` | 3 |
-| `EF BB BF + b"abc\n"` | `True` | `[3, 7]` | 1 |
-| `EF BB BF + b"\n"` | `True` | `[3, 4]` | 1 |
+| Indexed bytes         | `skip_utf8_bom` | Offsets        | Lines |
+| --------------------- | --------------: | -------------- | ----: |
+| `b""`                 |          either | `[0]`          |     0 |
+| `EF BB BF`            |          `True` | `[3]`          |     0 |
+| `EF BB BF`            |         `False` | `[0, 3]`       |     1 |
+| `b"abc"`              |          either | `[0, 3]`       |     1 |
+| `b"abc\n"`            |          either | `[0, 4]`       |     1 |
+| `b"abc\r\n"`          |          either | `[0, 5]`       |     1 |
+| `b"abc\rdef"`         |          either | `[0, 7]`       |     1 |
+| `b"\n"`               |          either | `[0, 1]`       |     1 |
+| `b"\n\n"`             |          either | `[0, 1, 2]`    |     2 |
+| `b"a\n\nb"`           |          either | `[0, 2, 3, 4]` |     3 |
+| `EF BB BF + b"abc\n"` |          `True` | `[3, 7]`       |     1 |
+| `EF BB BF + b"\n"`    |          `True` | `[3, 4]`       |     1 |
 
 ## 8. Scanning algorithm
 

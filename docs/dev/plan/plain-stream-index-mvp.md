@@ -33,7 +33,9 @@ It does not implement archive decompression or either persistence format.
 
 ## 4. Ordered implementation tasks
 
-### Task: establish the package and test baseline
+### Milestone: plain stream foundation
+
+#### Task: establish the package and test baseline
 
 Create `pyproject.toml`, the `src/archive_line_index/` package directory, minimal `__init__.py`, test directories, `.gitignore`, and the initial pytest configuration.
 
@@ -52,7 +54,7 @@ Verification:
 - run a smoke test importing `archive_line_index`;
 - run `python -m pytest` and confirm the empty/baseline suite executes normally.
 
-### Task: implement public errors
+#### Task: implement public errors
 
 Create `src/archive_line_index/errors.py` with the complete exception hierarchy specified for the final project. Add `tests/unit/test_errors.py`.
 
@@ -60,7 +62,7 @@ Tests verify inheritance, stable names, and that ordinary filesystem and argumen
 
 After the focused tests, run the package import smoke test.
 
-### Task: implement source ownership and prefix replay
+#### Task: implement source ownership and prefix replay
 
 Create `src/archive_line_index/sources.py` and `tests/unit/test_sources.py`.
 
@@ -79,7 +81,7 @@ Tests cover:
 
 Run `test_sources.py` and `test_errors.py`.
 
-### Task: implement format classification
+#### Task: implement format classification
 
 Create `src/archive_line_index/formats.py` and `tests/unit/test_formats.py`.
 
@@ -89,7 +91,7 @@ Tests cover every supported signature/suffix combination, unconventional archive
 
 Run format, source, and error unit tests.
 
-### Task: define the backend reader contract
+#### Task: define the backend reader contract
 
 Create `src/archive_line_index/backends/base.py`. Add focused protocol/fake-reader coverage to `tests/unit/test_stream.py` rather than creating a second abstract test hierarchy.
 
@@ -97,7 +99,7 @@ Define the minimal internal read/close/completion interface needed by the common
 
 Run the focused stream contract tests and import checks.
 
-### Task: implement the plain backend
+#### Task: implement the plain backend
 
 Create `src/archive_line_index/backends/plain.py` and `tests/unit/backends/test_plain.py`.
 
@@ -107,7 +109,7 @@ Tests cover empty and large sources, arbitrary short reads, replay boundaries, r
 
 Run plain-backend tests plus source and stream-contract tests.
 
-### Task: implement backend dispatch for the MVP
+#### Task: implement backend dispatch for the MVP
 
 Create `src/archive_line_index/backends/registry.py` and `tests/unit/backends/test_registry.py`. Keep `backends/__init__.py` free of eager concrete imports.
 
@@ -115,7 +117,7 @@ Register the plain backend. For detected ZIP, TAR, or 7z candidates, dispatch sh
 
 Run registry, format, and plain-backend tests.
 
-### Task: implement the common content stream
+#### Task: implement the common content stream
 
 Create `src/archive_line_index/stream.py` and complete `tests/unit/test_stream.py`.
 
@@ -125,7 +127,9 @@ Tests cover zero, bounded, short, and unbounded reads; exact and exceeded size l
 
 Run stream, backend base/plain, source, and error tests.
 
-### Task: implement the offset representation
+### Milestone: line indexing and public MVP
+
+#### Task: implement the offset representation
 
 Create `src/archive_line_index/offsets.py` and `tests/unit/test_offsets.py`.
 
@@ -135,7 +139,7 @@ Tests cover every valid zero-/one-/multi-line shape and wrong type code, empty a
 
 Run offset and error tests.
 
-### Task: implement the byte-line scanner
+#### Task: implement the byte-line scanner
 
 Create `src/archive_line_index/scanner.py` and `tests/unit/test_scanner.py` using the shared cases from `tests/helpers/binary_cases.py` and controlled streams from `tests/helpers/streams.py`.
 
@@ -145,7 +149,7 @@ Tests cover the complete line-index example table, every relevant block split, s
 
 Run scanner, offset, and error tests.
 
-### Task: compose the MVP public API
+#### Task: compose the MVP public API
 
 Create `src/archive_line_index/api.py` and integration tests in `tests/integration/test_content_stream.py` and `tests/integration/test_index_building.py` for plain sources.
 

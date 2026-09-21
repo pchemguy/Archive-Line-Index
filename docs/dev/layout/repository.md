@@ -27,6 +27,7 @@ archive-line-index/
 │       │   ├── archive-streams.md
 │       │   ├── index-persistence.md
 │       │   └── package-integration.md
+│       ├── ROADMAP.md
 │       ├── layout.md
 │       └── layout/
 │           ├── repository.md
@@ -65,6 +66,7 @@ archive-line-index/
     ├── fixtures/
     │   └── README.md
     ├── unit/
+    │   ├── test_package.py
     │   ├── test_errors.py
     │   ├── test_sources.py
     │   ├── test_formats.py

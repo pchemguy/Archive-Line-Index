@@ -19,7 +19,7 @@ The system shall support:
 
 - Python 3.11 and later on Windows, Linux, and macOS;
 - filesystem paths and caller-provided binary streams;
-- plain, ZIP, TAR, compressed-TAR, and 7z inputs;
+- plain inputs and unencrypted ZIP, TAR, compressed-TAR, and 7z inputs;
 - exactly one regular-file member per accepted archive;
 - content-first format detection with strict recognized-suffix handling;
 - sequential, read-only decompressed byte access;
@@ -38,7 +38,7 @@ The system shall not provide:
 - text decoding, encoding detection, or newline normalization;
 - recognition of line boundaries other than byte `0x0A`;
 - parsing or validation of JSONL or any other record format;
-- passwords, encrypted-archive support, prompting, or credential discovery;
+- encrypted or password-protected archives, password input, prompting, or credential discovery;
 - extraction of archive member paths to the filesystem;
 - random seeking within compressed data;
 - compression checkpoints or compression-format-specific seek indexes;
@@ -83,7 +83,7 @@ The system consists of four principal responsibilities:
 
 Dependencies are acyclic. Archive handling does not depend on line semantics. Line indexing does not depend on archive handling or a concrete stream class. Persistence does not depend on sources, archives, or scanning. Only the public API composition layer coordinates the full pipeline.
 
-The canonical physical ownership and allowed import directions are defined in [layout.md](layout.md).
+The canonical physical-ownership map is rooted at [layout.md](layout.md), and detailed production-module ownership and import directions are defined in [layout/src.md](layout/src.md).
 
 ## 6. System-wide terminology
 
@@ -141,7 +141,7 @@ The supported public Python surface, validation policy, and exceptions are defin
 
 The content-stream lifecycle, byte-delivery, size-limit, and completion contracts are defined in [spec/content-stream.md](spec/content-stream.md).
 
-Format detection, archive validation, backend behavior, encryption rejection, and 7z concurrency are defined in [spec/archive-handling.md](spec/archive-handling.md).
+Format detection, archive validation, backend behavior, supported source capabilities, and 7z concurrency are defined in [spec/archive-handling.md](spec/archive-handling.md).
 
 Byte-line semantics, BOM treatment, offset-array invariants, and the scanning algorithm are defined in [spec/line-index.md](spec/line-index.md).
 
@@ -183,7 +183,7 @@ The complete project is conformant when:
 2. Inputs substantially larger than available memory can be streamed without extraction or complete payload retention.
 3. Empty, BOM-only, LF-terminated, unterminated, empty-line, CRLF, and lone-CR cases produce the specified offsets and EOF sentinel.
 4. Newlines and UTF-8 BOM bytes split across every relevant source/backend boundary are handled correctly.
-5. Archives with zero, multiple, encrypted, corrupt, truncated, or special members fail through the specified error model.
+5. Supported archives with zero or multiple regular members, corrupt or truncated data, or special members fail through the specified error model.
 6. Successful terminal EOF includes all integrity checks available from the selected backend; early closure is explicitly non-validating.
 7. Caller-owned streams remain open, while every package-owned file, archive, queue, and worker is released by deterministic cleanup.
 8. SQLite rows ordered by offset and decoded raw `uint64` values exactly equal the source `array("Q")`.

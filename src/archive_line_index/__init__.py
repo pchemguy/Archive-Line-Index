@@ -9,7 +9,6 @@ from .api import (
 from .errors import (
     ArchiveLineIndexError,
     ArchiveStructureError,
-    EncryptedArchiveError,
     ExtractionError,
     InvalidArchiveError,
     InvalidIndexError,
@@ -26,7 +25,6 @@ __all__ = [
     "ArchiveStructureError",
     "ContentStream",
     "DEFAULT_BUFFER_SIZE",
-    "EncryptedArchiveError",
     "ExtractionError",
     "InvalidArchiveError",
     "InvalidIndexError",

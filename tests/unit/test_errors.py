@@ -8,7 +8,6 @@ PUBLIC_ERROR_NAMES = (
     "UnsupportedFormatError",
     "InvalidArchiveError",
     "ArchiveStructureError",
-    "EncryptedArchiveError",
     "SizeLimitExceededError",
     "ExtractionError",
     "InvalidIndexError",

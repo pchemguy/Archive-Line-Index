@@ -2543,9 +2543,24 @@ SHA-256: `c1664911edf28b1adf8122765498b53495f80666731daace76565ce8ac9e3329`
 
 > [!NOTE] Prompt
 > 
+> Activate @SDD Manager:
+> 
+> 1. Create ROADMAP; mark phases 1-2 as implemented.
+> 2. Revise phase 2:
+>     - This is INITIAL implementation. EXTRAS, such as not requested encryption of archives or Seekable TAR support must have never been implemented.
+>     - Review SPEC/PLAN docs - remove extras, clearly identify scope
+>     - Remove code / tests implementing support of encrypted archives and seekable TAR
+>     - Once revision is complete, append new phase 2 completion records to the journal (old records remain).
 
-* Encryption, structure, corruption, and truncation errors
+Phase 2 revision is complete and awaiting steering.
 
-```
-Seekable TAR support is complete across seven suffix/compression forms, with 87 focused tests passing. I’m now adding true non-seekable TAR streaming, where the accepted member may be delivered before trailing headers are known and terminal EOF is withheld until those headers validate.
-```
+* Plain, ZIP, TAR-family, and 7z support remain.
+* Encryption-specific code, public API, fixtures, and tests were removed.
+* TAR now uses one sequential streaming path for every source.
+* SPEC, PLAN, and LAYOUT describe the reduced design directly.
+* [ROADMAP.md](sandbox:/workspace/scratch/2f3398ece6d4/docs/dev/ROADMAP.md) records 2/4 phases, 6/11 milestones, and 21/35 tasks complete.
+* Replacement Phase 2 completion, steering, and checkpoint records were appended; old journal records remain.
+* Phase 3 was not started.
+
+Verification: 500 tests passed, lifecycle tests passed five consecutive runs, clean-wheel workflows passed for all four formats, and the 32 MiB 7z streaming smoke passed without extraction artifacts.
+

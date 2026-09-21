@@ -7,6 +7,9 @@ from ..formats import SourceFormat
 from ..sources import SourceHandle
 from .base import BackendReader
 from .plain import open_plain_backend
+from .sevenzip import open_sevenzip_backend
+from .tar import open_tar_backend
+from .zip import open_zip_backend
 
 
 def open_backend(
@@ -19,6 +22,12 @@ def open_backend(
         raise TypeError("source_format must be a SourceFormat")
     if source_format is SourceFormat.PLAIN:
         return open_plain_backend(source)
+    if source_format is SourceFormat.ZIP:
+        return open_zip_backend(source)
+    if source_format is SourceFormat.TAR:
+        return open_tar_backend(source)
+    if source_format is SourceFormat.SEVEN_ZIP:
+        return open_sevenzip_backend(source)
     raise UnsupportedFormatError(
         f"{source_format.value} archive support is not available"
     )

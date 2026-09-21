@@ -25,7 +25,9 @@ This phase implements:
 
 ## 4. Ordered implementation tasks
 
-### Task: finalize persistence-facing offset validation
+### Milestone: persistence adapters
+
+#### Task: finalize persistence-facing offset validation
 
 Review `src/archive_line_index/offsets.py` and extend it only where persistence requires shared validation not already implemented. Extend `tests/unit/test_offsets.py`.
 
@@ -41,7 +43,7 @@ Confirm:
 
 Run offset, scanner, and existing integration tests to ensure the stricter checks accept every scanner-produced result.
 
-### Task: implement SQLite writing
+#### Task: implement SQLite writing
 
 Create `src/archive_line_index/persistence/sqlite.py` and `tests/unit/persistence/test_sqlite.py` with the write path first.
 
@@ -51,7 +53,7 @@ Tests cover `[0]`, `[3]`, normal and large arrays; exact schema/rows; destinatio
 
 Run SQLite-write and offset tests.
 
-### Task: implement SQLite reading
+#### Task: implement SQLite reading
 
 Extend `persistence/sqlite.py` and `test_sqlite.py` with read-only loading and strict schema/content validation.
 
@@ -61,7 +63,7 @@ Verify malformed index content produces `InvalidIndexError`, operational failure
 
 Run SQLite, offsets, and error tests.
 
-### Task: implement raw writing
+#### Task: implement raw writing
 
 Create `src/archive_line_index/persistence/raw.py` and `tests/unit/persistence/test_raw.py` with the write path first.
 
@@ -71,7 +73,7 @@ Tests compare exact bytes against `struct.pack("<Q", value)` for every value, co
 
 Run raw-write, offsets, and error tests.
 
-### Task: implement raw reading
+#### Task: implement raw reading
 
 Extend `persistence/raw.py` and `test_raw.py` with complete loading into `array("Q")`, host-endian conversion, and structural validation.
 
@@ -81,7 +83,9 @@ Assert that no `mmap` API is used or exposed.
 
 Run raw, offsets, and scanner tests.
 
-### Task: expose persistence through the public API
+### Milestone: public persistence integration
+
+#### Task: expose persistence through the public API
 
 Add thin persistence functions to `src/archive_line_index/api.py` and their final exports to `__init__.py`. Do not add a combined two-destination write.
 
@@ -89,7 +93,7 @@ Extend public API integration coverage to verify validation occurs before tempor
 
 Run API, SQLite, raw, and error tests plus existing content/index integration tests.
 
-### Task: verify cross-format persistence equivalence
+#### Task: verify cross-format persistence equivalence
 
 Create `tests/integration/test_persistence_equivalence.py`.
 

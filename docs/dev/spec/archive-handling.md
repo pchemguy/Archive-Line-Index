@@ -2,7 +2,7 @@
 
 ## 1. Scope
 
-This specification defines source-format detection, supported archive formats, archive structure, encryption rejection, backend selection, backend-specific streaming behavior, and error classification.
+This specification defines source-format detection, supported unencrypted archive formats, archive structure, backend selection, backend-specific streaming behavior, and error classification.
 
 The common public byte-stream contract is defined in [content-stream.md](content-stream.md). Source ownership and public exceptions are defined in [public-api.md](public-api.md).
 
@@ -27,7 +27,7 @@ Recognized TAR filename forms include at least:
 .txz
 ```
 
-Standalone gzip, bzip2, or xz streams that do not contain a TAR archive are not supported as compressed plain files. Password-protected or otherwise encrypted archives are unsupported for every format.
+Standalone gzip, bzip2, or xz streams that do not contain a TAR archive are not supported as compressed plain files. Password-protected or otherwise encrypted archives are outside the supported input domain for every format. The API has no password or credential input and does not define detection, classification, or extraction behavior for them.
 
 No external `7z`, `7zz`, `tar`, or other archive executable is used.
 
@@ -62,7 +62,7 @@ Plain input may be non-seekable.
 
 ZIP and 7z require a seekable caller-provided stream unless their supported library version explicitly supplies a safe streaming mode adopted by a future specification revision. A non-seekable caller stream detected or claimed as ZIP/7z fails clearly rather than being buffered in full.
 
-TAR uses seekable inspection when available and a streaming TAR mode for non-seekable input. Observable member and integrity requirements remain the same, although some invalid structure may be detected only after member bytes have already been delivered.
+TAR always uses sequential streaming mode, regardless of source seekability. Some invalid structure may therefore be detected only after member bytes have already been delivered.
 
 Path sources may be reopened or repositioned internally as required, but the payload is still delivered sequentially and never extracted.
 
@@ -91,15 +91,7 @@ For streaming TAR, the backend may encounter the accepted regular member before 
 
 Declared member size is advisory for resource-limit prechecks but never replaces actual decompressed-byte counting.
 
-## 7. Encryption policy
-
-The API exposes no password argument. The package shall not prompt, read a password from standard input, consult environment variables or configuration, or attempt password discovery.
-
-An encrypted archive or member raises `EncryptedArchiveError` when the backend permits that condition to be distinguished. If a dependency reports encryption only through a generic open/extraction failure, the implementation shall inspect documented backend state or error codes before falling back to `InvalidArchiveError` or `ExtractionError`.
-
-Supplying no password to a backend is not by itself sufficient; the package must prevent dependency-level prompting or hidden password lookup.
-
-## 8. Plain backend
+## 7. Plain backend
 
 The plain backend adapts the source directly to the internal backend reader protocol.
 
@@ -113,13 +105,12 @@ It shall:
 
 Plain input has no archive-structure or CRC validation beyond successful source reads through EOF.
 
-## 9. ZIP backend
+## 8. ZIP backend
 
 The ZIP backend shall:
 
 - use `zipfile.ZipFile` for inspection;
 - validate the complete entry set before opening the selected member;
-- reject encrypted members;
 - open only the validated regular member;
 - use bounded reads from the member stream;
 - close the member and archive wrappers deterministically;
@@ -128,11 +119,11 @@ The ZIP backend shall:
 
 It shall not call `extract()`, `extractall()`, or create an output path.
 
-## 10. TAR backend
+## 9. TAR backend
 
 The TAR backend shall:
 
-- use `tarfile` inspection or streaming modes appropriate to source capabilities;
+- use `tarfile` sequential streaming mode for every source;
 - support compression filters available in the supported standard-library build without implying optional undeclared filters;
 - classify every encountered member;
 - open and read only the validated regular member;
@@ -141,7 +132,7 @@ The TAR backend shall:
 
 It shall not call filesystem extraction methods.
 
-## 11. 7z backend
+## 10. 7z backend
 
 The 7z backend shall use `py7zr.SevenZipFile` plus a custom `WriterFactory`/`Py7zIO` destination. An in-memory destination retaining the complete member is prohibited.
 
@@ -168,20 +159,19 @@ The consumer reader may combine or split queued blocks to satisfy arbitrary publ
 
 The backend validates entries before extraction whenever `py7zr` exposes a complete member list. It extracts only the accepted member into the custom destination and never to disk.
 
-## 12. Backend error classification
+## 11. Backend error classification
 
 Backend-specific exceptions are classified as follows:
 
 - recognized format that cannot be parsed: `InvalidArchiveError`;
 - invalid member count or entry type: `ArchiveStructureError`;
-- encryption/password requirement: `EncryptedArchiveError`;
 - configured declared or actual size exceeded: `SizeLimitExceededError`;
 - CRC, truncated compressed data, decompressor failure, callback delivery failure, or terminal footer failure: `ExtractionError` unless a narrower classification applies;
 - unsupported detected compression/archive kind: `UnsupportedFormatError`.
 
 Original exceptions remain available as chained causes. Filesystem exceptions arising before archive interpretation retain their ordinary types.
 
-## 13. Acceptance matrix
+## 12. Acceptance matrix
 
 Equivalent byte corpora shall be exercised through every format that can represent the case. Required archive cases include:
 
@@ -191,7 +181,6 @@ Equivalent byte corpora shall be exercised through every format that can represe
 - zero and multiple regular members;
 - one regular member plus a symbolic link or other special entry;
 - metadata file plus the intended file;
-- encrypted ZIP and 7z;
 - corrupt and truncated archives;
 - misleading recognized suffixes;
 - signature-recognized archives with unconventional names;
