@@ -2564,3 +2564,37 @@ Phase 2 revision is complete and awaiting steering.
 
 Verification: 500 tests passed, lifecycle tests passed five consecutive runs, clean-wheel workflows passed for all four formats, and the 32 MiB 7z streaming smoke passed without extraction artifacts.
 
+---
+---
+
+### 📗 Phase 2: Archive streams - Seekable backends
+
+> [!NOTE] Prompt
+> 
+> The package should not have the seekable branch at all regardless of backend. Is there code supporting such capability?
+
+Yes. The public payload stream is always sequential and non-seekable, but seekability-dependent code still exists in the input/backend plumbing:
+
+* sources.py
+    * Detects `stream.seekable()`.
+    * Implements `SourceHandle.seek()` and `tell()`.
+    * Branches during format probing: rewind seekable sources, replay bytes for non-seekable sources.
+* plain.py
+    * Seeks to EOF to determine size when possible.
+* zip.py
+    * Explicitly requires a seekable source.
+    * Rejects non-seekable ZIP inputs.
+* sevenzip.py
+    * Explicitly requires a seekable source.
+    * `_SourceIO` exposes `seek()`, `tell()`, and `seekable()` to `py7zr`.
+    * `_QueueWriter.seek()` is also present as a limited `py7zr` compatibility shim, though it does not make the delivered payload seekable.
+* archive-handling.md
+    * Currently specifies separate seekable/non-seekable behavior and requires seekable caller streams for ZIP and 7z.
+
+What is already correct:
+
+* stream.py always reports `seekable() is False`.
+* Its `seek()` always raises `io.UnsupportedOperation`.
+* TAR has one sequential `r|*` path with no seekability branch.
+
+So the earlier revision removed the seekable **TAR** branch, but not seekability as an input capability throughout the package. A strict “no seekable branch anywhere” revision must change the source contract, detection strategy, plain-size handling, ZIP/7z input policy, tests, SPEC, and PLAN together.
