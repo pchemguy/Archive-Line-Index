@@ -24,7 +24,7 @@ It does not implement SQLite or raw persistence.
 ## 3. Prerequisites
 
 - The plain stream and index MVP is complete and passing.
-- Backend base, content stream, scanner, source ownership, format detection, and public composition contracts are stable.
+- Backend base, content stream, scanner, path normalization, format detection, and public composition contracts are stable.
 - A compatible `py7zr` release range has been selected from supported releases, declared in `pyproject.toml`, and installed in the test environment.
 
 ## 4. Ordered implementation tasks
@@ -45,9 +45,9 @@ Run a focused helper smoke test from the first backend test that consumes it; he
 
 Create `src/archive_line_index/backends/zip.py` and `tests/unit/backends/test_zip.py`.
 
-Implement complete entry inspection, exactly-one-regular-member validation, directory exclusion, special/metadata entry rejection, selected-member streaming, CRC/truncation error translation, and ownership-safe cleanup.
+Implement complete entry inspection, exactly-one-regular-member validation, directory exclusion, special/metadata entry rejection, selected-member streaming, CRC/truncation error translation, and package-owned cleanup.
 
-Tests cover path and seekable caller-stream input, directories plus one file, nested paths, zero/multiple files, metadata files, corrupt and truncated archives, declared-size rejection, early close, and caller-source non-closure.
+Tests cover path input, directories plus one file, nested paths, zero/multiple files, metadata files, corrupt and truncated archives, declared-size rejection, and early close.
 
 Run ZIP tests plus source, format, stream, registry, and error tests.
 
@@ -65,9 +65,9 @@ Run the affected registry and integration tests plus all ZIP dependents.
 
 Create `src/archive_line_index/backends/tar.py` and `tests/unit/backends/test_tar.py`.
 
-Implement uncompressed and supported compressed TAR opening through one sequential `tarfile` streaming mode for paths and caller streams. Discover and deliver the first accepted regular member, then continue trailing-header validation before terminal EOF. A later extra or special member raises `ArchiveStructureError` after any already delivered prefix rather than being reported as successful EOF. Coalesce legal short source reads as required by the streaming transport and never extract to the filesystem.
+Implement uncompressed and supported compressed TAR opening through one sequential `tarfile` streaming mode for paths. Discover and deliver the first accepted regular member, then continue trailing-header validation before terminal EOF. A later extra or special member raises `ArchiveStructureError` after any already delivered prefix rather than being reported as successful EOF. Never extract to the filesystem.
 
-Tests cover `.tar`, `.tar.gz`/`.tgz`, `.tar.bz2`/`.tbz2`, and `.tar.xz`/`.txz` where supported by the runtime; nested paths; empty members; zero/multiple files; link/special/metadata entries; path, seekable, non-seekable, and short-read caller sources; late structure failure timing; corruption; early close; caller ownership; and absence of extraction artifacts.
+Tests cover `.tar`, `.tar.gz`/`.tgz`, `.tar.bz2`/`.tbz2`, and `.tar.xz`/`.txz` where supported by the runtime; nested paths; empty members; zero/multiple files; link/special/metadata entries; late structure failure timing; corruption; early close; and absence of extraction artifacts.
 
 Run TAR tests plus common source, format, stream, error, and content-stream lifecycle tests.
 
@@ -103,9 +103,9 @@ Run all sevenzip and stream tests.
 
 #### Task: implement 7z inspection and public error translation
 
-Complete `backends/sevenzip.py` with archive opening, full entry validation, empty-member support, selected-member extraction, declared-size precheck, extraction/CRC translation, ownership-safe source handling, and all cleanup paths.
+Complete `backends/sevenzip.py` with archive opening, full entry validation, empty-member support, selected-member extraction, declared-size precheck, extraction/CRC translation, path-owned source handling, and all cleanup paths.
 
-Tests cover path and seekable caller sources, non-seekable rejection, zero/one/ multiple members, directories, nested paths, special or metadata entries where representable, corruption/truncation, declared and actual size limits, early close, and worker failure after prefix delivery.
+Tests cover path sources, zero/one/multiple members, directories, nested paths, special or metadata entries where representable, corruption/truncation, declared and actual size limits, early close, and worker failure after prefix delivery.
 
 Run sevenzip, source, format, stream, and error tests.
 
@@ -130,7 +130,6 @@ Verify:
 - context exit after a consumer exception;
 - size-limit failure;
 - corrupt/truncated input;
-- caller-owned stream preservation;
 - package-owned file closure;
 - repeated close;
 - 7z worker termination and queue unblocking;
@@ -158,7 +157,7 @@ The phase is complete when:
 - every supported backend conforms to the common stream contract;
 - equivalent payloads produce identical public reads and offsets;
 - all late failures are raised instead of appearing as successful EOF;
-- no backend extracts to disk or closes caller-owned streams;
+- no backend extracts to disk;
 - no 7z worker survives deterministic cleanup;
 - dependency direction remains acyclic and `py7zr` remains isolated to the 7z backend;
 - all phase and prior-phase tests pass.

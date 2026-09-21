@@ -30,28 +30,3 @@ class FailingReadStream(io.BytesIO):
             raise OSError("controlled read failure")
         return super().read(size)
 
-
-class NonSeekableStream(io.BytesIO):
-    """Bytes stream that exposes no positioning operations."""
-
-    def seekable(self) -> bool:
-        return False
-
-    def seek(self, offset: int, whence: int = io.SEEK_SET) -> int:
-        raise io.UnsupportedOperation("stream is not seekable")
-
-    def tell(self) -> int:
-        raise io.UnsupportedOperation("stream is not seekable")
-
-
-class ShortNonSeekableStream(NonSeekableStream):
-    """Non-seekable stream that returns at most ``max_chunk`` bytes."""
-
-    def __init__(self, content: bytes, *, max_chunk: int) -> None:
-        super().__init__(content)
-        self.max_chunk = max_chunk
-
-    def read(self, size: int = -1) -> bytes:
-        if size < 0:
-            size = self.max_chunk
-        return super().read(min(size, self.max_chunk))

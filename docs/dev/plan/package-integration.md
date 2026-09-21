@@ -96,7 +96,7 @@ Pay particular attention to:
 - permission-denied behavior;
 - cleanup after failed replacement;
 - SQLite journal/WAL cleanup;
-- caller-open stream lifetime;
+- package-owned path-handle cleanup after open and processing failures;
 - no reliance on POSIX-only rename, unlink, or descriptor semantics.
 
 Keep platform-specific assertions conditional only when the operating-system contract genuinely differs; do not skip portable behavior.

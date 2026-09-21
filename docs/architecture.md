@@ -15,7 +15,7 @@ The project processes large inputs incrementally. It does not extract archive me
 
 ```mermaid
 flowchart TD
-    A["Path or caller-owned BinaryIO"] --> B["Source and archive handling"]
+    A["Filesystem path"] --> B["Source and archive handling"]
     B --> C["Sequential content stream"]
     C --> D["Byte-level line scanner"]
     D --> E["In-memory array('Q')"]
@@ -40,7 +40,7 @@ Archive handling must not depend on line semantics. Line scanning must not depen
 - ZIP archives through Python's `zipfile` module.
 - TAR archives and compression variants supported by Python's `tarfile` module.
 - 7z archives through `py7zr`.
-- Filesystem paths and caller-provided binary streams as input.
+- Filesystem paths as content sources.
 - Exactly one regular-file member in an archive.
 - Sequential delivery of original decompressed bytes.
 - LF-delimited byte-line indexing.
@@ -63,17 +63,13 @@ Archive handling must not depend on line semantics. Line scanning must not depen
 
 ## 4. Source and ownership model
 
-An input source is either:
+An input source is:
 
 ```python
-str | PathLike[str] | BinaryIO
+str | PathLike[str]
 ```
 
-For a path, the package owns and closes the opened file. A caller-provided binary stream remains caller-owned and is not closed by the package. Processing starts at the stream's current position, and that position is not restored.
-
-Caller-provided streams must return bytes. Formats whose selected backend requires seeking may reject a non-seekable source with a clear error. A non-seekable source remains valid for plain content and for archive modes that can process it incrementally.
-
-Format detection may read an initial prefix. If the input is ultimately treated as plain content and cannot be rewound, that prefix must be replayed so that no content bytes are lost.
+The package owns and closes every file it opens. Format detection uses a short-lived handle to read a bounded prefix, closes that handle, and then lets the selected backend open the same path from its beginning. Source capability negotiation is not part of the architecture.
 
 ## 5. Format detection and archive validation
 
@@ -184,15 +180,15 @@ decompressed_size = offsets[-1]
 
 The array always contains at least the EOF sentinel. Representative values are:
 
-| Decompressed content | Offset sequence |
-| --- | --- |
-| Empty | `[0]` |
-| UTF-8 BOM only, excluded | `[3]` |
-| `abc` | `[0, 3]` |
-| `abc\n` | `[0, 4]` |
-| `\n` | `[0, 1]` |
-| `\n\n` | `[0, 1, 2]` |
-| UTF-8 BOM followed by `abc\n` | `[3, 7]` |
+| Decompressed content          | Offset sequence |
+| ----------------------------- | --------------- |
+| Empty                         | `[0]`           |
+| UTF-8 BOM only, excluded      | `[3]`           |
+| `abc`                         | `[0, 3]`        |
+| `abc\n`                       | `[0, 4]`        |
+| `\n`                          | `[0, 1]`        |
+| `\n\n`                        | `[0, 1, 2]`     |
+| UTF-8 BOM followed by `abc\n` | `[3, 7]`        |
 
 For a nonempty line set, offsets are strictly increasing. The final and maximum offset is always the EOF sentinel.
 
@@ -297,7 +293,6 @@ The architecture distinguishes:
 
 - unsupported or invalid formats;
 - invalid archive structure;
-- encrypted archives;
 - decompressed-size limit violations;
 - extraction or decompression failures;
 - text-independent indexing failures;

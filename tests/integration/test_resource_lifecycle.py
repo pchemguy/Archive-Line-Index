@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import builtins
-import io
 import os
 
 import pytest
@@ -43,31 +42,27 @@ def _make_source(tmp_path, source_format: str, content: bytes):
 
 
 @pytest.mark.parametrize("source_format", FORMATS)
-def test_normal_exhaustion_closes_package_resources_not_caller(
+def test_normal_exhaustion_closes_package_resources(
     tmp_path, source_format: str
 ) -> None:
     path = _make_source(tmp_path, source_format, b"payload")
-    caller = io.BytesIO(path.read_bytes())
-    with open_content_stream(caller) as stream:
+    with open_content_stream(path) as stream:
         assert stream.read() == b"payload"
         assert stream.read(1) == b""
         if source_format == "sevenzip":
             assert not stream._backend._reader._worker.is_alive()
     assert stream.closed
-    assert not caller.closed
 
 
 @pytest.mark.parametrize("source_format", FORMATS)
-def test_early_and_repeated_close_preserve_caller(
+def test_early_and_repeated_close_release_resources(
     tmp_path, source_format: str
 ) -> None:
     path = _make_source(tmp_path, source_format, b"x" * (3 * 1024 * 1024))
-    caller = io.BytesIO(path.read_bytes())
-    stream = open_content_stream(caller)
+    stream = open_content_stream(path)
     assert stream.read(1) == b"x"
     stream.close()
     stream.close()
-    assert not caller.closed
     if source_format == "sevenzip":
         assert not stream._backend._reader._worker.is_alive()
 
@@ -77,37 +72,33 @@ def test_context_exit_after_consumer_exception_releases_resources(
     tmp_path, source_format: str
 ) -> None:
     path = _make_source(tmp_path, source_format, b"payload")
-    caller = io.BytesIO(path.read_bytes())
     with pytest.raises(RuntimeError, match="consumer"):
-        with open_content_stream(caller) as stream:
+        with open_content_stream(path) as stream:
             assert stream.read(1) == b"p"
             raise RuntimeError("consumer failure")
     assert stream.closed
-    assert not caller.closed
     if source_format == "sevenzip":
         assert not stream._backend._reader._worker.is_alive()
 
 
 @pytest.mark.parametrize("source_format", FORMATS)
-def test_declared_size_failure_preserves_caller_and_joins_worker(
+def test_declared_size_failure_releases_resources_and_joins_worker(
     tmp_path, source_format: str
 ) -> None:
     path = _make_source(tmp_path, source_format, b"payload")
-    caller = io.BytesIO(path.read_bytes())
     with pytest.raises(SizeLimitExceededError):
-        open_content_stream(caller, max_uncompressed_size=6)
-    assert not caller.closed
+        open_content_stream(path, max_uncompressed_size=6)
 
 
 @pytest.mark.parametrize(
     "content",
     [b"PK\x03\x04broken", b"\x1f\x8bbroken", b"7z\xbc\xaf\x27\x1cbroken"],
 )
-def test_invalid_archive_failure_preserves_caller(content: bytes) -> None:
-    caller = io.BytesIO(content)
+def test_invalid_archive_failure_releases_path(tmp_path, content: bytes) -> None:
+    path = tmp_path / "invalid"
+    path.write_bytes(content)
     with pytest.raises(InvalidArchiveError):
-        open_content_stream(caller)
-    assert not caller.closed
+        open_content_stream(path)
 
 
 @pytest.mark.parametrize("source_format", FORMATS)
@@ -127,8 +118,8 @@ def test_path_owned_source_file_is_closed_after_exhaustion(
     monkeypatch.setattr(builtins, "open", tracking_open)
     with open_content_stream(path) as stream:
         assert stream.read() == b"payload"
-    assert len(opened) == 1
-    assert opened[0].closed
+    assert opened
+    assert all(item.closed for item in opened)
 
 
 @pytest.mark.parametrize("source_format", FORMATS)

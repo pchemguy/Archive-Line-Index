@@ -17,7 +17,6 @@ from ..errors import (
     ExtractionError,
     InvalidArchiveError,
 )
-from ..sources import SourceHandle
 
 
 _CALLBACK_BLOCK_SIZE = 1024 * 1024
@@ -271,18 +270,12 @@ class _QueueBackendReader:
 class SevenZipBackendReader:
     """Inspect one 7z member and stream extraction through a bounded worker."""
 
-    def __init__(self, source: SourceHandle) -> None:
-        self._source = source
-        self._fileobj = _SourceIO(source)
+    def __init__(self, path: str) -> None:
         self._archive: py7zr.SevenZipFile | None = None
         self._reader: _QueueBackendReader | None = None
 
-        if not source.seekable():
-            source.close()
-            raise InvalidArchiveError("7z input must be seekable")
-
         try:
-            self._archive = py7zr.SevenZipFile(self._fileobj, "r")
+            self._archive = py7zr.SevenZipFile(path, "r")
             selected = _select_7z_member(self._archive.list())
         except (py7zr.exceptions.ArchiveError, EOFError, struct.error) as exc:
             self._close_unstarted()
@@ -304,18 +297,16 @@ class SevenZipBackendReader:
             except py7zr.exceptions.ArchiveError as exc:
                 raise ExtractionError("7z member extraction failed") from exc
             finally:
-                try:
-                    archive.close()
-                finally:
-                    try:
-                        self._fileobj.close()
-                    finally:
-                        source.close()
+                archive.close()
 
-        self._reader = _QueueBackendReader(
-            produce,
-            declared_size=selected.uncompressed,
-        )
+        try:
+            self._reader = _QueueBackendReader(
+                produce,
+                declared_size=selected.uncompressed,
+            )
+        except BaseException:
+            self._close_unstarted()
+            raise
 
     @property
     def declared_size(self) -> int | None:
@@ -339,20 +330,14 @@ class SevenZipBackendReader:
 
     def _close_unstarted(self) -> None:
         archive, self._archive = self._archive, None
-        try:
-            if archive is not None:
-                archive.close()
-        finally:
-            try:
-                self._fileobj.close()
-            finally:
-                self._source.close()
+        if archive is not None:
+            archive.close()
 
 
-def open_sevenzip_backend(source: SourceHandle) -> SevenZipBackendReader:
+def open_sevenzip_backend(path: str) -> SevenZipBackendReader:
     """Open, validate, and begin bounded extraction of a 7z source."""
 
-    return SevenZipBackendReader(source)
+    return SevenZipBackendReader(path)
 
 
 def _select_7z_member(entries) -> Any:
@@ -370,36 +355,3 @@ def _select_7z_member(entries) -> Any:
             f"7z archive must contain exactly one regular file; found {len(regular)}"
         )
     return regular[0]
-
-
-class _SourceIO(io.RawIOBase):
-    """Present a SourceHandle to py7zr without transferring ownership."""
-
-    def __init__(self, source: SourceHandle) -> None:
-        super().__init__()
-        self._source = source
-
-    def readable(self) -> bool:
-        return True
-
-    def seekable(self) -> bool:
-        return self._source.seekable()
-
-    def read(self, size: int = -1) -> bytes:
-        self._checkClosed()
-        return self._source.read(size)
-
-    def readinto(self, buffer) -> int:
-        self._checkClosed()
-        view = memoryview(buffer).cast("B")
-        data = self._source.read(len(view))
-        view[: len(data)] = data
-        return len(data)
-
-    def seek(self, offset: int, whence: int = io.SEEK_SET) -> int:
-        self._checkClosed()
-        return self._source.seek(offset, whence)
-
-    def tell(self) -> int:
-        self._checkClosed()
-        return self._source.tell()

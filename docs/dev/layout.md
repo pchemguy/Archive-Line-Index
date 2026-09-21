@@ -20,14 +20,14 @@ The complete tree is defined in [layout/repository.md](layout/repository.md).
 
 ## 3. LAYOUT decomposition
 
-| Node | Canonical responsibility |
-| --- | --- |
-| This root | Authority, high-level map, routing, global invariants, and change rules |
-| [repository.md](layout/repository.md) | Complete tree, root files, package naming, `src` layout, and repository-wide configuration |
-| [docs.md](layout/docs.md) | Documentation locations and SPEC/PLAN/LAYOUT ownership |
-| [src.md](layout/src.md) | Production packages, modules, backends, persistence, and imports |
-| [tests.md](layout/tests.md) | Test locations, infrastructure, fixtures, and production-to-test mapping |
-| [packaging-runtime.md](layout/packaging-runtime.md) | Runtime/generated artifacts, distributions, installed behavior, and CLI absence |
+| Node                                                | Canonical responsibility                                                                   |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| This root                                           | Authority, high-level map, routing, global invariants, and change rules                    |
+| [repository.md](layout/repository.md)               | Complete tree, root files, package naming, `src` layout, and repository-wide configuration |
+| [docs.md](layout/docs.md)                           | Documentation locations and SPEC/PLAN/LAYOUT ownership                                     |
+| [src.md](layout/src.md)                             | Production packages, modules, backends, persistence, and imports                           |
+| [tests.md](layout/tests.md)                         | Test locations, infrastructure, fixtures, and production-to-test mapping                   |
+| [packaging-runtime.md](layout/packaging-runtime.md) | Runtime/generated artifacts, distributions, installed behavior, and CLI absence            |
 
 For an ordinary change, load this root and the child owning the affected location. These boundaries follow physical ownership; they do not mirror SPEC components or PLAN phases.
 

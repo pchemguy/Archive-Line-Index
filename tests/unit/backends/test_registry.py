@@ -1,8 +1,4 @@
-"""Tests for backend dispatch."""
-
-import io
-import tarfile
-import zipfile
+"""Tests for path-based backend dispatch."""
 
 import pytest
 
@@ -10,53 +6,33 @@ import archive_line_index.backends as backend_package
 from archive_line_index.backends.base import BackendReader
 from archive_line_index.backends.registry import open_backend
 from archive_line_index.formats import SourceFormat
-from archive_line_index.sources import open_source
-from tests.helpers.archive_factory import ArchiveMember, write_7z
+from tests.helpers.archive_factory import ArchiveMember, write_7z, write_tar, write_zip
 
 
-def test_plain_candidate_dispatches_to_a_reader() -> None:
-    reader = open_backend(SourceFormat.PLAIN, open_source(io.BytesIO(b"payload")))
+@pytest.mark.parametrize("source_format", list(SourceFormat))
+def test_candidate_dispatches_to_a_reader(tmp_path, source_format) -> None:
+    content = b"payload"
+    if source_format is SourceFormat.PLAIN:
+        path = tmp_path / "data"
+        path.write_bytes(content)
+    elif source_format is SourceFormat.ZIP:
+        path = write_zip(tmp_path / "data.zip", [ArchiveMember("data", content)])
+    elif source_format is SourceFormat.TAR:
+        path = write_tar(tmp_path / "data.tar", [ArchiveMember("data", content)])
+    else:
+        path = write_7z(tmp_path / "data.7z", [ArchiveMember("data", content)])
+
+    reader = open_backend(source_format, str(path))
     assert isinstance(reader, BackendReader)
-    assert reader.read(16) == b"payload"
-
-
-def test_zip_candidate_dispatches_to_a_reader() -> None:
-    source = io.BytesIO()
-    with zipfile.ZipFile(source, "w") as archive:
-        archive.writestr("data", b"payload")
-    source.seek(0)
-    reader = open_backend(SourceFormat.ZIP, open_source(source))
-    assert isinstance(reader, BackendReader)
-    assert reader.read(16) == b"payload"
-    reader.close()
-    assert not source.closed
-
-
-def test_tar_candidate_dispatches_to_a_reader() -> None:
-    source = io.BytesIO()
-    with tarfile.open(fileobj=source, mode="w:") as archive:
-        info = tarfile.TarInfo("data")
-        info.size = 7
-        archive.addfile(info, io.BytesIO(b"payload"))
-    source.seek(0)
-    reader = open_backend(SourceFormat.TAR, open_source(source))
-    assert isinstance(reader, BackendReader)
-    assert reader.read(16) == b"payload"
-    reader.close()
-    assert not source.closed
-
-
-def test_sevenzip_candidate_dispatches_to_a_reader(tmp_path) -> None:
-    path = write_7z(tmp_path / "data.7z", [ArchiveMember("data", b"payload")])
-    reader = open_backend(SourceFormat.SEVEN_ZIP, open_source(path))
-    assert isinstance(reader, BackendReader)
-    assert reader.read(16) == b"payload"
+    assert reader.read(16) == content
     reader.close()
 
 
-def test_invalid_internal_format_is_rejected() -> None:
+def test_invalid_internal_format_is_rejected(tmp_path) -> None:
+    path = tmp_path / "data"
+    path.write_bytes(b"payload")
     with pytest.raises(TypeError, match="SourceFormat"):
-        open_backend("plain", open_source(io.BytesIO(b"payload")))
+        open_backend("plain", str(path))
 
 
 def test_backend_package_has_no_eager_concrete_exports() -> None:

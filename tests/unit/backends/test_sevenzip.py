@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import threading
+from types import SimpleNamespace
 
 import pytest
 import py7zr
@@ -22,10 +23,8 @@ from archive_line_index.errors import (
     InvalidArchiveError,
     SizeLimitExceededError,
 )
-from archive_line_index.sources import open_source
 from archive_line_index.stream import ContentStream
 from tests.helpers.archive_factory import ArchiveMember, write_7z
-from tests.helpers.streams import NonSeekableStream
 
 
 def _payload_producer(chunks):
@@ -211,8 +210,8 @@ def test_cancellation_during_large_callback_delivery_joins_worker() -> None:
     assert not reader._worker.is_alive()
 
 
-def _read_backend(path_or_stream, size: int = 3) -> bytes:
-    backend = open_sevenzip_backend(open_source(path_or_stream))
+def _read_backend(path, size: int = 3) -> bytes:
+    backend = open_sevenzip_backend(str(path))
     chunks = []
     try:
         while chunk := backend.read(size):
@@ -234,16 +233,9 @@ def test_path_streams_nested_member_with_directory(tmp_path) -> None:
     assert _read_backend(path, 1) == b"a\nb"
 
 
-def test_seekable_caller_stream_remains_open(tmp_path) -> None:
-    path = write_7z(tmp_path / "data.7z", [ArchiveMember("data", b"payload")])
-    source = io.BytesIO(path.read_bytes())
-    assert _read_backend(source) == b"payload"
-    assert not source.closed
-
-
 def test_empty_member_is_valid(tmp_path) -> None:
     path = write_7z(tmp_path / "empty.7z", [ArchiveMember("empty", b"")])
-    backend = open_sevenzip_backend(open_source(path))
+    backend = open_sevenzip_backend(str(path))
     assert backend.declared_size == 0
     assert backend.read(1) == b""
     assert backend.completed
@@ -261,14 +253,14 @@ def test_empty_member_is_valid(tmp_path) -> None:
 def test_zero_multiple_and_metadata_files_are_rejected(tmp_path, members) -> None:
     path = write_7z(tmp_path / "structure.7z", members)
     with pytest.raises(ArchiveStructureError, match="exactly one"):
-        open_sevenzip_backend(open_source(path))
+        open_sevenzip_backend(str(path))
 
 
 def test_invalid_and_truncated_archives_are_open_failures(tmp_path) -> None:
     invalid = tmp_path / "invalid.7z"
     invalid.write_bytes(b"7z\xbc\xaf\x27\x1cnot-an-archive")
     with pytest.raises(InvalidArchiveError):
-        open_sevenzip_backend(open_source(invalid))
+        open_sevenzip_backend(str(invalid))
 
     valid = write_7z(
         tmp_path / "valid.7z",
@@ -278,34 +270,63 @@ def test_invalid_and_truncated_archives_are_open_failures(tmp_path) -> None:
     content = valid.read_bytes()
     truncated.write_bytes(content[: len(content) // 2])
     with pytest.raises(InvalidArchiveError):
-        open_sevenzip_backend(open_source(truncated))
+        open_sevenzip_backend(str(truncated))
 
 
-def test_declared_size_limit_rejects_and_preserves_caller(tmp_path) -> None:
+def test_declared_size_limit_closes_backend_and_joins_worker(tmp_path) -> None:
     path = write_7z(tmp_path / "data.7z", [ArchiveMember("data", b"payload")])
-    source = io.BytesIO(path.read_bytes())
-    backend = open_sevenzip_backend(open_source(source))
+    backend = open_sevenzip_backend(str(path))
     with pytest.raises(SizeLimitExceededError, match="declared"):
         ContentStream(backend, max_uncompressed_size=6)
-    assert not source.closed
     assert not backend._reader._worker.is_alive()
 
 
-def test_early_close_joins_worker_and_preserves_caller(tmp_path) -> None:
+def test_early_close_joins_worker(tmp_path) -> None:
     content = b"x" * (_CALLBACK_BLOCK_SIZE * 3)
     path = write_7z(tmp_path / "data.7z", [ArchiveMember("data", content)])
-    source = io.BytesIO(path.read_bytes())
-    backend = open_sevenzip_backend(open_source(source))
+    backend = open_sevenzip_backend(str(path))
     assert backend.read(1) == b"x"
     backend.close()
     backend.close()
     assert not backend._reader._worker.is_alive()
-    assert not source.closed
 
 
-def test_nonseekable_7z_is_rejected_without_closing_caller(tmp_path) -> None:
-    path = write_7z(tmp_path / "data.7z", [ArchiveMember("data", b"payload")])
-    source = NonSeekableStream(path.read_bytes())
-    with pytest.raises(InvalidArchiveError, match="seekable"):
-        open_sevenzip_backend(open_source(source))
-    assert not source.closed
+def test_worker_start_failure_closes_open_archive(monkeypatch) -> None:
+    class Archive:
+        closed = False
+
+        def list(self):
+            return [
+                SimpleNamespace(
+                    filename="data",
+                    is_directory=False,
+                    is_symlink=False,
+                    is_file=True,
+                    uncompressed=7,
+                )
+            ]
+
+        def close(self) -> None:
+            self.closed = True
+
+    archive = Archive()
+    failure = RuntimeError("thread start failed")
+
+    monkeypatch.setattr(
+        "archive_line_index.backends.sevenzip.py7zr.SevenZipFile",
+        lambda *args, **kwargs: archive,
+    )
+
+    def fail_reader(*args, **kwargs):
+        raise failure
+
+    monkeypatch.setattr(
+        "archive_line_index.backends.sevenzip._QueueBackendReader",
+        fail_reader,
+    )
+
+    with pytest.raises(RuntimeError) as captured:
+        open_sevenzip_backend("data.7z")
+
+    assert captured.value is failure
+    assert archive.closed

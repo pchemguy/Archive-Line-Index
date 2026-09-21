@@ -18,7 +18,7 @@ The package is intended for inputs whose decompressed content may be much larger
 The system shall support:
 
 - Python 3.11 and later on Windows, Linux, and macOS;
-- filesystem paths and caller-provided binary streams;
+- filesystem-path content sources;
 - plain inputs and unencrypted ZIP, TAR, compressed-TAR, and 7z inputs;
 - exactly one regular-file member per accepted archive;
 - content-first format detection with strict recognized-suffix handling;
@@ -52,7 +52,7 @@ The system shall not provide:
 
 ### 4.1 Standalone sequential content access
 
-A caller opens a path or binary stream and consumes original decompressed bytes through a conventional readable binary interface. The caller may stop early and close deterministically or consume to terminal EOF to establish every integrity check available from the selected backend.
+A caller opens a filesystem path and consumes original decompressed bytes through a conventional readable binary interface. The caller may stop early and close deterministically or consume to terminal EOF to establish every integrity check available from the selected backend.
 
 ### 4.2 Build an in-memory line index
 
@@ -66,7 +66,7 @@ A caller writes a completed offset array to a dedicated SQLite file, a raw binar
 
 ```mermaid
 flowchart TD
-    A["Path or BinaryIO"] --> B["Source and archive handling"]
+    A["Filesystem path"] --> B["Source and archive handling"]
     B --> C["Sequential content stream"]
     C --> D["LF byte scanner"]
     D --> E["array('Q') offsets"]
@@ -76,7 +76,7 @@ flowchart TD
 
 The system consists of four principal responsibilities:
 
-1. **Content acquisition** normalizes input ownership, detects format, validates archive structure, and selects a decompression backend.
+1. **Content acquisition** normalizes the source path, detects format, validates archive structure, and selects a decompression backend.
 2. **Content streaming** provides the backend-independent read-only sequential byte interface, byte counting, size-limit enforcement, and cleanup.
 3. **Line indexing** scans any readable binary stream and constructs the canonical in-memory offset sequence.
 4. **Persistence** converts a completed offset sequence to and from either SQLite rows or raw little-endian integers.
@@ -88,8 +88,7 @@ The canonical physical-ownership map is rooted at [layout.md](layout.md), and de
 ## 6. System-wide terminology
 
 **Source**
-: A filesystem path or caller-provided readable binary stream supplied to the
-  content-opening API.
+: A filesystem path supplied to the content-opening API.
 
 **Payload**
 : The plain file's bytes or the decompressed bytes of the archive's sole
@@ -132,8 +131,7 @@ The canonical physical-ownership map is rooted at [layout.md](layout.md), and de
 10. Persisted SQLite and raw indexes represent exactly the same logical offset sequence as the validated in-memory array.
 11. No completed index or replacement persistence file is published following source, archive, decompression, scanning, validation, or persistence failure.
 12. Bounded reads do not retain the complete decompressed payload.
-13. Caller-provided source streams are never closed by the package.
-14. Package-owned threads terminate following deterministic stream cleanup.
+13. Package-owned threads terminate following deterministic stream cleanup.
 
 ## 8. Top-level contracts
 
@@ -141,7 +139,7 @@ The supported public Python surface, validation policy, and exceptions are defin
 
 The content-stream lifecycle, byte-delivery, size-limit, and completion contracts are defined in [spec/content-stream.md](spec/content-stream.md).
 
-Format detection, archive validation, backend behavior, supported source capabilities, and 7z concurrency are defined in [spec/archive-handling.md](spec/archive-handling.md).
+Format detection, archive validation, backend behavior, path ownership, and 7z concurrency are defined in [spec/archive-handling.md](spec/archive-handling.md).
 
 Byte-line semantics, BOM treatment, offset-array invariants, and the scanning algorithm are defined in [spec/line-index.md](spec/line-index.md).
 
@@ -185,7 +183,7 @@ The complete project is conformant when:
 4. Newlines and UTF-8 BOM bytes split across every relevant source/backend boundary are handled correctly.
 5. Supported archives with zero or multiple regular members, corrupt or truncated data, or special members fail through the specified error model.
 6. Successful terminal EOF includes all integrity checks available from the selected backend; early closure is explicitly non-validating.
-7. Caller-owned streams remain open, while every package-owned file, archive, queue, and worker is released by deterministic cleanup.
+7. Every package-owned file, archive, queue, and worker is released by deterministic cleanup.
 8. SQLite rows ordered by offset and decoded raw `uint64` values exactly equal the source `array("Q")`.
 9. Existing persistence destinations are protected unless replacement is explicitly authorized.
 10. Failed replacement leaves the previous destination intact.

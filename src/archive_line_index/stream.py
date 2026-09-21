@@ -46,10 +46,6 @@ class ContentStream(io.RawIOBase):
         self._checkClosed()
         return False
 
-    def seekable(self) -> bool:
-        self._checkClosed()
-        return False
-
     def read(self, size: int = -1) -> bytes:
         self._checkClosed()
         size = operator.index(size)
@@ -82,10 +78,6 @@ class ContentStream(io.RawIOBase):
     def writelines(self, lines) -> None:
         self._checkClosed()
         raise io.UnsupportedOperation("stream is not writable")
-
-    def seek(self, offset: int, whence: int = io.SEEK_SET) -> int:
-        self._checkClosed()
-        raise io.UnsupportedOperation("stream is not seekable")
 
     def truncate(self, size: int | None = None) -> int:
         self._checkClosed()

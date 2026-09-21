@@ -7,7 +7,6 @@ import pytest
 from archive_line_index.backends.base import BackendReader
 from archive_line_index.backends.plain import open_plain_backend
 from archive_line_index.errors import ExtractionError, SizeLimitExceededError
-from archive_line_index.sources import open_source
 from archive_line_index.stream import ContentStream
 
 
@@ -203,9 +202,12 @@ def test_context_exit_after_consumer_exception_closes_backend() -> None:
     assert backend.closed
 
 
-def test_plain_backend_cleanup_preserves_caller_source() -> None:
-    source = io.BytesIO(b"payload")
-    stream = ContentStream(open_plain_backend(open_source(source)))
+def test_plain_backend_cleanup_closes_owned_source(tmp_path) -> None:
+    source = tmp_path / "payload"
+    source.write_bytes(b"payload")
+    backend = open_plain_backend(str(source))
+    raw = backend._stream
+    stream = ContentStream(backend)
     assert stream.read() == b"payload"
     stream.close()
-    assert not source.closed
+    assert raw.closed

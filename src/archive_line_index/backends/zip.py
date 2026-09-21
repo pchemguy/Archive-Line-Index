@@ -10,30 +10,24 @@ from ..errors import (
     ExtractionError,
     InvalidArchiveError,
 )
-from ..sources import SourceHandle
 
 
 class ZipBackendReader:
     """Expose a validated ZIP member through the backend reader contract."""
 
-    def __init__(self, source: SourceHandle) -> None:
-        self._source = source
+    def __init__(self, path: str) -> None:
         self._archive: zipfile.ZipFile | None = None
         self._member = None
         self._closed = False
         self._completed = False
         self._declared_size: int | None = None
 
-        if not source.seekable():
-            source.close()
-            raise InvalidArchiveError("ZIP input must be seekable")
-
         try:
-            self._archive = zipfile.ZipFile(source, "r")
+            self._archive = zipfile.ZipFile(path, "r")
             selected = _select_member(self._archive.infolist())
             self._declared_size = selected.file_size
             try:
-                self._member = self._archive.open(selected, "r", pwd=None)
+                self._member = self._archive.open(selected, "r")
             except RuntimeError as exc:
                 raise InvalidArchiveError("ZIP member could not be opened") from exc
         except ArchiveStructureError:
@@ -90,17 +84,14 @@ class ZipBackendReader:
             if member is not None:
                 member.close()
         finally:
-            try:
-                if archive is not None:
-                    archive.close()
-            finally:
-                self._source.close()
+            if archive is not None:
+                archive.close()
 
 
-def open_zip_backend(source: SourceHandle) -> ZipBackendReader:
+def open_zip_backend(path: str) -> ZipBackendReader:
     """Open and validate a ZIP source without extracting to disk."""
 
-    return ZipBackendReader(source)
+    return ZipBackendReader(path)
 
 
 def _select_member(entries: list[zipfile.ZipInfo]) -> zipfile.ZipInfo:

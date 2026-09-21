@@ -36,14 +36,7 @@ It is a foundational module and imports no other project module. Ordinary Python
 
 ### `src/archive_line_index/sources.py`
 
-Owns source normalization and lifetime boundaries:
-
-- the accepted path-or-binary-stream source alias;
-- opening path sources;
-- attaching to caller-owned streams without assuming ownership;
-- seekability and byte-return validation;
-- replay of prefixes consumed while detecting non-seekable plain input;
-- idempotent release of package-owned source resources.
+Owns the public filesystem-path source alias and normalization to a native string path. It rejects byte-valued path-like objects and non-path inputs without opening the source.
 
 It does not detect archive formats or understand archive members.
 
@@ -57,7 +50,7 @@ Owns format classification and detection:
 - strict handling of misleading recognized archive suffixes;
 - the bounded prefix requirements used during detection.
 
-It consumes the source abstraction without taking over source ownership. It does not open archive members or produce the public content stream.
+It opens and closes a short-lived detection handle. It does not open archive members or produce the public content stream.
 
 ### `src/archive_line_index/stream.py`
 
@@ -69,7 +62,6 @@ Owns the common read-only sequential content-stream implementation. It wraps an 
 - maximum-size enforcement;
 - normal EOF versus failure distinction;
 - idempotent closure and context management;
-- preservation of caller-owned source lifetime;
 - cleanup delegation to the selected backend reader.
 
 It does not detect formats, inspect archive members, scan for lines, or create persistence output.
@@ -123,7 +115,7 @@ It performs dispatch only. Format detection remains in `formats.py`, and the pub
 
 ### `src/archive_line_index/backends/plain.py`
 
-Adapts an uncompressed source to the internal reader protocol. It preserves any prefix consumed during detection and reads bounded byte blocks without loading the complete file.
+Opens an uncompressed path as a package-owned file and adapts it to the internal reader protocol with bounded byte reads and deterministic closure.
 
 ### `src/archive_line_index/backends/zip.py`
 
@@ -131,7 +123,7 @@ Owns ZIP inspection, exactly-one-regular-member validation, member opening, boun
 
 ### `src/archive_line_index/backends/tar.py`
 
-Owns TAR and supported compressed-TAR member validation, sequential streaming, TAR error translation, and cleanup. It uses one `tarfile` streaming path for all sources without filesystem extraction and completes trailing-member validation before terminal EOF.
+Owns TAR and supported compressed-TAR member validation, sequential streaming, TAR error translation, and cleanup. It uses one `tarfile` streaming path for all paths without filesystem extraction and completes trailing-member validation before terminal EOF.
 
 ### `src/archive_line_index/backends/sevenzip.py`
 
@@ -206,20 +198,20 @@ flowchart TD
 
 The graph is intentionally acyclic. The following import constraints are normative for physical organization:
 
-| Location               | May depend on                                                 | Must not depend on                                               |
-| ---------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `errors.py`            | Python standard library                                       | Any project module                                               |
-| `sources.py`           | `errors.py`                                                   | Formats, backends, stream, scanner, persistence, API             |
-| `formats.py`           | Errors and source abstractions                                | Concrete backends, stream, scanner, persistence, API             |
-| `backends/base.py`     | Errors and minimal source types                               | Concrete backends, stream, scanner, persistence, API             |
-| Concrete backends      | Errors, sources, formats, backend base, their archive library | Stream, scanner, offsets, persistence, API                       |
-| `backends/registry.py` | Formats and concrete backends                                 | Scanner, offsets, persistence, API                               |
-| `stream.py`            | Errors and backend base                                       | Detection, concrete backends, scanner, offsets, persistence, API |
-| `offsets.py`           | Python standard library                                       | Sources, formats, backends, stream, scanner, persistence, API    |
-| `scanner.py`           | Offsets and binary-I/O protocols                              | Sources, formats, backends, concrete stream, persistence, API    |
-| Persistence adapters   | Errors and offsets                                            | Sources, formats, backends, stream, scanner, API                 |
-| `api.py`               | All required lower-level components                           | Package `__init__.py`                                            |
-| Package `__init__.py`  | Public API and public errors                                  | Backend and persistence implementation modules                   |
+| Location               | May depend on                               | Must not depend on                                               |
+| ---------------------- | ------------------------------------------- | ---------------------------------------------------------------- |
+| `errors.py`            | Python standard library                     | Any project module                                               |
+| `sources.py`           | Python standard library                     | Formats, backends, stream, scanner, persistence, API             |
+| `formats.py`           | Source path types                           | Concrete backends, stream, scanner, persistence, API             |
+| `backends/base.py`     | Errors and Python protocols                 | Concrete backends, stream, scanner, persistence, API             |
+| Concrete backends      | Errors, backend base, their archive library | Stream, scanner, offsets, persistence, API                       |
+| `backends/registry.py` | Formats and concrete backends               | Scanner, offsets, persistence, API                               |
+| `stream.py`            | Errors and backend base                     | Detection, concrete backends, scanner, offsets, persistence, API |
+| `offsets.py`           | Python standard library                     | Sources, formats, backends, stream, scanner, persistence, API    |
+| `scanner.py`           | Offsets and binary-I/O protocols            | Sources, formats, backends, concrete stream, persistence, API    |
+| Persistence adapters   | Errors and offsets                          | Sources, formats, backends, stream, scanner, API                 |
+| `api.py`               | All required lower-level components         | Package `__init__.py`                                            |
+| Package `__init__.py`  | Public API and public errors                | Backend and persistence implementation modules                   |
 
 When two modules appear to need one another, shared definitions must move to a lower-level owner such as `backends/base.py` or `offsets.py`; reciprocal imports are not permitted.
 

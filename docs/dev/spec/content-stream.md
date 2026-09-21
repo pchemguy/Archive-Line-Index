@@ -35,7 +35,7 @@ It shall not:
 - concatenate multiple archive members;
 - synthesize trailing bytes.
 
-For a plain file, the payload begins at the source stream's current position. For an archive, the payload is the full decompressed content of the selected regular member.
+For a plain file, the payload begins at byte zero. For an archive, the payload is the full decompressed content of the selected regular member.
 
 ## 4. Read behavior
 
@@ -93,17 +93,7 @@ Once successful terminal EOF has been returned, subsequent reads return `b""` wi
 
 ## 7. Source ownership
 
-When constructed from a path, the content stream owns and closes the source file, archive object, member object, internal buffers, and any extraction worker.
-
-When constructed from a caller-provided binary stream:
-
-- the caller retains ownership;
-- closing `ContentStream` closes archive/member wrappers and package resources but not the caller stream;
-- processing begins at the stream's current position;
-- consumed bytes and the final position are not restored;
-- a backend library must not be permitted to close the caller stream as an accidental side effect.
-
-Where a standard-library archive wrapper unavoidably closes only its own wrapper but not the passed file object, normal wrapper closure is sufficient. Where a dependency would close the passed object, the package shall interpose a non-closing adapter.
+The content stream owns and closes every source file, archive object, member object, internal buffer, and extraction worker opened for the supplied path. Detection and backend handles are independent and are each closed by the component that opened them.
 
 ## 8. Closure and cancellation
 
@@ -118,7 +108,7 @@ For the threaded 7z backend, closure shall:
 1. set a cooperative cancellation signal;
 2. unblock a producer waiting for queue capacity;
 3. stop accepting callback bytes;
-4. release 7z and source resources when safe;
+4. release 7z resources when safe;
 5. join the package-owned extraction worker;
 6. discard cancellation-only internal messages;
 7. leave no live package-owned worker before returning.
@@ -157,7 +147,6 @@ The content-stream implementation conforms when:
 4. Actual-size counting rejects the first byte beyond the configured inclusive limit.
 5. Terminal backend failures are raised instead of being converted to EOF.
 6. Explicit close and every exceptional path release owned resources.
-7. Caller-owned source streams remain open.
-8. No 7z worker remains alive after deterministic close.
-9. A slow consumer cannot cause unbounded producer lookahead.
-10. Streaming a large generated payload with bounded reads does not retain the entire decompressed payload.
+7. No 7z worker remains alive after deterministic close.
+8. A slow consumer cannot cause unbounded producer lookahead.
+9. Streaming a large generated payload with bounded reads does not retain the entire decompressed payload.

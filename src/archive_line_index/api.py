@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-import os
 from array import array
 from typing import BinaryIO
 
 from .backends.registry import open_backend
 from .formats import detect_format
 from .scanner import scan_offsets
-from .sources import Source, open_source
+from .sources import Source, normalize_source_path
 from .stream import ContentStream
 
 
@@ -24,18 +23,13 @@ def open_content_stream(
     """Open a plain payload or supported archive member as sequential bytes."""
 
     _validate_max_uncompressed_size(max_uncompressed_size)
-    filename = source if isinstance(source, (str, os.PathLike)) else None
-    handle = open_source(source)
-    try:
-        source_format = detect_format(handle, filename=filename)
-        backend = open_backend(source_format, handle)
-        return ContentStream(
-            backend,
-            max_uncompressed_size=max_uncompressed_size,
-        )
-    except BaseException:
-        handle.close()
-        raise
+    path = normalize_source_path(source)
+    source_format = detect_format(path)
+    backend = open_backend(source_format, path)
+    return ContentStream(
+        backend,
+        max_uncompressed_size=max_uncompressed_size,
+    )
 
 
 def scan_line_offsets(

@@ -88,33 +88,31 @@ def test_sevenzip_build_matches_expected_offsets(tmp_path, case) -> None:
     assert tuple(offsets) == case.offsets
 
 
-def test_caller_stream_build_uses_current_position_and_preserves_ownership() -> None:
-    source = io.BytesIO(b"ignored" + UTF8_BOM + b"a\n\nb")
-    source.seek(len(b"ignored"))
-
-    offsets = build_line_index(source, buffer_size=1)
-
-    assert tuple(offsets) == (3, 5, 6, 7)
-    assert not source.closed
-
-
-def test_bom_policy_changes_only_the_first_line_start() -> None:
+def test_bom_policy_changes_only_the_first_line_start(tmp_path) -> None:
     content = UTF8_BOM + b"a\nb"
+    path = tmp_path / "data"
+    path.write_bytes(content)
 
-    skipped = build_line_index(io.BytesIO(content), skip_utf8_bom=True)
-    retained = build_line_index(io.BytesIO(content), skip_utf8_bom=False)
+    skipped = build_line_index(path, skip_utf8_bom=True)
+    retained = build_line_index(path, skip_utf8_bom=False)
 
     assert tuple(skipped) == (3, 5, 6)
     assert tuple(retained) == (0, 5, 6)
 
 
-def test_maximum_size_is_applied_to_composed_build() -> None:
-    source = io.BytesIO(b"a\nb")
+def test_maximum_size_is_applied_to_composed_build(tmp_path) -> None:
+    source = tmp_path / "data"
+    source.write_bytes(b"a\nb")
 
     with pytest.raises(SizeLimitExceededError):
         build_line_index(source, max_uncompressed_size=2)
 
-    assert not source.closed
+
+def test_build_rejects_binary_stream_but_direct_scanner_accepts_it() -> None:
+    source = io.BytesIO(b"a\nb")
+    with pytest.raises(TypeError, match="filesystem path"):
+        build_line_index(source)
+    assert tuple(scan_line_offsets(source)) == (0, 2, 3)
 
 
 @pytest.mark.parametrize(

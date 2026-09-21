@@ -52,19 +52,15 @@ Rules:
 5. Plain-file suffixes are unrestricted, including `.txt`, `.jsonl`, unknown suffixes, and no suffix.
 6. Suffix comparison is case-insensitive.
 
-Detection reads only a bounded prefix. A seekable source may be restored to the detection start. For a non-seekable source ultimately classified as plain, the prefix is replayed by the plain backend. No detection byte is lost or duplicated.
+Detection opens the path, reads only a bounded prefix, and closes its handle. The selected backend independently opens the same path from its beginning, so detection state is never shared with payload delivery.
 
 Content signatures identify candidate formats; the selected archive library remains authoritative for full structural validity.
 
-## 4. Source capability requirements
+## 4. Source requirements
 
-Plain input may be non-seekable.
+Archive-opening operations accept filesystem paths only. The package does not inspect source positioning capabilities or select a backend strategy from seekability. Plain and TAR backends read package-owned files sequentially. `zipfile` and `py7zr` may position their own internally opened archive handles as required, while the public payload remains sequential and is never extracted.
 
-ZIP and 7z require a seekable caller-provided stream unless their supported library version explicitly supplies a safe streaming mode adopted by a future specification revision. A non-seekable caller stream detected or claimed as ZIP/7z fails clearly rather than being buffered in full.
-
-TAR always uses sequential streaming mode, regardless of source seekability. Some invalid structure may therefore be detected only after member bytes have already been delivered.
-
-Path sources may be reopened or repositioned internally as required, but the payload is still delivered sequentially and never extracted.
+TAR always uses sequential streaming mode. Some invalid structure may therefore be detected only after member bytes have already been delivered.
 
 ## 5. Archive structure
 
@@ -97,11 +93,10 @@ The plain backend adapts the source directly to the internal backend reader prot
 
 It shall:
 
-- replay any detection prefix for a non-seekable source;
 - read bounded byte chunks;
 - preserve all bytes exactly;
 - participate in actual-size counting through the common stream wrapper;
-- close path-owned sources but not caller-owned streams.
+- close its package-owned source.
 
 Plain input has no archive-structure or CRC validation beyond successful source reads through EOF.
 
@@ -114,7 +109,7 @@ The ZIP backend shall:
 - open only the validated regular member;
 - use bounded reads from the member stream;
 - close the member and archive wrappers deterministically;
-- preserve caller source ownership;
+- close its package-owned archive handle;
 - allow `zipfile` CRC or truncation failures to surface through the package error model.
 
 It shall not call `extract()`, `extractall()`, or create an output path.
@@ -123,7 +118,7 @@ It shall not call `extract()`, `extractall()`, or create an output path.
 
 The TAR backend shall:
 
-- use `tarfile` sequential streaming mode for every source;
+- use `tarfile` sequential streaming mode for every path;
 - support compression filters available in the supported standard-library build without implying optional undeclared filters;
 - classify every encountered member;
 - open and read only the validated regular member;
@@ -184,8 +179,7 @@ Equivalent byte corpora shall be exercised through every format that can represe
 - corrupt and truncated archives;
 - misleading recognized suffixes;
 - signature-recognized archives with unconventional names;
-- path and caller-owned stream sources;
-- seekable and allowed non-seekable inputs;
+- string and path-like filesystem sources;
 - declared-size and actual-size limit failures;
 - early close during active extraction;
 - terminal integrity failure after earlier payload delivery.

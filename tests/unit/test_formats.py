@@ -1,7 +1,8 @@
-"""Tests for bounded, content-first format classification."""
+"""Tests for bounded, content-first path format classification."""
 
 from __future__ import annotations
 
+import builtins
 import io
 import tarfile
 
@@ -12,7 +13,12 @@ from archive_line_index.formats import (
     SourceFormat,
     detect_format,
 )
-from archive_line_index.sources import open_source
+
+
+def _write(tmp_path, name: str, content: bytes):
+    path = tmp_path / name
+    path.write_bytes(content)
+    return path
 
 
 def _tar_bytes() -> bytes:
@@ -38,22 +44,22 @@ def _tar_bytes() -> bytes:
     ],
 )
 def test_recognized_signature_wins_over_conflicting_suffix(
-    signature: bytes, expected: SourceFormat
+    tmp_path, signature: bytes, expected: SourceFormat
 ) -> None:
-    handle = open_source(io.BytesIO(signature + b"not-an-archive"))
-    assert detect_format(handle, filename="conflict.zip") is expected
+    path = _write(tmp_path, "conflict.zip", signature + b"not-an-archive")
+    assert detect_format(path) is expected
 
 
-def test_valid_uncompressed_tar_header_is_detected() -> None:
-    handle = open_source(io.BytesIO(_tar_bytes()))
-    assert detect_format(handle, filename="unconventional.data") is SourceFormat.TAR
+def test_valid_uncompressed_tar_header_is_detected(tmp_path) -> None:
+    path = _write(tmp_path, "unconventional.data", _tar_bytes())
+    assert detect_format(path) is SourceFormat.TAR
 
 
-def test_ustar_text_without_a_valid_checksum_is_plain() -> None:
+def test_ustar_text_without_a_valid_checksum_is_plain(tmp_path) -> None:
     content = bytearray(DETECTION_PREFIX_SIZE)
     content[257:262] = b"ustar"
-    handle = open_source(io.BytesIO(content))
-    assert detect_format(handle) is SourceFormat.PLAIN
+    path = _write(tmp_path, "data", content)
+    assert detect_format(path) is SourceFormat.PLAIN
 
 
 @pytest.mark.parametrize(
@@ -72,61 +78,44 @@ def test_ustar_text_without_a_valid_checksum_is_plain() -> None:
     ],
 )
 def test_recognized_suffix_claims_a_candidate(
-    filename: str, expected: SourceFormat
+    tmp_path, filename: str, expected: SourceFormat
 ) -> None:
-    handle = open_source(io.BytesIO(b"not-an-archive"))
-    assert detect_format(handle, filename=filename) is expected
+    assert detect_format(_write(tmp_path, filename, b"not-an-archive")) is expected
 
 
-@pytest.mark.parametrize("filename", [None, "payload", "payload.txt", "payload.gz"])
-def test_unknown_or_plain_filename_falls_back_to_plain(filename) -> None:
-    handle = open_source(io.BytesIO(b"ordinary content"))
-    assert detect_format(handle, filename=filename) is SourceFormat.PLAIN
+@pytest.mark.parametrize("filename", ["payload", "payload.txt", "payload.gz"])
+def test_unknown_or_plain_filename_falls_back_to_plain(tmp_path, filename) -> None:
+    path = _write(tmp_path, filename, b"ordinary content")
+    assert detect_format(path) is SourceFormat.PLAIN
 
 
-def test_nonseekable_detection_prefix_is_replayed_exactly() -> None:
-    class NonSeekable(io.BytesIO):
-        def seekable(self) -> bool:
-            return False
+def test_detection_requests_only_the_bounded_prefix(tmp_path, monkeypatch) -> None:
+    path = _write(tmp_path, "large", b"x" * (DETECTION_PREFIX_SIZE * 4))
+    requests = []
+    original_open = builtins.open
 
-    content = b"plain nonseekable payload"
-    handle = open_source(NonSeekable(content))
-    assert detect_format(handle) is SourceFormat.PLAIN
-    assert handle.read() == content
+    class RecordingReader:
+        def __init__(self, stream) -> None:
+            self._stream = stream
 
+        def __enter__(self):
+            return self
 
-def test_seekable_detection_restores_attachment_origin() -> None:
-    stream = io.BytesIO(b"prefix" + b"PK\x03\x04payload")
-    stream.seek(len(b"prefix"))
-    handle = open_source(stream)
+        def __exit__(self, *args):
+            self._stream.close()
 
-    assert detect_format(handle) is SourceFormat.ZIP
-    assert handle.tell() == 0
-    assert handle.read(4) == b"PK\x03\x04"
+        def read(self, size=-1):
+            requests.append(size)
+            return self._stream.read(size)
 
+    def recording_open(file, mode="r", *args, **kwargs):
+        return RecordingReader(original_open(file, mode, *args, **kwargs))
 
-def test_detection_requests_only_the_bounded_prefix() -> None:
-    class RecordingStream(io.BytesIO):
-        def __init__(self, data: bytes) -> None:
-            super().__init__(data)
-            self.requests: list[int] = []
-
-        def read(self, size: int = -1) -> bytes:
-            self.requests.append(size)
-            return super().read(size)
-
-    stream = RecordingStream(b"x" * (DETECTION_PREFIX_SIZE * 4))
-    handle = open_source(stream)
-    assert detect_format(handle) is SourceFormat.PLAIN
-    assert max(stream.requests) == DETECTION_PREFIX_SIZE
-    assert stream.tell() == 0
+    monkeypatch.setattr(builtins, "open", recording_open)
+    assert detect_format(path) is SourceFormat.PLAIN
+    assert requests == [DETECTION_PREFIX_SIZE]
 
 
-def test_bytes_filename_is_rejected_after_prefix_restoration() -> None:
-    class BytesPath:
-        def __fspath__(self) -> bytes:
-            return b"invalid.zip"
-
-    handle = open_source(io.BytesIO(b"plain"))
-    with pytest.raises(TypeError, match="resolve to str"):
-        detect_format(handle, filename=BytesPath())
+def test_missing_path_preserves_filesystem_exception(tmp_path) -> None:
+    with pytest.raises(FileNotFoundError):
+        detect_format(tmp_path / "missing")

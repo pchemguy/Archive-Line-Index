@@ -22,7 +22,7 @@ Defines the shared byte corpora and expected offset sequences used across plain 
 
 ### `tests/helpers/streams.py`
 
-Provides controlled caller-owned streams, non-seekable streams, short-read streams, failing streams, and instrumentation used to verify ownership, backpressure, closure, and error propagation.
+Provides controlled short-read and failing streams used by direct scanner tests to verify bounded reads, caller ownership, and error propagation.
 
 ### `tests/fixtures/`
 
@@ -53,10 +53,10 @@ Unit tests correspond directly to production ownership:
 
 ## 4. Integration tests
 
-`tests/integration/test_content_stream.py` exercises public stream behavior across every supported source format, including source ownership, bounded reads, error timing, early closure, and terminal integrity.
+`tests/integration/test_content_stream.py` exercises public stream behavior across every supported source format, including path ownership, bounded reads, error timing, early closure, and terminal integrity.
 
 `tests/integration/test_index_building.py` verifies that equivalent plain, ZIP, TAR, and 7z content produces the same offset sequence through the public composition path.
 
 `tests/integration/test_persistence_equivalence.py` verifies that the completed in-memory array, rows selected from SQLite in ascending order, and decoded raw `uint64` values are identical, including the EOF sentinel.
 
-`tests/integration/test_resource_lifecycle.py` verifies deterministic cleanup, no surviving 7z extraction worker after closure, caller-owned stream preservation, and cleanup following consumer, backend, scanner, and persistence failures.
+`tests/integration/test_resource_lifecycle.py` verifies deterministic cleanup, no surviving 7z extraction worker after closure, package-owned file closure, and cleanup following consumer, backend, scanner, and persistence failures.

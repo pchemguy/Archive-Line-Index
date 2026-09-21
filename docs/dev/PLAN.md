@@ -40,13 +40,13 @@ The first phase produces the smallest useful product: a public sequential binary
 
 ### Plain stream and index MVP
 
-Implements foundational errors, source ownership, format classification needed to reject not-yet-enabled archives, internal backend protocol, plain backend, common content stream, offset representation, scanner, and public composition.
+Implements foundational errors, path normalization, format classification needed to reject not-yet-enabled archives, internal backend protocol, plain backend, common content stream, offset representation, scanner, and public composition.
 
-At completion, callers can stream and index plain paths or binary streams with all byte-line/BOM/EOF semantics and deterministic ownership behavior tested.
+At completion, callers can stream and index plain paths, and can directly scan arbitrary readable binary streams, with all byte-line/BOM/EOF semantics and deterministic ownership behavior tested.
 
 ### Archive streams
 
-Implements unencrypted ZIP, TAR, and 7z backends, completes dispatch for every supported format, and verifies identical public byte/index behavior across formats. The threaded 7z adapter is built last because it depends on the stable pull reader and stream lifecycle contracts. TAR uses one sequential streaming strategy for paths and caller streams.
+Implements unencrypted ZIP, TAR, and 7z backends, completes dispatch for every supported format, and verifies identical public byte/index behavior across formats. The threaded 7z adapter is built last because it depends on the stable pull reader and stream lifecycle contracts. TAR uses one sequential streaming strategy for filesystem paths.
 
 ### Index persistence
 

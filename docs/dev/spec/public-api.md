@@ -21,7 +21,7 @@ The distribution name is `archive-line-index`; the import package is `archive_li
 from os import PathLike
 from typing import BinaryIO, TypeAlias
 
-Source: TypeAlias = str | PathLike[str] | BinaryIO
+Source: TypeAlias = str | PathLike[str]
 
 DEFAULT_BUFFER_SIZE = 1024 * 1024
 ```
@@ -90,7 +90,7 @@ def build_line_index(
     """Open a source, scan its payload, and return a completed offset array."""
 ```
 
-This is the composition of `open_content_stream()` and `scan_line_offsets()`. It always closes the package-created `ContentStream`, including when scanning fails. Caller-provided source ownership remains unchanged.
+This is the composition of `open_content_stream()` and `scan_line_offsets()`. It always closes the package-created `ContentStream`, including when scanning fails.
 
 Both functions return `array("Q")`. They return no partial result following an exception.
 
@@ -151,7 +151,7 @@ Validation that does not require source I/O occurs before opening a path, starti
 - `buffer_size` must be an integer greater than zero; `bool` is rejected.
 - `max_uncompressed_size` must be `None` or a non-negative integer; `bool` is rejected.
 - `skip_utf8_bom` and `overwrite` must be actual `bool` values.
-- A source stream must provide binary bytes rather than text strings.
+- A direct scanner input must provide binary bytes rather than text strings.
 - Persistence input must be an `array` with type code `"Q"` and 8-byte items.
 - Offset arrays must contain at least one value, fit the shared signed SQLite range, and satisfy the monotonic/sentinel structural contract.
 - Path-like arguments are resolved through normal Python filesystem semantics; empty or otherwise invalid paths fail through the corresponding standard exception.
@@ -160,9 +160,9 @@ Invalid public values raise `TypeError` when the argument has the wrong kind and
 
 ## 8. Ownership and positioning
 
-For source paths, the package owns every opened file and archive object. For a caller-provided `BinaryIO`, the caller retains ownership and the package shall not close it.
+Source-opening operations accept filesystem paths only. The package owns every file and archive object it opens for detection and content delivery.
 
-Processing begins at the caller stream's current position. That position is not restored. `scan_line_offsets()` defines its returned offset zero at the current position when scanning begins. `open_content_stream()` applies format detection from the current position and replays any detection prefix required for plain non-seekable input.
+`scan_line_offsets()` remains independent: it consumes an arbitrary caller-provided readable `BinaryIO` from its current position, defines that position as offset zero, neither closes it nor restores its position, and does not require the stream to support positioning.
 
 Persistence read functions own and close the files they open. Persistence write functions own their temporary and destination handles but not the supplied in-memory array.
 
@@ -226,7 +226,7 @@ The public API conforms when:
 1. Every documented export is importable from `archive_line_index` in an installed wheel.
 2. No undocumented backend or persistence implementation name is re-exported.
 3. Invalid arguments fail before resource acquisition or destination mutation.
-4. Path sources and caller-owned streams obey their respective ownership rules.
+4. Path-owned resources close deterministically, while direct scanner inputs remain caller-owned.
 5. Direct stream scanning and source-based index building produce identical offsets for equivalent bytes.
 6. Persistence functions protect existing destinations by default and preserve them after failed explicit replacement.
 7. Narrow public errors are stable across backend-specific exception changes, with original causes retained.

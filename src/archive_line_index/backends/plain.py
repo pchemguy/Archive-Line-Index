@@ -1,23 +1,26 @@
-"""Plain-source adapter for the internal backend reader contract."""
+"""Plain-path adapter for the internal backend reader contract."""
 
 from __future__ import annotations
 
 import os
-
-from ..sources import SourceHandle
+from typing import BinaryIO
 
 
 class PlainBackendReader:
-    """Expose a normalized source as a sequential backend reader."""
+    """Expose a package-owned plain file as a sequential backend reader."""
 
-    def __init__(self, source: SourceHandle) -> None:
-        self._source = source
+    def __init__(self, path: str) -> None:
+        self._stream: BinaryIO = open(path, "rb")
         self._completed = False
         self._closed = False
-        self._declared_size = self._measure_size(source)
+        try:
+            self._declared_size = os.fstat(self._stream.fileno()).st_size
+        except BaseException:
+            self._stream.close()
+            raise
 
     @property
-    def declared_size(self) -> int | None:
+    def declared_size(self) -> int:
         return self._declared_size
 
     @property
@@ -34,7 +37,7 @@ class PlainBackendReader:
         if self._completed:
             return b""
 
-        data = self._source.read(size)
+        data = self._stream.read(size)
         if not data:
             self._completed = True
         return data
@@ -43,19 +46,10 @@ class PlainBackendReader:
         if self._closed:
             return
         self._closed = True
-        self._source.close()
-
-    @staticmethod
-    def _measure_size(source: SourceHandle) -> int | None:
-        if not source.seekable():
-            return None
-        position = source.tell()
-        end = source.seek(0, os.SEEK_END)
-        source.seek(position, os.SEEK_SET)
-        return end
+        self._stream.close()
 
 
-def open_plain_backend(source: SourceHandle) -> PlainBackendReader:
-    """Construct a plain backend reader for ``source``."""
+def open_plain_backend(path: str) -> PlainBackendReader:
+    """Open ``path`` as an uncompressed sequential source."""
 
-    return PlainBackendReader(source)
+    return PlainBackendReader(path)

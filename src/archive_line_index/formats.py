@@ -4,9 +4,7 @@ from __future__ import annotations
 
 import os
 from enum import Enum
-from os import PathLike
-
-from .sources import SourceHandle
+from .sources import Source, normalize_source_path
 
 
 DETECTION_PREFIX_SIZE = 512
@@ -41,18 +39,18 @@ class SourceFormat(Enum):
 
 
 def detect_format(
-    source: SourceHandle,
-    *,
-    filename: str | PathLike[str] | None = None,
+    source: Source,
 ) -> SourceFormat:
-    """Classify ``source`` without consuming bytes from its processing view."""
+    """Classify a source path from a bounded prefix and its suffix."""
 
-    prefix = source.probe_prefix(DETECTION_PREFIX_SIZE)
+    path = normalize_source_path(source)
+    with open(path, "rb") as stream:
+        prefix = stream.read(DETECTION_PREFIX_SIZE)
     signature_format = _format_from_signature(prefix)
     if signature_format is not None:
         return signature_format
 
-    suffix_format = _format_from_suffix(filename)
+    suffix_format = _format_from_suffix(path)
     if suffix_format is not None:
         return suffix_format
     return SourceFormat.PLAIN
@@ -70,11 +68,7 @@ def _format_from_signature(prefix: bytes) -> SourceFormat | None:
     return None
 
 
-def _format_from_suffix(
-    filename: str | PathLike[str] | None,
-) -> SourceFormat | None:
-    if filename is None:
-        return None
+def _format_from_suffix(filename: Source) -> SourceFormat | None:
     name = os.fspath(filename)
     if not isinstance(name, str):
         raise TypeError("filename must resolve to str, not bytes")

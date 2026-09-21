@@ -4,7 +4,7 @@
 
 This phase delivers the smallest useful Archive Line Index package:
 
-- plain path and caller-owned binary-stream sources;
+- plain filesystem-path sources;
 - a public read-only sequential `ContentStream`;
 - bounded reads, byte counting, size limits, and deterministic cleanup;
 - LF byte-line indexing with optional initial UTF-8 BOM exclusion;
@@ -62,22 +62,18 @@ Tests verify inheritance, stable names, and that ordinary filesystem and argumen
 
 After the focused tests, run the package import smoke test.
 
-#### Task: implement source ownership and prefix replay
+#### Task: implement source path normalization
 
 Create `src/archive_line_index/sources.py` and `tests/unit/test_sources.py`.
 
-Implement path opening, caller-stream attachment, ownership tracking, seekability reporting, binary-read validation, bounded prefix reading/replay, and idempotent release of owned handles.
+Implement the public path type and normalization to native string paths without opening the source.
 
 Tests cover:
 
 - string and path-like sources;
-- missing and inaccessible paths;
-- seekable and non-seekable streams;
-- current-position preservation as the processing origin;
-- replay with prefixes split by short reads;
-- rejection of text streams;
-- package-owned closure and caller-owned non-closure;
-- repeated cleanup.
+- missing paths remaining valid during normalization;
+- byte-valued path-like rejection;
+- rejection of streams and other non-path objects.
 
 Run `test_sources.py` and `test_errors.py`.
 
@@ -87,7 +83,7 @@ Create `src/archive_line_index/formats.py` and `tests/unit/test_formats.py`.
 
 Implement the internal format identifier, bounded signature probing, recognized compound suffixes, content-first precedence, strict suffix claims, and plain fallback. At this phase, detection identifies all final candidates even though the archive registry cannot yet open them.
 
-Tests cover every supported signature/suffix combination, unconventional archive names, misleading recognized suffixes, unknown/plain suffixes, case-insensitive matching, and prefix replay requirements.
+Tests cover every supported signature/suffix combination, unconventional archive names, misleading recognized suffixes, unknown/plain suffixes, case-insensitive matching, one bounded detection read, and independent handle closure.
 
 Run format, source, and error unit tests.
 
@@ -103,9 +99,9 @@ Run the focused stream contract tests and import checks.
 
 Create `src/archive_line_index/backends/plain.py` and `tests/unit/backends/test_plain.py`.
 
-Adapt source handles to bounded reads, preserve replay prefixes, and implement owned/caller-owned cleanup through the backend contract.
+Open a package-owned plain file, expose bounded reads, obtain declared size without repositioning, and close the file through the backend contract.
 
-Tests cover empty and large sources, arbitrary short reads, replay boundaries, read failures, early close, and ownership.
+Tests cover empty and large sources, missing paths, bounded reads, early close, read-size validation, and owned-file cleanup.
 
 Run plain-backend tests plus source and stream-contract tests.
 
@@ -123,7 +119,7 @@ Create `src/archive_line_index/stream.py` and complete `tests/unit/test_stream.p
 
 Implement readable binary behavior, arbitrary bounded read sizes, `readinto`, internal buffering, actual-byte size enforcement, successful EOF state, idempotent close, context management, and delegation to fake/plain readers.
 
-Tests cover zero, bounded, short, and unbounded reads; exact and exceeded size limits; error-before-EOF behavior; repeat EOF; unsupported operations; closure after consumer exceptions; and no closure of caller-owned sources.
+Tests cover zero, bounded, short, and unbounded reads; exact and exceeded size limits; error-before-EOF behavior; repeat EOF; unsupported operations; and closure after consumer exceptions.
 
 Run stream, backend base/plain, source, and error tests.
 
@@ -143,7 +139,7 @@ Run offset and error tests.
 
 Create `src/archive_line_index/scanner.py` and `tests/unit/test_scanner.py` using the shared cases from `tests/helpers/binary_cases.py` and controlled streams from `tests/helpers/streams.py`.
 
-Implement split BOM probing, prefix replay, block reads, repeated `bytes.find(b"\n")`, absolute positions, final unterminated-line handling, EOF sentinel insertion, and final structural validation.
+Implement split BOM probing, buffered prefix handling, block reads, repeated `bytes.find(b"\n")`, absolute positions, final unterminated-line handling, EOF sentinel insertion, and final structural validation.
 
 Tests cover the complete line-index example table, every relevant block split, short-read patterns, a line larger than the buffer, read failures, source non-closure, invalid buffer sizes, and a guard against a Python per-byte scan implementation.
 
@@ -155,7 +151,7 @@ Create `src/archive_line_index/api.py` and integration tests in `tests/integrati
 
 Implement `open_content_stream()`, `scan_line_offsets()`, and `build_line_index()` as thin composition. Add the initial final public exports for these capabilities to `__init__.py`; persistence names may be added only when implemented.
 
-Tests cover path and caller-stream workflows, source position, deterministic cleanup, package/caller ownership, BOM policy, max size, direct-versus-composed index equality, and archive-candidate rejection during the MVP.
+Tests cover path-based opening, direct caller-stream scanning, deterministic cleanup, BOM policy, max size, direct-versus-composed index equality, and archive-candidate rejection during the MVP.
 
 Run all unit tests plus both integration files.
 
@@ -168,7 +164,7 @@ After all tasks:
 3. Build a wheel and install it into a clean environment.
 4. From outside the repository, import the current public names.
 5. Stream and index plain files containing the complete shared byte corpus.
-6. Confirm caller-owned streams remain open after success and failure.
+6. Confirm direct scanner inputs remain caller-owned after success and failure.
 7. Confirm archive signatures are rejected rather than indexed as plain bytes.
 8. Run a generated large plain-input test demonstrating memory proportional to offsets and bounded buffers, not payload size or longest line.
 

@@ -16,7 +16,7 @@ Owns the public Python surface:
 
 - exported functions, classes, aliases, and constants;
 - argument validation visible to callers;
-- source ownership rules;
+- source-path ownership rules;
 - context-management and closure contracts;
 - exception hierarchy and propagation guarantees;
 - which names are re-exported from `archive_line_index`.
@@ -25,11 +25,11 @@ It links to component specifications for detailed stream, archive, indexing, and
 
 ### `docs/dev/spec/content-stream.md`
 
-Owns the common sequential binary-stream contract, including read behavior, buffering guarantees, byte counting, decompressed-size limits, early closure, terminal integrity semantics, and the distinction between owned and caller-owned resources.
+Owns the common sequential binary-stream contract, including read behavior, buffering guarantees, byte counting, decompressed-size limits, early closure, terminal integrity semantics, and package-owned resource cleanup.
 
 ### `docs/dev/spec/archive-handling.md`
 
-Owns input-format detection, recognized suffix behavior, exactly-one-member validation, special-entry rejection, supported source capabilities, backend-specific constraints, and 7z push-to-pull adaptation.
+Owns input-format detection, recognized suffix behavior, exactly-one-member validation, special-entry rejection, path ownership, backend-specific constraints, and 7z push-to-pull adaptation.
 
 ### `docs/dev/spec/line-index.md`
 
@@ -53,11 +53,11 @@ Provides the compact, PLAN-derived progress projection. Every phase, milestone, 
 
 ### `docs/dev/plan/plain-stream-index-mvp.md`
 
-Describes the smallest useful testable product: plain-source ownership and streaming, byte-line scanning, the in-memory offset representation, and a thin public composition path. It excludes archive decoding and persistence.
+Describes the smallest useful testable product: plain-path ownership and streaming, byte-line scanning, the in-memory offset representation, and a thin public composition path. It excludes archive decoding and persistence.
 
 ### `docs/dev/plan/archive-streams.md`
 
-Adds content detection and the unencrypted ZIP, TAR, and 7z backends to the already tested stream/index pipeline. TAR uses one sequential streaming strategy for every source. The plan orders pull-based backends before the threaded 7z adapter and includes cross-format behavioral verification.
+Adds content detection and the unencrypted ZIP, TAR, and 7z backends to the already tested stream/index pipeline. TAR uses one sequential streaming strategy for every path. The plan orders pull-based backends before the threaded 7z adapter and includes cross-format behavioral verification.
 
 ### `docs/dev/plan/index-persistence.md`
 

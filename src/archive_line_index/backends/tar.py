@@ -5,7 +5,6 @@ from __future__ import annotations
 import tarfile
 
 from ..errors import ArchiveStructureError, ExtractionError, InvalidArchiveError
-from ..sources import SourceHandle
 
 
 _TAR_ERRORS = (tarfile.TarError, EOFError)
@@ -14,8 +13,7 @@ _TAR_ERRORS = (tarfile.TarError, EOFError)
 class TarBackendReader:
     """Expose one TAR member through a single sequential streaming path."""
 
-    def __init__(self, source: SourceHandle) -> None:
-        self._source = source
+    def __init__(self, path: str) -> None:
         self._archive: tarfile.TarFile | None = None
         self._member_stream = None
         self._closed = False
@@ -25,7 +23,7 @@ class TarBackendReader:
 
         try:
             self._archive = tarfile.open(
-                fileobj=_FullReadAdapter(source),
+                name=path,
                 mode="r|*",
             )
             selected = _find_first_stream_member(self._archive)
@@ -115,17 +113,14 @@ class TarBackendReader:
             if member_stream is not None:
                 member_stream.close()
         finally:
-            try:
-                if archive is not None:
-                    archive.close()
-            finally:
-                self._source.close()
+            if archive is not None:
+                archive.close()
 
 
-def open_tar_backend(source: SourceHandle) -> TarBackendReader:
+def open_tar_backend(path: str) -> TarBackendReader:
     """Open a TAR-family source through sequential streaming mode."""
 
-    return TarBackendReader(source)
+    return TarBackendReader(path)
 
 
 def _find_first_stream_member(archive: tarfile.TarFile) -> tarfile.TarInfo:
@@ -140,26 +135,3 @@ def _find_first_stream_member(archive: tarfile.TarFile) -> tarfile.TarInfo:
     raise ArchiveStructureError(
         "TAR archive must contain exactly one regular file; found 0"
     )
-
-
-class _FullReadAdapter:
-    """Coalesce legal short reads for tarfile's streaming transport."""
-
-    def __init__(self, source: SourceHandle) -> None:
-        self._source = source
-
-    def read(self, size: int = -1) -> bytes:
-        if size < 0:
-            return self._source.read()
-        chunks: list[bytes] = []
-        remaining = size
-        while remaining:
-            chunk = self._source.read(remaining)
-            if not chunk:
-                break
-            chunks.append(chunk)
-            remaining -= len(chunk)
-        return b"".join(chunks)
-
-    def close(self) -> None:
-        pass

@@ -29,40 +29,28 @@ def test_path_source_streams_bytes_and_closes_with_context(tmp_path) -> None:
     assert stream.closed
 
 
-def test_caller_stream_starts_at_current_position_and_remains_open() -> None:
-    source = io.BytesIO(b"ignoredpayload")
-    source.seek(len(b"ignored"))
+def test_non_path_source_is_rejected_before_reading() -> None:
+    source = io.BytesIO(b"payload")
 
-    with open_content_stream(source) as stream:
-        assert stream.read() == b"payload"
+    with pytest.raises(TypeError, match="filesystem path"):
+        open_content_stream(source)
 
+    assert source.read() == b"payload"
     assert not source.closed
 
 
-def test_consumer_exception_closes_content_stream_not_caller_stream() -> None:
-    source = io.BytesIO(b"payload")
-
-    with pytest.raises(RuntimeError, match="consumer"):
-        with open_content_stream(source) as stream:
-            assert stream.read(1) == b"p"
-            raise RuntimeError("consumer failed")
-
-    assert stream.closed
-    assert not source.closed
-
-
-def test_exact_maximum_size_is_allowed() -> None:
-    source = io.BytesIO(b"payload")
+def test_exact_maximum_size_is_allowed(tmp_path) -> None:
+    source = tmp_path / "payload"
+    source.write_bytes(b"payload")
     with open_content_stream(source, max_uncompressed_size=7) as stream:
         assert stream.read() == b"payload"
-    assert not source.closed
 
 
-def test_size_limit_failure_preserves_caller_ownership() -> None:
-    source = io.BytesIO(b"payload")
+def test_size_limit_failure_closes_package_source(tmp_path) -> None:
+    source = tmp_path / "payload"
+    source.write_bytes(b"payload")
     with pytest.raises(SizeLimitExceededError, match="declared"):
         open_content_stream(source, max_uncompressed_size=6)
-    assert not source.closed
 
 
 @pytest.mark.parametrize("limit", [True, -1, 1.5, "7"])
@@ -77,12 +65,12 @@ def test_invalid_size_limit_fails_before_path_open(tmp_path, limit) -> None:
     [b"PK\x03\x04", b"7z\xbc\xaf\x27\x1c", b"\x1f\x8b"],
 )
 def test_signature_claimed_invalid_archives_never_fall_back_to_plain(
-    signature: bytes,
+    tmp_path, signature: bytes,
 ) -> None:
-    source = io.BytesIO(signature + b"not-an-archive")
+    source = tmp_path / "source"
+    source.write_bytes(signature + b"not-an-archive")
     with pytest.raises(InvalidArchiveError):
         open_content_stream(source)
-    assert not source.closed
 
 
 @pytest.mark.parametrize("read_size", [1, 3, 64])
