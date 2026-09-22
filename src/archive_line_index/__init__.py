@@ -4,7 +4,11 @@ from .api import (
     DEFAULT_BUFFER_SIZE,
     build_line_index,
     open_content_stream,
+    read_raw_index,
+    read_sqlite_index,
     scan_line_offsets,
+    write_raw_index,
+    write_sqlite_index,
 )
 from .errors import (
     ArchiveLineIndexError,
@@ -34,5 +38,9 @@ __all__ = [
     "UnsupportedFormatError",
     "build_line_index",
     "open_content_stream",
+    "read_raw_index",
+    "read_sqlite_index",
     "scan_line_offsets",
+    "write_raw_index",
+    "write_sqlite_index",
 ]

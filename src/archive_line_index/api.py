@@ -3,10 +3,15 @@
 from __future__ import annotations
 
 from array import array
+from os import PathLike
 from typing import BinaryIO
 
 from .backends.registry import open_backend
 from .formats import detect_format
+from .persistence.raw import read_raw_index as _read_raw_index
+from .persistence.raw import write_raw_index as _write_raw_index
+from .persistence.sqlite import read_sqlite_index as _read_sqlite_index
+from .persistence.sqlite import write_sqlite_index as _write_sqlite_index
 from .scanner import scan_offsets
 from .sources import Source, normalize_source_path
 from .stream import ContentStream
@@ -67,6 +72,40 @@ def build_line_index(
             skip_utf8_bom=skip_utf8_bom,
             buffer_size=buffer_size,
         )
+
+
+def write_sqlite_index(
+    offsets: array,
+    destination: str | PathLike[str],
+    *,
+    overwrite: bool = False,
+) -> None:
+    """Write a complete offset sequence to a dedicated SQLite file."""
+
+    _write_sqlite_index(offsets, destination, overwrite=overwrite)
+
+
+def read_sqlite_index(source: str | PathLike[str]) -> array:
+    """Load and validate offsets from a dedicated SQLite index file."""
+
+    return _read_sqlite_index(source)
+
+
+def write_raw_index(
+    offsets: array,
+    destination: str | PathLike[str],
+    *,
+    overwrite: bool = False,
+) -> None:
+    """Write offsets as headerless little-endian uint64 values."""
+
+    _write_raw_index(offsets, destination, overwrite=overwrite)
+
+
+def read_raw_index(source: str | PathLike[str]) -> array:
+    """Load and validate a complete raw offset file."""
+
+    return _read_raw_index(source)
 
 
 def _validate_scan_options(skip_utf8_bom: bool, buffer_size: int) -> None:

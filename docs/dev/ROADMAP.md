@@ -8,16 +8,16 @@ This roadmap is the compact progress projection of [PLAN.md](PLAN.md). PLAN owns
 
 | Boundary   | Complete | Total |
 | ---------- | -------: | ----: |
-| Phases     |        2 |     4 |
-| Milestones |        6 |    11 |
-| Tasks      |       21 |    35 |
+| Phases     |        3 |     4 |
+| Milestones |        8 |    11 |
+| Tasks      |       28 |    35 |
 
 ## [x] [Phase 1: Plain stream and index MVP](PLAN.md#plain-stream-and-index-mvp)
 
 - [x] [Milestone: plain stream foundation](plan/plain-stream-index-mvp.md#milestone-plain-stream-foundation)
     - [x] [Task: establish the package and test baseline](plan/plain-stream-index-mvp.md#task-establish-the-package-and-test-baseline)
     - [x] [Task: implement public errors](plan/plain-stream-index-mvp.md#task-implement-public-errors)
-    - [x] [Task: implement source ownership and prefix replay](plan/plain-stream-index-mvp.md#task-implement-source-ownership-and-prefix-replay)
+    - [x] [Task: implement source path normalization](plan/plain-stream-index-mvp.md#task-implement-source-path-normalization)
     - [x] [Task: implement format classification](plan/plain-stream-index-mvp.md#task-implement-format-classification)
     - [x] [Task: define the backend reader contract](plan/plain-stream-index-mvp.md#task-define-the-backend-reader-contract)
     - [x] [Task: implement the plain backend](plan/plain-stream-index-mvp.md#task-implement-the-plain-backend)
@@ -45,17 +45,17 @@ This roadmap is the compact progress projection of [PLAN.md](PLAN.md). PLAN owns
 - [x] [Milestone: archive lifecycle certification](plan/archive-streams.md#milestone-archive-lifecycle-certification)
     - [x] [Task: complete resource-lifecycle integration tests](plan/archive-streams.md#task-complete-resource-lifecycle-integration-tests)
 
-## [ ] [Phase 3: Index persistence](PLAN.md#index-persistence)
+## [x] [Phase 3: Index persistence](PLAN.md#index-persistence)
 
-- [ ] [Milestone: persistence adapters](plan/index-persistence.md#milestone-persistence-adapters)
-    - [ ] [Task: finalize persistence-facing offset validation](plan/index-persistence.md#task-finalize-persistence-facing-offset-validation)
-    - [ ] [Task: implement SQLite writing](plan/index-persistence.md#task-implement-sqlite-writing)
-    - [ ] [Task: implement SQLite reading](plan/index-persistence.md#task-implement-sqlite-reading)
-    - [ ] [Task: implement raw writing](plan/index-persistence.md#task-implement-raw-writing)
-    - [ ] [Task: implement raw reading](plan/index-persistence.md#task-implement-raw-reading)
-- [ ] [Milestone: public persistence integration](plan/index-persistence.md#milestone-public-persistence-integration)
-    - [ ] [Task: expose persistence through the public API](plan/index-persistence.md#task-expose-persistence-through-the-public-api)
-    - [ ] [Task: verify cross-format persistence equivalence](plan/index-persistence.md#task-verify-cross-format-persistence-equivalence)
+- [x] [Milestone: persistence adapters](plan/index-persistence.md#milestone-persistence-adapters)
+    - [x] [Task: finalize persistence-facing offset validation](plan/index-persistence.md#task-finalize-persistence-facing-offset-validation)
+    - [x] [Task: implement SQLite writing](plan/index-persistence.md#task-implement-sqlite-writing)
+    - [x] [Task: implement SQLite reading](plan/index-persistence.md#task-implement-sqlite-reading)
+    - [x] [Task: implement raw writing](plan/index-persistence.md#task-implement-raw-writing)
+    - [x] [Task: implement raw reading](plan/index-persistence.md#task-implement-raw-reading)
+- [x] [Milestone: public persistence integration](plan/index-persistence.md#milestone-public-persistence-integration)
+    - [x] [Task: expose persistence through the public API](plan/index-persistence.md#task-expose-persistence-through-the-public-api)
+    - [x] [Task: verify cross-format persistence equivalence](plan/index-persistence.md#task-verify-cross-format-persistence-equivalence)
 
 ## [ ] [Phase 4: Package integration](PLAN.md#package-integration)
 
