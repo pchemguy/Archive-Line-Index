@@ -2567,7 +2567,7 @@ Verification: 500 tests passed, lifecycle tests passed five consecutive runs, cl
 ---
 ---
 
-### 📗 Phase 2: Archive streams - Seekable backends
+### 📗 Review Phase 2: Archive streams - Seekable backends
 
 > [!NOTE] Prompt
 > 
@@ -2598,3 +2598,156 @@ What is already correct:
 * TAR has one sequential `r|*` path with no seekability branch.
 
 So the earlier revision removed the seekable **TAR** branch, but not seekability as an input capability throughout the package. A strict “no seekable branch anywhere” revision must change the source contract, detection strategy, plain-size handling, ZIP/7z input policy, tests, SPEC, and PLAN together.
+
+---
+---
+
+### 📗 Revise Phase 2 Cont
+
+> [!NOTE] Prompt
+> 
+> @SDD Manager cleanup code base from encryption and seekability features as if those have never been implemented. Make sure update all docs and tests as well.
+
+The coherent “as if never implemented” design is:
+
+- `open_content_stream()` and `build_line_index()` accept filesystem paths only.
+- `scan_line_offsets()` remains usable with any readable `BinaryIO`.
+- Format detection reads a bounded prefix from a short-lived file handle; backends open the path themselves.
+- Plain and TAR read sequentially; ZIP and 7z may seek internally inside `zipfile`/`py7zr`, but the package has no source seekability abstraction, capability test, or seekability-selected branch.
+- `SourceHandle.seekable()`, `seek()`, `tell()`, origin tracking, and seekable/non-seekable replay branches disappear.
+- The redundant ZIP `pwd=None`, all encryption-specific code/tests, and obsolete encryption fixtures remain absent.
+- `ContentStream` stays observably non-seekable as required by its sequential `BinaryIO` contract. The small `Py7zIO` destination `seek()` shim must remain because `py7zr` requires that interface; it is not an input capability or backend branch.
+- SPEC, PLAN, LAYOUT, ROADMAP, tests, and the append-only journal will be normalized and Phase 2 recertified. Stale recovery directories will first be reconciled and removed under the recovery protocol.
+
+This removes caller-provided archive streams, which is the only conservative way to eliminate source seekability without adding temporary spooling or replacing the archive stack.
+
+---
+---
+
+### 📗 Revise Phase 2 Cont - Status
+
+> [!NOTE] Prompt
+> 
+> @SDD Manager The last task was "cleanup code base from encryption and seekability features as if those have never been implemented. Make sure update all docs and tests as well" and it was interrupted. The project must be in incomplete transaction state.
+> 
+> The last agent thought before interruption were
+> 
+> ```
+> Phase-level verification is green: 475 tests, lifecycle suite 27/27 five consecutive times, compile/residue gates, and installed-wheel plain/ZIP/TAR/7z smoke all passed. Before recording the final steering completion, I’m applying the required fresh review pass to the complete revised source/docs boundary.
+> 
+> Fresh review has identified one likely lifecycle gap in a failure path: if starting the 7z worker thread fails after archive validation, the already-open archive may not be closed. The reviewer is verifying that finding and checking whether the current path-closure integration test meaningfully observes backend-owned handles rather than only the detection handle.
+> 
+> The review confirmed two path-lifecycle defects, not feature-scope leftovers: 7z can leak its opened archive if worker startup fails, and TAR can leak its path descriptor if tarfile fails during initial probing. I’m adding both to the current recovery transaction, first with failing regression tests, then I’ll rerun the full verification and packaging smoke test.
+> ```
+> 
+> I want you to assess the possibility to complete the transaction instead of rolling it back.
+
+I’m activating SDD Manager’s recovery workflow to assess continuation without changing files. Because its default rule normally reverts `PREPARED`-without-`COMPLETED`, I’ll inspect the journal, manifest/backups, current diff, and verification evidence to determine whether an explicit user-authorized continuation can be made safe and exactly bounded.
+
+Yes—this transaction can be completed safely instead of rolled back, using the explicitly authorized exceptional-continuation path.
+
+Evidence:
+
+* Exactly one transaction is active: `20260921T150812Z-normalize-path-only-phase2`.
+* The journal contains 108 valid JSONL records.
+* Its latest state is `PREPARED`, manifest version 2; no `COMPLETED` record exists.
+* The manifest hash exactly matches the latest `prepared` record.
+* Every backup exists and matches its recorded baseline hash.
+* All current documentation changes and overlay deletions are declared in the manifest.
+* The four lifecycle-fix files added by the scope extension remain at their recorded baselines—they were prepared but never modified.
+* No other recovery directory exists.
+* The two identified defects belong directly to the current Phase 2 normalization/recertification task:
+
+  * close the opened 7z archive if worker construction/startup fails;
+  * close the path-owned TAR file if initial TAR probing fails.
+* The previous 475-test verification is useful evidence, but it predates these fixes and cannot support completion.
+
+Recommended continuation:
+
+1. Append an exceptional-continuation record documenting your explicit override of normal rollback.
+2. Add failing regression tests to the two already-declared test files.
+3. Implement the fixes in the two already-declared backend files.
+4. Run focused tests, dependent lifecycle tests, the full suite, residue/document checks, and installed-wheel cross-format smoke.
+5. Review the entire manifest scope and final diff.
+6. Append the final Phase 2 `completed`, `steering-completed`, and checkpoint records.
+7. Verify final-state hashes, then remove this recovery directory.
+
+No new manifest extension is presently needed. Rollback would discard a coherent, fully backed-up documentation normalization merely to recreate it, while continuation preserves both the exact baseline and the interrupted work.
+
+I have not changed any files. To authorize the exception, the next instruction can simply be: **“Continue and complete the active transaction without rollback.”**
+
+---
+---
+
+### 📗 Revise Phase 2 Cont - Resume
+
+> [!NOTE] Prompt
+> 
+> Continue and complete the active transaction without rollback.
+
+The interrupted transaction was completed without rollback.
+
+* Public source APIs are path-only.
+* Package-owned seekability detection, branching, positioning, and replay abstractions are absent.
+* Encryption-specific code and tests remain absent.
+* Plain, ZIP, TAR-family, and 7z streaming/indexing remain supported.
+* Fixed a confirmed 7z archive-handle leak when worker startup fails.
+* Added lifecycle regression coverage.
+* The suspected TAR leak was disproved; no unnecessary production change was made.
+* SPEC, PLAN, architecture, LAYOUT, and ROADMAP are normalized.
+* Temporary feature documents were removed.
+
+Verification:
+
+* 477 tests passed.
+* Lifecycle suite: 27/27 passed five consecutive times.
+* Compilation, residue, documentation-link, and PLAN/ROADMAP checks passed.
+* Clean-wheel plain/ZIP/TAR/7z workflows passed.
+* 32 MiB 7z smoke passed without extraction artifacts.
+* All 19 final-state paths match the completion record.
+* Recovery state is clean.
+
+Progress remains 2/4 phases, 6/11 milestones, and 21/35 tasks. The project is awaiting steering before Phase 3.
+
+---
+---
+
+### 📗 Implement Phase 3
+
+> [!NOTE] Prompt
+> 
+> @SDD Manager Implement Phase 3
+> 
+> ---
+> 
+> @SDD Manager Resume phase 3
+> 
+> ---
+> 
+> Reconstruct and verify the raw-writing baselines, repair the active recovery manifest, then continue Phase 3.
+
+Phase 3 is complete and the recovery transaction is clean.
+
+* Reconstructed raw-writing baselines matched all recorded SHA-256 hashes.
+* Repaired and completed the interrupted raw-reading transaction.
+* Added public SQLite/raw persistence APIs.
+* Added cross-format tests for plain, ZIP, TAR, and 7z sources.
+* Full suite: **626 passed**
+* Fresh installed-wheel verification passed.
+* Roadmap: **3/4 phases, 8/11 milestones, 28/35 tasks**
+* Phase 4 has not started.
+
+Updated source archive.
+
+SHA-256: `5349592b583ed222544aa38f95923706c90f930f4475c3a7c93f7fc31f467fb6`
+
+---
+---
+
+### 📗 Implement Phase 4 Milestone 1
+
+> [!NOTE] Prompt
+> 
+> Implement the next milestone
+
+
