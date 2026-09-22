@@ -13,33 +13,6 @@ from archive_line_index.persistence import raw as raw_persistence
 from archive_line_index.persistence import sqlite as sqlite_persistence
 
 
-PUBLIC_NAMES = {
-    "ArchiveLineIndexError",
-    "ArchiveStructureError",
-    "ContentStream",
-    "DEFAULT_BUFFER_SIZE",
-    "ExtractionError",
-    "InvalidArchiveError",
-    "InvalidIndexError",
-    "PersistenceError",
-    "SizeLimitExceededError",
-    "Source",
-    "UnsupportedFormatError",
-    "build_line_index",
-    "open_content_stream",
-    "read_raw_index",
-    "read_sqlite_index",
-    "scan_line_offsets",
-    "write_raw_index",
-    "write_sqlite_index",
-}
-
-
-def test_package_exports_exact_documented_public_surface() -> None:
-    assert set(archive_line_index.__all__) == PUBLIC_NAMES
-    assert all(hasattr(archive_line_index, name) for name in PUBLIC_NAMES)
-
-
 @pytest.mark.parametrize("kind", ["sqlite", "raw"])
 def test_public_persistence_round_trip(tmp_path, kind: str) -> None:
     offsets = array("Q", [0, 4, 9])

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+import queue
 import threading
 from types import SimpleNamespace
 
@@ -11,7 +12,9 @@ import py7zr
 
 from archive_line_index.backends.sevenzip import (
     _CALLBACK_BLOCK_SIZE,
+    _Payload,
     _QueueBackendReader,
+    _QueueProducer,
     _QueueWriter,
     _SelectedWriterFactory,
     _extract_member,
@@ -47,31 +50,53 @@ def test_arbitrary_reads_split_and_coalesce_producer_blocks() -> None:
 
 def test_callback_input_is_subdivided_at_one_mebibyte() -> None:
     content = b"x" * (_CALLBACK_BLOCK_SIZE + 17)
-    reader = _QueueBackendReader(_payload_producer([content]))
-    assert reader.read(_CALLBACK_BLOCK_SIZE) == content[:_CALLBACK_BLOCK_SIZE]
-    assert reader.read(_CALLBACK_BLOCK_SIZE) == content[_CALLBACK_BLOCK_SIZE:]
-    assert reader.read(1) == b""
-    reader.close()
+    messages: queue.Queue[object] = queue.Queue(maxsize=3)
+    producer = _QueueProducer(messages, threading.Event())
+
+    assert producer.send(content) == len(content)
+
+    first = messages.get_nowait()
+    second = messages.get_nowait()
+    assert isinstance(first, _Payload)
+    assert isinstance(second, _Payload)
+    assert len(first.data) == _CALLBACK_BLOCK_SIZE
+    assert len(second.data) == 17
+    assert messages.empty()
 
 
 def test_one_slot_queue_applies_slow_consumer_backpressure() -> None:
+    attempted_second_put = threading.Event()
     sent_all = threading.Event()
 
     def produce(channel) -> None:
+        original_put = channel._put
+        put_count = 0
+
+        def observed_put(message) -> None:
+            nonlocal put_count
+            put_count += 1
+            if put_count == 2:
+                attempted_second_put.set()
+            original_put(message)
+
+        channel._put = observed_put
         channel.send(b"a")
         channel.send(b"b")
         channel.send(b"c")
         sent_all.set()
 
     reader = _QueueBackendReader(produce)
-    assert not sent_all.wait(0.05)
-    assert reader.read(1) == b"a"
-    assert not sent_all.wait(0.05)
-    assert reader.read(1) == b"b"
-    assert reader.read(1) == b"c"
-    assert sent_all.wait(1)
-    assert reader.read(1) == b""
-    reader.close()
+    try:
+        assert attempted_second_put.wait(1)
+        assert reader._messages.qsize() == 1
+        assert not sent_all.is_set()
+        assert reader.read(1) == b"a"
+        assert reader.read(1) == b"b"
+        assert reader.read(1) == b"c"
+        assert sent_all.wait(1)
+        assert reader.read(1) == b""
+    finally:
+        reader.close()
 
 
 def test_failure_after_prefix_is_raised_on_next_progress_read() -> None:
@@ -90,16 +115,32 @@ def test_failure_after_prefix_is_raised_on_next_progress_read() -> None:
 
 
 def test_close_unblocks_blocked_producer_and_joins_worker() -> None:
-    entered = threading.Event()
+    attempted_second_put = threading.Event()
+    exited = threading.Event()
 
     def produce(channel) -> None:
-        entered.set()
-        while True:
-            channel.send(b"x")
+        original_put = channel._put
+        put_count = 0
+
+        def observed_put(message) -> None:
+            nonlocal put_count
+            put_count += 1
+            if put_count == 2:
+                attempted_second_put.set()
+            original_put(message)
+
+        channel._put = observed_put
+        try:
+            channel.send(b"a")
+            channel.send(b"b")
+        finally:
+            exited.set()
 
     reader = _QueueBackendReader(produce)
-    assert entered.wait(1)
+    assert attempted_second_put.wait(1)
+    assert reader._messages.qsize() == 1
     reader.close()
+    assert exited.wait(1)
     assert not reader._worker.is_alive()
 
 
@@ -198,14 +239,25 @@ def test_writer_preserves_callback_exception_identity() -> None:
 
 
 def test_cancellation_during_large_callback_delivery_joins_worker() -> None:
-    entered = threading.Event()
+    attempted_second_put = threading.Event()
 
     def produce(channel) -> None:
-        entered.set()
+        original_put = channel._put
+        put_count = 0
+
+        def observed_put(message) -> None:
+            nonlocal put_count
+            put_count += 1
+            if put_count == 2:
+                attempted_second_put.set()
+            original_put(message)
+
+        channel._put = observed_put
         _QueueWriter(channel).write(b"x" * (_CALLBACK_BLOCK_SIZE * 4))
 
     reader = _QueueBackendReader(produce)
-    assert entered.wait(1)
+    assert attempted_second_put.wait(1)
+    assert reader._messages.qsize() == 1
     reader.close()
     assert not reader._worker.is_alive()
 

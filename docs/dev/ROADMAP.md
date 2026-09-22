@@ -9,8 +9,8 @@ This roadmap is the compact progress projection of [PLAN.md](PLAN.md). PLAN owns
 | Boundary   | Complete | Total |
 | ---------- | -------: | ----: |
 | Phases     |        3 |     4 |
-| Milestones |        8 |    11 |
-| Tasks      |       28 |    35 |
+| Milestones |       10 |    11 |
+| Tasks      |       34 |    35 |
 
 ## [x] [Phase 1: Plain stream and index MVP](PLAN.md#plain-stream-and-index-mvp)
 
@@ -59,13 +59,13 @@ This roadmap is the compact progress projection of [PLAN.md](PLAN.md). PLAN owns
 
 ## [ ] [Phase 4: Package integration](PLAN.md#package-integration)
 
-- [ ] [Milestone: distribution surface](plan/package-integration.md#milestone-distribution-surface)
-    - [ ] [Task: finalize package exports](plan/package-integration.md#task-finalize-package-exports)
-    - [ ] [Task: finalize dependency and build metadata](plan/package-integration.md#task-finalize-dependency-and-build-metadata)
-    - [ ] [Task: write the user README](plan/package-integration.md#task-write-the-user-readme)
-- [ ] [Milestone: operational verification](plan/package-integration.md#milestone-operational-verification)
-    - [ ] [Task: complete large-input and backpressure verification](plan/package-integration.md#task-complete-large-input-and-backpressure-verification)
-    - [ ] [Task: complete cross-platform filesystem verification](plan/package-integration.md#task-complete-cross-platform-filesystem-verification)
-    - [ ] [Task: run installed-package end-to-end workflows](plan/package-integration.md#task-run-installed-package-end-to-end-workflows)
+- [x] [Milestone: distribution surface](plan/package-integration.md#milestone-distribution-surface)
+    - [x] [Task: finalize package exports](plan/package-integration.md#task-finalize-package-exports)
+    - [x] [Task: finalize dependency and build metadata](plan/package-integration.md#task-finalize-dependency-and-build-metadata)
+    - [x] [Task: write the user README](plan/package-integration.md#task-write-the-user-readme)
+- [x] [Milestone: operational verification](plan/package-integration.md#milestone-operational-verification)
+    - [x] [Task: complete large-input and backpressure verification](plan/package-integration.md#task-complete-large-input-and-backpressure-verification)
+    - [x] [Task: complete cross-platform filesystem verification](plan/package-integration.md#task-complete-cross-platform-filesystem-verification)
+    - [x] [Task: run installed-package end-to-end workflows](plan/package-integration.md#task-run-installed-package-end-to-end-workflows)
 - [ ] [Milestone: documentation and acceptance](plan/package-integration.md#milestone-documentation-and-acceptance)
     - [ ] [Task: reconcile documentation and acceptance coverage](plan/package-integration.md#task-reconcile-documentation-and-acceptance-coverage)
