@@ -1,8 +1,19 @@
-"""Slow generated-scale verification for bounded streaming and indexing."""
+"""Slow generated-scale verification for bounded streaming and indexing.
+
+RSS checks sample this test process immediately before and during a bounded
+read loop. Their limits apply to the observed incremental resident set, not to
+absolute interpreter memory or a portable peak-watermark guarantee. Running
+the slow suite separately reduces allocator reuse that could conceal growth;
+the 7z allowance also includes memory retained by dependency callbacks. On
+Linux, ``/proc/self`` resolves the actual process even when container and proc
+PID namespaces differ; other platforms use psutil's current process lookup.
+"""
 
 from __future__ import annotations
 
 import gc
+import mmap
+import os
 from pathlib import Path
 import sys
 import tracemalloc
@@ -34,9 +45,21 @@ def _write_repeated(path: Path, block: bytes, total_size: int) -> None:
 
 
 def _rss() -> int:
-    """Return the current process resident set size in bytes."""
+    """Sample current-process RSS; this is not a historical peak reading."""
 
+    if sys.platform == "linux":
+        resident_pages = int(Path("/proc/self/statm").read_text().split()[1])
+        return resident_pages * os.sysconf("SC_PAGE_SIZE")
     return psutil.Process().memory_info().rss
+
+
+def test_rss_sampler_tracks_this_process() -> None:
+    gc.collect()
+    baseline = _rss()
+    with mmap.mmap(-1, 32 * MEBIBYTE) as allocation:
+        for offset in range(0, len(allocation), mmap.PAGESIZE):
+            allocation[offset] = 1
+        assert _rss() - baseline > 16 * MEBIBYTE
 
 
 def test_large_plain_payload_streams_with_bounded_process_memory(tmp_path) -> None:

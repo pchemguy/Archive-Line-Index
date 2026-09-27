@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import io
+import zipfile
 
 import pytest
 
 from archive_line_index import (
+    ExtractionError,
     SizeLimitExceededError,
     build_line_index,
     scan_line_offsets,
@@ -86,6 +88,21 @@ def test_sevenzip_build_matches_expected_offsets(tmp_path, case) -> None:
         buffer_size=2,
     )
     assert tuple(offsets) == case.offsets
+
+
+def test_composed_zip_build_rejects_terminal_crc_failure(tmp_path) -> None:
+    path = tmp_path / "corrupt.zip"
+    with zipfile.ZipFile(path, "w", compression=zipfile.ZIP_STORED) as archive:
+        archive.writestr("lines", b"alpha\nbeta")
+    data = bytearray(path.read_bytes())
+    local = data.index(b"PK\x03\x04")
+    payload_start = local + 30 + int.from_bytes(data[local + 26 : local + 28], "little")
+    payload_start += int.from_bytes(data[local + 28 : local + 30], "little")
+    data[payload_start] ^= 0xFF
+    path.write_bytes(data)
+
+    with pytest.raises(ExtractionError):
+        build_line_index(path, buffer_size=2)
 
 
 def test_bom_policy_changes_only_the_first_line_start(tmp_path) -> None:

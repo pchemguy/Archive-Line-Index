@@ -11,7 +11,7 @@ If an implementation does not fit cleanly, reconsider the architecture and LAYOU
 ```text
 archive-line-index/
 ├── repository-root files
-├── docs/dev/{SPEC.md,spec/,PLAN.md,plan/,ROADMAP.md,layout.md,layout/}
+├── docs/dev/{SPEC.md,spec/,PLAN.md,plan/,ROADMAP.md,ACCEPTANCE.md,layout.md,layout/}
 ├── src/archive_line_index/
 └── tests/{helpers/,fixtures/,unit/,integration/}
 ```
@@ -33,18 +33,19 @@ For an ordinary change, load this root and the child owning the affected locatio
 
 ## 4. Cross-tree routing
 
-| Area            | SPEC                                                         | LAYOUT                                                                               | Tests                                   | PLAN                                    |
-| --------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------ | --------------------------------------- | --------------------------------------- |
-| API/composition | [public-api](spec/public-api.md)                             | [source](layout/src.md)                                                              | [unit/integration](layout/tests.md)     | MVP, archives, persistence, integration |
-| Content stream  | [content-stream](spec/content-stream.md)                     | [source](layout/src.md)                                                              | [stream/resource](layout/tests.md)      | MVP, archives                           |
-| Archives        | [archive-handling](spec/archive-handling.md)                 | [source](layout/src.md)                                                              | [backend/cross-format](layout/tests.md) | archives                                |
-| Line index      | [line-index](spec/line-index.md)                             | [source](layout/src.md)                                                              | [scanner/index](layout/tests.md)        | MVP                                     |
-| Persistence     | [persistence](spec/persistence.md)                           | [source](layout/src.md)                                                              | [persistence](layout/tests.md)          | persistence                             |
-| Packaging       | [system acceptance](SPEC.md#11-system-acceptance-conditions) | [repository](layout/repository.md), [packaging/runtime](layout/packaging-runtime.md) | installed workflows                     | integration                             |
+| Area                | SPEC                                                         | LAYOUT                                                                               | Tests                                      | PLAN                                    |
+| ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------ | --------------------------------------- |
+| API/composition     | [public-api](spec/public-api.md)                             | [source](layout/src.md)                                                              | [unit/integration](layout/tests.md)        | MVP, archives, persistence, integration |
+| Content stream      | [content-stream](spec/content-stream.md)                     | [source](layout/src.md)                                                              | [stream/resource](layout/tests.md)         | MVP, archives                           |
+| Archives            | [archive-handling](spec/archive-handling.md)                 | [source](layout/src.md)                                                              | [backend/cross-format](layout/tests.md)    | archives                                |
+| Line index          | [line-index](spec/line-index.md)                             | [source](layout/src.md)                                                              | [scanner/index](layout/tests.md)           | MVP                                     |
+| Persistence         | [persistence](spec/persistence.md)                           | [source](layout/src.md)                                                              | [persistence](layout/tests.md)             | persistence                             |
+| Packaging           | [system acceptance](SPEC.md#11-system-acceptance-conditions) | [repository](layout/repository.md), [packaging/runtime](layout/packaging-runtime.md) | installed workflows                        | integration                             |
+| Acceptance evidence | [all acceptance conditions](ACCEPTANCE.md)                   | [documentation](layout/docs.md)                                                      | [documentation integrity](layout/tests.md) | integration                             |
 
 PLAN phase links and order are canonical in [PLAN.md](PLAN.md). This table is only a routing map; detailed behavior, sequencing, and physical ownership stay in their respective trees.
 
-[ROADMAP.md](ROADMAP.md) is the PLAN-derived durable progress view. It owns no behavior, implementation order, or physical-layout requirement.
+[ROADMAP.md](ROADMAP.md) is the PLAN-derived durable progress view. It owns no behavior, implementation order, or physical-layout requirement. [ACCEPTANCE.md](ACCEPTANCE.md) is the non-normative evidence index for the numbered conditions owned by the SPEC tree.
 
 ## 5. Global physical invariants
 

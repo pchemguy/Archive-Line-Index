@@ -51,6 +51,10 @@ The compact authoritative entry point for implementing the complete system from 
 
 Provides the compact, PLAN-derived progress projection. Every phase, milestone, and task links to its canonical PLAN heading. Checkboxes and summary counts reflect only durable journal and recovery evidence; ROADMAP owns no scope, order, dependency, or verification requirement.
 
+### `docs/dev/ACCEPTANCE.md`
+
+Maps every numbered SPEC-tree acceptance condition to focused automated or manual evidence. It does not restate normative behavior, and command results remain owned by the append-only implementation journal.
+
 ### `docs/dev/plan/plain-stream-index-mvp.md`
 
 Describes the smallest useful testable product: plain-path ownership and streaming, byte-line scanning, the in-memory offset representation, and a thin public composition path. It excludes archive decoding and persistence.
@@ -78,3 +82,29 @@ SPEC nodes may refer to implementation locations, and PLAN tasks may name files 
 Exploration notes or temporary architecture documents outside `docs/dev/` are not normative. Once their settled content has been integrated into the authoritative SPEC, PLAN, and LAYOUT trees, they should be removed unless they retain a distinct, durable explanatory purpose.
 
 New shared development documents shall be introduced only for a clear canonical responsibility not naturally owned by SPEC, PLAN, or LAYOUT. They must not become miscellaneous overflow containers.
+
+## 6. Current authoritative paths
+
+This inventory is complete for Markdown documents under `docs/dev/`:
+
+```text
+docs/dev/SPEC.md
+docs/dev/spec/public-api.md
+docs/dev/spec/content-stream.md
+docs/dev/spec/archive-handling.md
+docs/dev/spec/line-index.md
+docs/dev/spec/persistence.md
+docs/dev/PLAN.md
+docs/dev/plan/plain-stream-index-mvp.md
+docs/dev/plan/archive-streams.md
+docs/dev/plan/index-persistence.md
+docs/dev/plan/package-integration.md
+docs/dev/ROADMAP.md
+docs/dev/ACCEPTANCE.md
+docs/dev/layout.md
+docs/dev/layout/repository.md
+docs/dev/layout/docs.md
+docs/dev/layout/src.md
+docs/dev/layout/tests.md
+docs/dev/layout/packaging-runtime.md
+```

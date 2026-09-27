@@ -28,6 +28,7 @@ archive-line-index/
 │       │   ├── index-persistence.md
 │       │   └── package-integration.md
 │       ├── ROADMAP.md
+│       ├── ACCEPTANCE.md
 │       ├── layout.md
 │       └── layout/
 │           ├── repository.md
@@ -84,8 +85,16 @@ archive-line-index/
     │       └── test_raw.py
     └── integration/
         ├── test_content_stream.py
+        ├── test_distribution_metadata.py
+        ├── test_documentation.py
+        ├── test_filesystem_portability.py
+        ├── test_import_surface.py
         ├── test_index_building.py
+        ├── test_installed_package_workflow.py
+        ├── test_large_inputs.py
+        ├── test_persistence_api.py
         ├── test_persistence_equivalence.py
+        ├── test_readme.py
         └── test_resource_lifecycle.py
 ```
 

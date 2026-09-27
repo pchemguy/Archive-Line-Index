@@ -147,6 +147,8 @@ SQLite and raw-binary representations, safe publication, and loading are defined
 
 When a subject is defined in a child specification, that child is normative. This root specifies only the system-level guarantee and relationship.
 
+[ACCEPTANCE.md](ACCEPTANCE.md) maps every numbered acceptance condition in this tree to focused executable or manual evidence. It is an evidence index, not a second source of behavioral requirements.
+
 ## 9. Dependency constraints
 
 Using `A → B` to mean that **B depends on A**, the principal dependency paths are:

@@ -36,6 +36,7 @@ def test_readme_covers_the_package_contract() -> None:
 def test_readme_development_links_resolve() -> None:
     text = README.read_text(encoding="utf-8")
     expected = {
+        "docs/dev/ACCEPTANCE.md",
         "docs/dev/SPEC.md",
         "docs/dev/PLAN.md",
         "docs/dev/layout.md",

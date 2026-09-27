@@ -73,6 +73,25 @@ def test_signature_claimed_invalid_archives_never_fall_back_to_plain(
         open_content_stream(source)
 
 
+@pytest.mark.parametrize("kind", ["zip", "tar", "tar-gzip", "7z"])
+def test_valid_signature_archive_with_unconventional_name_is_streamed(
+    tmp_path, kind: str
+) -> None:
+    content = b"alpha\nbeta"
+    member = [ArchiveMember("nested/payload", content)]
+    if kind == "tar-gzip":
+        path = write_tar(tmp_path / "payload.tgz", member)
+        unconventional = tmp_path / "unconventional.data"
+        path.rename(unconventional)
+        path = unconventional
+    else:
+        constructors = {"zip": write_zip, "tar": write_tar, "7z": write_7z}
+        path = constructors[kind](tmp_path / "unconventional.data", member)
+
+    with open_content_stream(path) as stream:
+        assert stream.read() == content
+
+
 @pytest.mark.parametrize("read_size", [1, 3, 64])
 def test_zip_and_plain_streams_are_byte_identical(tmp_path, read_size: int) -> None:
     content = b"\xef\xbb\xbfalpha\r\n\nbeta"

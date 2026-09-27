@@ -25,8 +25,8 @@ from archive_line_index.persistence import sqlite as sqlite_persistence
 
 
 WRITERS = (
-    (raw_persistence, write_raw_index, ".raw"),
-    (sqlite_persistence, write_sqlite_index, ".sqlite"),
+    (raw_persistence, write_raw_index, read_raw_index, ".raw"),
+    (sqlite_persistence, write_sqlite_index, read_sqlite_index, ".sqlite"),
 )
 
 
@@ -64,31 +64,34 @@ def test_unicode_path_like_values_round_trip(
     assert reader(StringPath(destination)) == offsets
 
 
-@pytest.mark.parametrize(("module", "writer", "suffix"), WRITERS)
-def test_temporary_file_is_a_hidden_destination_sibling(
-    tmp_path, monkeypatch, module, writer, suffix: str
+@pytest.mark.parametrize(("module", "writer", "reader", "suffix"), WRITERS)
+def test_temporary_file_is_a_destination_sibling_and_is_cleaned(
+    tmp_path, monkeypatch, module, writer, reader, suffix: str
 ) -> None:
     destination = tmp_path / f"index{suffix}"
-    observed = {}
+    observed_paths = []
     real_mkstemp = module.tempfile.mkstemp
 
     def tracking_mkstemp(*args, **kwargs):
-        observed.update(kwargs)
-        return real_mkstemp(*args, **kwargs)
+        descriptor, temporary = real_mkstemp(*args, **kwargs)
+        observed_paths.append(Path(temporary))
+        return descriptor, temporary
 
     monkeypatch.setattr(module.tempfile, "mkstemp", tracking_mkstemp)
 
     writer(array("Q", [0, 4]), destination)
 
-    assert Path(observed["dir"]) == destination.parent
-    assert observed["prefix"] == f".{destination.name}."
-    assert observed["suffix"] == ".tmp"
+    assert len(observed_paths) == 1
+    assert observed_paths[0].parent == destination.parent
+    assert observed_paths[0] != destination
+    assert not observed_paths[0].exists()
+    assert reader(destination) == array("Q", [0, 4])
     assert {path.name for path in tmp_path.iterdir()} == {destination.name}
 
 
-@pytest.mark.parametrize(("module", "writer", "suffix"), WRITERS)
+@pytest.mark.parametrize(("module", "writer", "reader", "suffix"), WRITERS)
 def test_permission_denied_during_replacement_preserves_destination_and_cleans_temp(
-    tmp_path, monkeypatch, module, writer, suffix: str
+    tmp_path, monkeypatch, module, writer, reader, suffix: str
 ) -> None:
     destination = tmp_path / f"index{suffix}"
     destination.write_bytes(b"original")
@@ -107,9 +110,9 @@ def test_permission_denied_during_replacement_preserves_destination_and_cleans_t
     assert {path.name for path in tmp_path.iterdir()} == {destination.name}
 
 
-@pytest.mark.parametrize(("module", "writer", "suffix"), WRITERS)
+@pytest.mark.parametrize(("module", "writer", "reader", "suffix"), WRITERS)
 def test_permission_denied_during_no_overwrite_publish_cleans_temp(
-    tmp_path, monkeypatch, module, writer, suffix: str
+    tmp_path, monkeypatch, module, writer, reader, suffix: str
 ) -> None:
     destination = tmp_path / f"index{suffix}"
     failure = PermissionError("controlled hard-link denial")
@@ -126,21 +129,33 @@ def test_permission_denied_during_no_overwrite_publish_cleans_temp(
     assert list(tmp_path.iterdir()) == []
 
 
-@pytest.mark.parametrize(("module", "writer", "suffix"), WRITERS)
+@pytest.mark.parametrize(("module", "writer", "reader", "suffix"), WRITERS)
 def test_replacing_an_open_destination_follows_host_semantics(
-    tmp_path, module, writer, suffix: str
+    tmp_path, module, writer, reader, suffix: str
 ) -> None:
     destination = tmp_path / f"index{suffix}"
     destination.write_bytes(b"original")
 
     with destination.open("rb") as original:
         if os.name == "nt":
-            with pytest.raises(OSError):
-                writer(array("Q", [0, 4]), destination, overwrite=True)
+            attempted = []
+            real_replace = module.os.replace
+
+            def tracking_replace(source, target):
+                attempted.append((Path(source), Path(target)))
+                return real_replace(source, target)
+
+            with pytest.MonkeyPatch.context() as patcher:
+                patcher.setattr(module.os, "replace", tracking_replace)
+                with pytest.raises(OSError):
+                    writer(array("Q", [0, 4]), destination, overwrite=True)
+            assert len(attempted) == 1
+            assert attempted[0][1] == destination
             assert destination.read_bytes() == b"original"
         else:
             writer(array("Q", [0, 4]), destination, overwrite=True)
             assert original.read() == b"original"
+            assert reader(destination) == array("Q", [0, 4])
 
     assert not any(
         path.name.startswith(f".{destination.name}.")

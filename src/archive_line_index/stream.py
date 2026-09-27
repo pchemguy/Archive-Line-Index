@@ -13,7 +13,29 @@ _BACKEND_READ_SIZE = 64 * 1024
 
 
 class ContentStream(io.RawIOBase):
-    """Expose one backend payload through a conventional binary-I/O surface."""
+    """Read one package-owned payload through sequential binary I/O.
+
+    The stream is readable, non-writable, and non-seekable. Bounded reads use
+    bounded internal buffering; an unbounded ``read()`` necessarily
+    materializes all remaining bytes. The stream owns its backend and closes
+    all package-owned resources on EOF, explicit close, context exit, or
+    failure. An empty result from a positive-size read, or successful
+    completion of an unbounded read, proves the backend's available terminal
+    checks. ``read(0)`` also returns ``b''`` without progressing or validating
+    the backend. Closing early releases resources without validating unread
+    content.
+
+    Args:
+        backend: Initialized reader whose lifetime transfers to this stream.
+        max_uncompressed_size: Optional inclusive limit for accepted payload
+            bytes. A larger declared size is rejected during construction;
+            otherwise the first actual excess byte causes rejection.
+
+    Raises:
+        TypeError: ``max_uncompressed_size`` has the wrong type.
+        ValueError: ``max_uncompressed_size`` is negative.
+        SizeLimitExceededError: The backend declares a payload over the limit.
+    """
 
     def __init__(
         self,

@@ -116,4 +116,4 @@ After all phases:
 9. Inspect built artifacts for unintended test fixtures, caches, generated indexes, or private development files.
 10. Confirm README examples and the complete SPEC acceptance conditions.
 
-The project is complete only when every system-level acceptance condition in `SPEC.md` is supported by a passing test or an explicitly documented manual verification appropriate to that condition.
+The project is complete only when every system-level acceptance condition in `SPEC.md` is supported by a passing test or an explicitly documented manual verification appropriate to that condition. The durable condition-to-evidence mapping is maintained in [ACCEPTANCE.md](ACCEPTANCE.md); actual campaign results are recorded in the append-only implementation journal.

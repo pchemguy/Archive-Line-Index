@@ -25,7 +25,27 @@ def open_content_stream(
     *,
     max_uncompressed_size: int | None = None,
 ) -> ContentStream:
-    """Open a plain payload or supported archive member as sequential bytes."""
+    """Open a source payload as a read-only sequential byte stream.
+
+    Args:
+        source: String or path-like filesystem source. Plain files and the sole
+            regular member of supported unencrypted archives are accepted.
+        max_uncompressed_size: Optional inclusive payload-size limit in bytes.
+
+    Returns:
+        A package-owned :class:`ContentStream`. Closing it releases every
+        source, archive, member, queue, and worker owned by the package.
+
+    Raises:
+        TypeError: An argument has the wrong type.
+        ValueError: ``max_uncompressed_size`` is negative.
+        InvalidArchiveError: A claimed archive cannot be opened.
+        ArchiveStructureError: An archive violates the one-member policy.
+        SizeLimitExceededError: A known payload size exceeds the limit.
+
+    Errors that require decompression or terminal validation are raised by a
+    later read rather than necessarily by this function.
+    """
 
     _validate_max_uncompressed_size(max_uncompressed_size)
     path = normalize_source_path(source)
@@ -43,7 +63,24 @@ def scan_line_offsets(
     skip_utf8_bom: bool = True,
     buffer_size: int = DEFAULT_BUFFER_SIZE,
 ) -> array:
-    """Return line starts followed by an EOF sentinel."""
+    """Scan a caller-owned binary stream for LF-delimited line offsets.
+
+    Args:
+        stream: Readable binary stream consumed from its current position.
+        skip_utf8_bom: Exclude an initial UTF-8 BOM from the first line when
+            true. Offsets remain in the original byte space.
+        buffer_size: Positive number of bytes requested per scan block.
+
+    Returns:
+        An ``array('Q')`` of line starts followed by the EOF sentinel.
+
+    Raises:
+        TypeError: An option has the wrong type or the stream returns text.
+        ValueError: ``buffer_size`` is not positive.
+
+    The current stream position becomes local offset zero. Scanning advances
+    the stream to EOF; it neither closes nor restores its original position.
+    """
 
     return scan_offsets(
         stream,
@@ -59,7 +96,27 @@ def build_line_index(
     buffer_size: int = DEFAULT_BUFFER_SIZE,
     max_uncompressed_size: int | None = None,
 ) -> array:
-    """Open a source, scan its payload, and return its completed index."""
+    """Open a source and build its completed byte-line index.
+
+    Args:
+        source: String or path-like filesystem source.
+        skip_utf8_bom: Exclude an initial UTF-8 BOM from the first line when
+            true without changing the underlying byte coordinate system.
+        buffer_size: Positive number of bytes requested per scan block.
+        max_uncompressed_size: Optional inclusive payload-size limit in bytes.
+
+    Returns:
+        An ``array('Q')`` of line starts followed by decompressed EOF.
+
+    Raises:
+        TypeError: An argument has the wrong type.
+        ValueError: A numeric argument is outside its permitted range.
+        ArchiveLineIndexError: Source, archive, extraction, size, or index
+            validation fails.
+
+    The package-created stream is always closed. No partial index is returned,
+    and successful return includes terminal archive validation.
+    """
 
     _validate_scan_options(skip_utf8_bom, buffer_size)
     _validate_max_uncompressed_size(max_uncompressed_size)
@@ -80,13 +137,40 @@ def write_sqlite_index(
     *,
     overwrite: bool = False,
 ) -> None:
-    """Write a complete offset sequence to a dedicated SQLite file."""
+    """Atomically write offsets to a dedicated SQLite database.
+
+    Args:
+        offsets: Valid completed ``array('Q')`` offset sequence.
+        destination: Filesystem path for the dedicated database.
+        overwrite: Replace an existing destination only when true.
+
+    Raises:
+        FileExistsError: The destination exists and replacement is disabled.
+        InvalidIndexError: ``offsets`` violates the index contract.
+        PersistenceError: SQLite cannot create a valid database.
+
+    A pre-publication failure preserves an existing destination.
+    """
 
     _write_sqlite_index(offsets, destination, overwrite=overwrite)
 
 
 def read_sqlite_index(source: str | PathLike[str]) -> array:
-    """Load and validate offsets from a dedicated SQLite index file."""
+    """Load and validate a dedicated SQLite index database.
+
+    Args:
+        source: Filesystem path to the database.
+
+    Returns:
+        The validated offsets as ``array('Q')``.
+
+    Raises:
+        FileNotFoundError: ``source`` does not exist.
+        InvalidIndexError: Stored offsets violate the index contract.
+        PersistenceError: SQLite cannot read the database or execute its query.
+
+    A noncanonical schema raises ``InvalidIndexError``.
+    """
 
     return _read_sqlite_index(source)
 
@@ -97,13 +181,38 @@ def write_raw_index(
     *,
     overwrite: bool = False,
 ) -> None:
-    """Write offsets as headerless little-endian uint64 values."""
+    """Atomically write offsets as headerless little-endian ``uint64`` values.
+
+    Args:
+        offsets: Valid completed ``array('Q')`` offset sequence.
+        destination: Filesystem path for the raw index.
+        overwrite: Replace an existing destination only when true.
+
+    Raises:
+        FileExistsError: The destination exists and replacement is disabled.
+        InvalidIndexError: ``offsets`` violates the index contract.
+        PersistenceError: The complete raw representation cannot be written.
+
+    A pre-publication failure preserves an existing destination.
+    """
 
     _write_raw_index(offsets, destination, overwrite=overwrite)
 
 
 def read_raw_index(source: str | PathLike[str]) -> array:
-    """Load and validate a complete raw offset file."""
+    """Load and validate a headerless little-endian raw index.
+
+    Args:
+        source: Filesystem path to the raw index.
+
+    Returns:
+        The validated offsets as ``array('Q')``.
+
+    Raises:
+        FileNotFoundError: ``source`` does not exist.
+        InvalidIndexError: The byte length or decoded offsets are invalid.
+        OSError: The source cannot be read through ordinary filesystem I/O.
+    """
 
     return _read_raw_index(source)
 

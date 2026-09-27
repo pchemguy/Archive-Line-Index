@@ -60,3 +60,52 @@ Unit tests correspond directly to production ownership:
 `tests/integration/test_persistence_equivalence.py` verifies that the completed in-memory array, rows selected from SQLite in ascending order, and decoded raw `uint64` values are identical, including the EOF sentinel.
 
 `tests/integration/test_resource_lifecycle.py` verifies deterministic cleanup, no surviving 7z extraction worker after closure, package-owned file closure, and cleanup following consumer, backend, scanner, and persistence failures.
+
+`tests/integration/test_distribution_metadata.py` verifies declared package metadata, explicit source discovery, and required license/readme files.
+
+`tests/integration/test_documentation.py` verifies local link targets, the acceptance-evidence schema and selectors, complete ownership inventories, and retirement of obsolete architecture documentation.
+
+`tests/integration/test_filesystem_portability.py` verifies Unicode and path-like inputs, temporary-sibling publication, cleanup, host-specific open-destination replacement semantics, and archive-handle closure.
+
+`tests/integration/test_import_surface.py` verifies curated exports, acyclic submodule imports, and the prohibition on importing internal code through the package root.
+
+`tests/integration/test_installed_package_workflow.py` exercises all supported archive formats and both persistence formats through an installed package outside the checkout.
+
+`tests/integration/test_large_inputs.py` contains separately selected slow generated-scale memory and expansion checks.
+
+`tests/integration/test_persistence_api.py` verifies validation order and public persistence error behavior. `tests/integration/test_readme.py` executes the user examples and checks development-document routing.
+
+## 5. Complete current test inventory
+
+```text
+tests/conftest.py
+tests/helpers/archive_factory.py
+tests/helpers/binary_cases.py
+tests/helpers/streams.py
+tests/unit/test_package.py
+tests/unit/test_errors.py
+tests/unit/test_sources.py
+tests/unit/test_formats.py
+tests/unit/test_stream.py
+tests/unit/test_offsets.py
+tests/unit/test_scanner.py
+tests/unit/backends/test_registry.py
+tests/unit/backends/test_plain.py
+tests/unit/backends/test_zip.py
+tests/unit/backends/test_tar.py
+tests/unit/backends/test_sevenzip.py
+tests/unit/persistence/test_sqlite.py
+tests/unit/persistence/test_raw.py
+tests/integration/test_content_stream.py
+tests/integration/test_distribution_metadata.py
+tests/integration/test_documentation.py
+tests/integration/test_filesystem_portability.py
+tests/integration/test_import_surface.py
+tests/integration/test_index_building.py
+tests/integration/test_installed_package_workflow.py
+tests/integration/test_large_inputs.py
+tests/integration/test_persistence_api.py
+tests/integration/test_persistence_equivalence.py
+tests/integration/test_readme.py
+tests/integration/test_resource_lifecycle.py
+```

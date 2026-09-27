@@ -80,6 +80,26 @@ def test_source_index_round_trips_identically_through_both_formats(
     )
 
 
+def test_generated_large_index_round_trips_through_both_readers(tmp_path) -> None:
+    line_count = 250_000
+    source = tmp_path / "generated.txt"
+    with source.open("wb") as stream:
+        for _ in range(line_count // 10_000):
+            stream.write(b"x\n" * 10_000)
+
+    original = build_line_index(source)
+    sqlite_path = tmp_path / "large.sqlite"
+    raw_path = tmp_path / "large.raw"
+    write_sqlite_index(original, sqlite_path)
+    write_raw_index(original, raw_path)
+
+    assert len(original) == line_count + 1
+    assert original[0] == 0
+    assert original[-1] == 2 * line_count
+    assert read_sqlite_index(sqlite_path) == original
+    assert read_raw_index(raw_path) == original
+
+
 @pytest.mark.parametrize(
     ("writer", "reader", "suffix"),
     [

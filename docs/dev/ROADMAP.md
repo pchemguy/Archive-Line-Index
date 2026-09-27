@@ -8,9 +8,9 @@ This roadmap is the compact progress projection of [PLAN.md](PLAN.md). PLAN owns
 
 | Boundary   | Complete | Total |
 | ---------- | -------: | ----: |
-| Phases     |        3 |     4 |
-| Milestones |       10 |    11 |
-| Tasks      |       34 |    35 |
+| Phases     |        4 |     4 |
+| Milestones |       11 |    11 |
+| Tasks      |       35 |    35 |
 
 ## [x] [Phase 1: Plain stream and index MVP](PLAN.md#plain-stream-and-index-mvp)
 
@@ -57,7 +57,7 @@ This roadmap is the compact progress projection of [PLAN.md](PLAN.md). PLAN owns
     - [x] [Task: expose persistence through the public API](plan/index-persistence.md#task-expose-persistence-through-the-public-api)
     - [x] [Task: verify cross-format persistence equivalence](plan/index-persistence.md#task-verify-cross-format-persistence-equivalence)
 
-## [ ] [Phase 4: Package integration](PLAN.md#package-integration)
+## [x] [Phase 4: Package integration](PLAN.md#package-integration)
 
 - [x] [Milestone: distribution surface](plan/package-integration.md#milestone-distribution-surface)
     - [x] [Task: finalize package exports](plan/package-integration.md#task-finalize-package-exports)
@@ -67,5 +67,5 @@ This roadmap is the compact progress projection of [PLAN.md](PLAN.md). PLAN owns
     - [x] [Task: complete large-input and backpressure verification](plan/package-integration.md#task-complete-large-input-and-backpressure-verification)
     - [x] [Task: complete cross-platform filesystem verification](plan/package-integration.md#task-complete-cross-platform-filesystem-verification)
     - [x] [Task: run installed-package end-to-end workflows](plan/package-integration.md#task-run-installed-package-end-to-end-workflows)
-- [ ] [Milestone: documentation and acceptance](plan/package-integration.md#milestone-documentation-and-acceptance)
-    - [ ] [Task: reconcile documentation and acceptance coverage](plan/package-integration.md#task-reconcile-documentation-and-acceptance-coverage)
+- [x] [Milestone: documentation and acceptance](plan/package-integration.md#milestone-documentation-and-acceptance)
+    - [x] [Task: reconcile documentation and acceptance coverage](plan/package-integration.md#task-reconcile-documentation-and-acceptance-coverage)
