@@ -81,6 +81,10 @@ SPEC nodes may refer to implementation locations, and PLAN tasks may name files 
 
 Exploration notes or temporary architecture documents outside `docs/dev/` are not normative. Once their settled content has been integrated into the authoritative SPEC, PLAN, and LAYOUT trees, they should be removed unless they retain a distinct, durable explanatory purpose.
 
+### `docs/dev/implementation_notes.md`
+
+Provides a focused collection of specific implementation choices, engineering tradeoffs, and measured performance optimizations (e.g., endianness handling in raw indexing) that document the "why" and "how" of particular code paths without cluttering the high-level architecture or SPEC.
+
 New shared development documents shall be introduced only for a clear canonical responsibility not naturally owned by SPEC, PLAN, or LAYOUT. They must not become miscellaneous overflow containers.
 
 ## 6. Current authoritative paths
@@ -107,4 +111,5 @@ docs/dev/layout/docs.md
 docs/dev/layout/src.md
 docs/dev/layout/tests.md
 docs/dev/layout/packaging-runtime.md
+docs/dev/implementation_notes.md
 ```
