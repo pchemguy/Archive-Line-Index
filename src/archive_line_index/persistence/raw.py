@@ -13,6 +13,7 @@ from typing import BinaryIO
 
 from ..errors import InvalidIndexError, PersistenceError
 from ..offsets import validate_offset_array
+from .common import _normalize_path, _publish
 
 
 def write_raw_index(
@@ -110,20 +111,3 @@ def _write_all(stream: BinaryIO, data: bytes) -> None:
         written += count
 
 
-def _publish(temporary: Path, destination: Path, *, overwrite: bool) -> None:
-    if overwrite:
-        os.replace(temporary, destination)
-        return
-    if destination.exists():
-        raise FileExistsError(destination)
-    os.link(temporary, destination)
-    temporary.unlink()
-
-
-def _normalize_path(value: str | PathLike[str], name: str) -> Path:
-    if not isinstance(value, (str, os.PathLike)):
-        raise TypeError(f"{name} must be a filesystem path")
-    path = os.fspath(value)
-    if not isinstance(path, str):
-        raise TypeError(f"{name} paths must resolve to str, not bytes")
-    return Path(path)
