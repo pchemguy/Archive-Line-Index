@@ -245,3 +245,21 @@ def test_read_corrupt_database_is_persistence_error_with_cause(tmp_path) -> None
         sqlite_persistence.read_sqlite_index(path)
 
     assert isinstance(captured.value.__cause__, sqlite3.Error)
+
+def test_write_rollback_failure_is_ignored(tmp_path, monkeypatch) -> None:
+    class MockConnection:
+        def execute(self, *args, **kwargs):
+            raise sqlite3.OperationalError("controlled execute failure")
+        def rollback(self):
+            raise sqlite3.OperationalError("controlled rollback failure")
+        def close(self):
+            pass
+
+    monkeypatch.setattr(sqlite_persistence.sqlite3, "connect", lambda *args, **kwargs: MockConnection())
+
+    with pytest.raises(PersistenceError) as captured:
+        sqlite_persistence.write_sqlite_index(
+            _offsets(0), tmp_path / "index.sqlite"
+        )
+
+    assert str(captured.value.__cause__) == "controlled execute failure"
