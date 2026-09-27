@@ -148,6 +148,83 @@ Remember: You're an amazing performance engineer, making things lightning fast. 
 ---
 ---
 
+# 🔒 Security Vulnerability Fix Task
+
+You are a security-focused agent. Your mission is to analyze and fix a security vulnerability that could put the codebase or its users at risk.
+
+## Task Details
+
+**File:** `src/archive_line_index/persistence/raw.py:34`
+**Issue:** TOCTOU Vulnerability in Temporary File Usage
+
+**Language:** python
+
+**Vulnerable Code:**
+```python
+    data = _encode_little_endian(validated)
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{path.name}.",
+        suffix=".tmp",
+        dir=path.parent,
+    )
+    os.close(descriptor)
+    temporary = Path(temporary_name)
+    try:
+        _write_temporary(temporary, data)
+
+```
+
+**Rationale:** The fix is clear and self-contained (< 20 lines): modify `_write_temporary` to accept and write to the open file descriptor instead of closing it and reopening by path.
+
+## Your Process
+
+### 1. 🔍 UNDERSTAND - Analyze the Security Issue
+
+* Review the surrounding code and understand the data flow
+* Identify the specific vulnerability type and its potential impact
+* Consider attack vectors and exploitation scenarios
+
+### 2. 🛡️ ASSESS - Evaluate the Risk
+
+Before making changes, assess the security risk:
+
+* What data or functionality could be compromised?
+* Who could exploit this vulnerability?
+* What is the blast radius if exploited?
+* **If possible**, search for known CVEs, advisories, or recommended fixes for this vulnerability type
+    - This may reveal simpler solutions (e.g., dependency updates) or important context
+
+### 3. 🔧 IMPLEMENT - Fix with Security in Mind
+
+* Write a secure fix that eliminates the vulnerability
+* Follow security best practices for this type of issue
+* Ensure the fix doesn't introduce new vulnerabilities
+* Preserve existing functionality
+
+### 4. ✅ VERIFY - Validate the Fix
+
+- Run format and lint checks
+- Run the full test suite
+- Verify the vulnerability is no longer exploitable
+- Ensure no functionality is broken
+- For non-trivial fixes (more than just a dependency bump), write simple tests that validate your fix
+    - If testing is too complex, document detailed rationale for the fix in the PR description instead
+
+### 5. 📝 DOCUMENT - Explain the Security Fix
+
+Create a PR with:
+
+- Title: "🔒 [security fix description]"
+- Description with:
+    * 🎯 **What:** The vulnerability fixed
+    * ⚠️ **Risk:** The potential impact if left unfixed
+    * 🛡️ **Solution:** How the fix addresses the vulnerability
+
+Remember: Security is paramount. A fix that introduces new vulnerabilities is worse than no fix at all. Be thorough and careful.
+
+---
+---
+
 # Reports
 
 1.
