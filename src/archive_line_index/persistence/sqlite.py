@@ -66,13 +66,14 @@ def read_sqlite_index(source: str | PathLike[str]) -> array:
         uri = path.resolve().as_uri() + "?mode=ro"
         connection = sqlite3.connect(uri, uri=True)
         _validate_read_schema(connection)
-        values = []
-        for (value,) in connection.execute(
+
+        rows = connection.execute(
             "SELECT offset FROM line_index ORDER BY offset"
-        ):
+        ).fetchall()
+        values = [row[0] for row in rows]
+        for value in values:
             if not isinstance(value, int) or isinstance(value, bool):
                 raise InvalidIndexError("SQLite offsets must be integers")
-            values.append(value)
         return make_offset_array(values)
     except InvalidIndexError:
         raise
