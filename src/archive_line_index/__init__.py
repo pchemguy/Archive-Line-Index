@@ -23,7 +23,6 @@ from .errors import (
 from .sources import Source
 from .stream import ContentStream
 
-
 __all__ = [
     "ArchiveLineIndexError",
     "ArchiveStructureError",

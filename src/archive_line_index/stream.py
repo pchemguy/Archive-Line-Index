@@ -8,7 +8,6 @@ import operator
 from .backends.base import BackendReader
 from .errors import ExtractionError, SizeLimitExceededError
 
-
 _BACKEND_READ_SIZE = 64 * 1024
 
 

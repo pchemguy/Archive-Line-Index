@@ -8,7 +8,6 @@ from typing import BinaryIO
 from .errors import InvalidIndexError
 from .offsets import MAX_OFFSET, validate_offset_array
 
-
 UTF8_BOM = b"\xef\xbb\xbf"
 
 
