@@ -72,7 +72,9 @@ def _encode_little_endian(
     if byteorder == "little":
         return offsets.tobytes()
     if byteorder == "big":
-        return b"".join(struct.pack("<Q", value) for value in offsets)
+        copy = array("Q", offsets)
+        copy.byteswap()
+        return copy.tobytes()
     raise ValueError(f"unsupported byte order: {byteorder!r}")
 
 
@@ -81,12 +83,13 @@ def _decode_little_endian(
     *,
     byteorder: str = sys.byteorder,
 ) -> array:
+    offsets = array("Q")
+    offsets.frombytes(data)
     if byteorder == "little":
-        offsets = array("Q")
-        offsets.frombytes(data)
         return offsets
     if byteorder == "big":
-        return array("Q", (value for (value,) in struct.iter_unpack("<Q", data)))
+        offsets.byteswap()
+        return offsets
     raise ValueError(f"unsupported byte order: {byteorder!r}")
 
 

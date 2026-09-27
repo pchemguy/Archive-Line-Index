@@ -267,7 +267,7 @@ The raw file contains exactly the same values, in the same order, as the in-memo
 (line_count + 1) * 8
 ```
 
-The raw format is explicitly little-endian. Because `array("Q")` uses native byte order, serialization byte-swaps on a big-endian host. The raw file can be loaded back into `array("Q")` or consumed by another language using the same fixed-width definition.
+The raw format is explicitly little-endian. Because `array("Q")` uses native byte order, serialization byte-swaps on a big-endian host using native `byteswap` operations. The raw file can be loaded back into `array("Q")` or consumed by another language using the same fixed-width definition.
 
 The format contains no header, magic value, version, source identity, BOM flag, or other metadata. Structural readers can require a nonzero file size divisible by eight and may additionally verify that decoded offsets are strictly increasing.
 

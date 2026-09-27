@@ -34,7 +34,11 @@ def test_write_produces_exact_little_endian_bytes(tmp_path, values: list[int]) -
 
 
 def test_big_endian_encoding_uses_swapped_copy_without_mutating_input() -> None:
+    import sys
+
     offsets = _offsets(0, 0x0102030405060708)
+    if sys.byteorder != "big":
+        offsets.byteswap()
     before = offsets.tobytes()
 
     encoded = raw_persistence._encode_little_endian(offsets, byteorder="big")
@@ -181,9 +185,14 @@ def test_read_rejects_invalid_decoded_offsets(tmp_path, values: list[int]) -> No
 
 
 def test_big_endian_decode_reconstructs_values() -> None:
+    import sys
+
     data = struct.pack("<QQQ", 0, 4, 9)
 
     decoded = raw_persistence._decode_little_endian(data, byteorder="big")
+
+    if sys.byteorder != "big":
+        decoded.byteswap()
 
     assert decoded.typecode == "Q"
     assert list(decoded) == [0, 4, 9]
