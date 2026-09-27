@@ -217,3 +217,33 @@ def test_read_error_retains_specific_os_exception(tmp_path, monkeypatch) -> None
 def test_raw_reader_does_not_use_or_expose_mmap() -> None:
     assert "mmap" not in inspect.getsource(raw_persistence)
     assert not hasattr(raw_persistence, "mmap")
+
+def test_prepublication_cleanup_failure_adds_note_to_primary_exception(
+    tmp_path, monkeypatch
+) -> None:
+    destination = tmp_path / "index.raw"
+    primary_failure = OSError("controlled publish failure")
+    cleanup_failure = OSError("controlled unlink failure")
+
+    import pathlib
+
+    def mock_publish(*args, **kwargs):
+        raise primary_failure
+
+    monkeypatch.setattr(
+        raw_persistence,
+        "_publish",
+        mock_publish,
+    )
+
+    def mock_unlink(*args, **kwargs):
+        raise cleanup_failure
+
+    monkeypatch.setattr(pathlib.Path, "unlink", mock_unlink)
+
+    with pytest.raises(OSError) as captured:
+        raw_persistence.write_raw_index(_offsets(0, 4), destination)
+
+    assert captured.value is primary_failure
+    assert hasattr(captured.value, "__notes__")
+    assert any("temporary cleanup failed: controlled unlink failure" in note for note in captured.value.__notes__)
