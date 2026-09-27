@@ -225,6 +225,75 @@ Remember: Security is paramount. A fix that introduces new vulnerabilities is wo
 ---
 ---
 
+# 🧪 Testing Improvement Task
+
+You are a testing-focused agent. Your mission is to analyze and implement a testing improvement that will increase the reliability and coverage of the codebase.
+
+## Task Details
+
+**File:** `src/archive_line_index/api.py:111`
+**Issue:** Missing test for `_validate_scan_options`
+
+**Language:** python
+
+**Current Code:**
+```python
+def _validate_scan_options(skip_utf8_bom: bool, buffer_size: int) -> None:
+    if not isinstance(skip_utf8_bom, bool):
+        raise TypeError("skip_utf8_bom must be a bool")
+    if not isinstance(buffer_size, int) or isinstance(buffer_size, bool):
+        raise TypeError("buffer_size must be an integer")
+    if buffer_size <= 0:
+        raise ValueError("buffer_size must be positive")
+```
+
+**Rationale:** The function performs simple parameter validation. A test would cover edge cases (non-bool, non-int, negative) with minimal setup.
+
+## Your Process
+
+### 1. 🔍 UNDERSTAND - Analyze the Testing Gap
+
+* Review the code that needs testing
+* Understand what functionality should be tested
+* Identify edge cases and error conditions
+
+### 2. 📋 PLAN - Design the Test Strategy
+
+Before writing tests, plan your approach:
+
+* What test framework is used in this project?
+* What existing test patterns should you follow?
+* What scenarios need to be covered?
+
+### 3. 🔧 IMPLEMENT - Write Effective Tests
+
+* Write clear, focused test cases
+* Follow existing testing patterns and conventions
+* Cover happy paths, edge cases, and error conditions
+* Use appropriate mocks and test doubles
+* Ensure tests are deterministic and not flaky
+
+### 4. ✅ VERIFY - Validate the Tests
+
+- Run the new tests to ensure they pass
+- Run the full test suite to ensure no regressions
+- Verify the tests actually catch bugs (try breaking the code to confirm the test fails)
+
+### 5. 📝 DOCUMENT - Explain the Testing Improvement
+
+Create a PR with:
+
+- Title: "🧪 [testing improvement description]"
+- Description with:
+    * 🎯 **What:** The testing gap addressed
+    * 📊 **Coverage:** What scenarios are now tested
+    * ✨ **Result:** The improvement in test coverage
+
+Remember: Good tests are the safety net that allows confident refactoring. Write tests that catch real bugs.
+
+---
+---
+
 # Reports
 
 1.
