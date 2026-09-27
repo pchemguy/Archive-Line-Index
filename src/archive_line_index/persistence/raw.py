@@ -2,13 +2,12 @@
 
 from __future__ import annotations
 
-from array import array
 import os
-from os import PathLike
-from pathlib import Path
-import struct
 import sys
 import tempfile
+from array import array
+from os import PathLike
+from pathlib import Path
 from typing import BinaryIO
 
 from ..errors import InvalidIndexError, PersistenceError
@@ -37,10 +36,9 @@ def write_raw_index(
         suffix=".tmp",
         dir=path.parent,
     )
-    os.close(descriptor)
     temporary = Path(temporary_name)
     try:
-        _write_temporary(temporary, data)
+        _write_temporary(descriptor, data)
         if temporary.stat().st_size != len(data):
             raise PersistenceError("raw index size validation failed")
         _publish(temporary, path, overwrite=overwrite)
@@ -97,8 +95,8 @@ def _read_bytes(path: Path) -> bytes:
     return path.read_bytes()
 
 
-def _write_temporary(path: Path, data: bytes) -> None:
-    with path.open("wb") as stream:
+def _write_temporary(descriptor: int, data: bytes) -> None:
+    with open(descriptor, "wb") as stream:
         _write_all(stream, data)
         stream.flush()
         os.fsync(stream.fileno())
