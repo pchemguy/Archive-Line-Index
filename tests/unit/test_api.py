@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from archive_line_index.api import _validate_scan_options
+from archive_line_index.api import (
+    _validate_max_uncompressed_size,
+    _validate_scan_options,
+)
 
 
 def test_validate_scan_options_accepts_valid_inputs() -> None:
@@ -28,3 +31,21 @@ def test_validate_scan_options_rejects_non_int_buffer_size(buffer_size) -> None:
 def test_validate_scan_options_rejects_nonpositive_buffer_size(buffer_size: int) -> None:
     with pytest.raises(ValueError, match="buffer_size must be positive"):
         _validate_scan_options(True, buffer_size)
+
+
+def test_validate_max_uncompressed_size_accepts_valid_inputs() -> None:
+    _validate_max_uncompressed_size(None)
+    _validate_max_uncompressed_size(0)
+    _validate_max_uncompressed_size(1024)
+
+
+@pytest.mark.parametrize("max_uncompressed_size", [True, False, 1.5, "1024"])
+def test_validate_max_uncompressed_size_rejects_non_int(max_uncompressed_size) -> None:
+    with pytest.raises(TypeError, match="max_uncompressed_size must be an integer or None"):
+        _validate_max_uncompressed_size(max_uncompressed_size)
+
+
+@pytest.mark.parametrize("max_uncompressed_size", [-1, -1024])
+def test_validate_max_uncompressed_size_rejects_negative(max_uncompressed_size: int) -> None:
+    with pytest.raises(ValueError, match="max_uncompressed_size must be non-negative"):
+        _validate_max_uncompressed_size(max_uncompressed_size)
