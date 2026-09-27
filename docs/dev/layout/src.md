@@ -145,6 +145,15 @@ No other production module imports `py7zr`. If this module later becomes too bro
 
 Marks the persistence package and may expose internal persistence protocols used by `api.py`. It does not re-export persistence operations as an alternative public surface unless `../spec/public-api.md` explicitly assigns that role.
 
+### `src/archive_line_index/persistence/fs.py`
+
+Owns common filesystem operations for persistence adapters:
+
+- input path normalization and type validation;
+- atomic file replacement and publication logic.
+
+It does not interact with the offset representation, SQLite schemas, raw binary encoding, or archive handling.
+
 ### `src/archive_line_index/persistence/sqlite.py`
 
 Owns SQLite persistence of the complete offset sequence:

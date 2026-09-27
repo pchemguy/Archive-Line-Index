@@ -11,7 +11,7 @@ import tempfile
 
 from ..errors import InvalidIndexError, PersistenceError
 from ..offsets import make_offset_array, validate_offset_array
-from .common import _normalize_path, _publish
+from .fs import _normalize_path, _publish
 
 
 _SCHEMA = """CREATE TABLE line_index (

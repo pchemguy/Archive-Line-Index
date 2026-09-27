@@ -13,7 +13,7 @@ from typing import BinaryIO
 
 from ..errors import InvalidIndexError, PersistenceError
 from ..offsets import validate_offset_array
-from .common import _normalize_path, _publish
+from .fs import _normalize_path, _publish
 
 
 def write_raw_index(
