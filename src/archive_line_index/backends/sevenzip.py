@@ -6,8 +6,9 @@ import io
 import queue
 import struct
 import threading
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 import py7zr
 
@@ -17,7 +18,6 @@ from ..errors import (
     ExtractionError,
     InvalidArchiveError,
 )
-
 
 _CALLBACK_BLOCK_SIZE = 1024 * 1024
 _QUEUE_WAIT_SECONDS = 0.05

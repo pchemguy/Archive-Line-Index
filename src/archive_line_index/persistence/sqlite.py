@@ -2,17 +2,16 @@
 
 from __future__ import annotations
 
-from array import array
 import os
-from os import PathLike
-from pathlib import Path
 import sqlite3
 import tempfile
+from array import array
+from os import PathLike
+from pathlib import Path
 
 from ..errors import InvalidIndexError, PersistenceError
 from ..offsets import make_offset_array, validate_offset_array
 from .fs import _normalize_path, _publish
-
 
 _SCHEMA = """CREATE TABLE line_index (
     offset INTEGER PRIMARY KEY

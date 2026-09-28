@@ -6,7 +6,6 @@ import os
 from os import PathLike
 from typing import TypeAlias
 
-
 Source: TypeAlias = str | PathLike[str]
 
 

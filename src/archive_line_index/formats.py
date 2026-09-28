@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import os
 from enum import Enum
-from .sources import Source, normalize_source_path
 
+from .sources import Source, normalize_source_path
 
 DETECTION_PREFIX_SIZE = 512
 

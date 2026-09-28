@@ -8,14 +8,17 @@ from typing import BinaryIO
 
 from .backends.registry import open_backend
 from .formats import detect_format
-from .persistence.raw import read_raw_index as _read_raw_index
-from .persistence.raw import write_raw_index as _write_raw_index
-from .persistence.sqlite import read_sqlite_index as _read_sqlite_index
-from .persistence.sqlite import write_sqlite_index as _write_sqlite_index
+from .persistence.raw import (
+    read_raw_index as _read_raw_index,
+    write_raw_index as _write_raw_index,
+)
+from .persistence.sqlite import (
+    read_sqlite_index as _read_sqlite_index,
+    write_sqlite_index as _write_sqlite_index,
+)
 from .scanner import scan_offsets
 from .sources import Source, normalize_source_path
 from .stream import ContentStream
-
 
 DEFAULT_BUFFER_SIZE = 1024 * 1024
 

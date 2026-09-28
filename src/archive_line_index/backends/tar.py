@@ -6,7 +6,6 @@ import tarfile
 
 from ..errors import ArchiveStructureError, ExtractionError, InvalidArchiveError
 
-
 _TAR_ERRORS = (tarfile.TarError, EOFError)
 
 

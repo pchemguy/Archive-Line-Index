@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+import itertools
 from array import array
 from collections.abc import Iterable
 
 from .errors import InvalidIndexError
-
 
 MAX_OFFSET = (1 << 63) - 1
 
@@ -14,15 +14,35 @@ MAX_OFFSET = (1 << 63) - 1
 def make_offset_array(values: Iterable[int]) -> array:
     """Construct and validate a canonical unsigned 64-bit offset array."""
 
-    offsets = array("Q")
-    for value in values:
-        if not isinstance(value, int) or isinstance(value, bool):
+    try:
+        iterator = iter(values)
+    except TypeError:
+        raise TypeError("values must be an iterable") from None
+
+    chained: Iterable[int]
+    try:
+        first = next(iterator)
+    except StopIteration:
+        chained = ()
+    else:
+        if type(first) is bool:
             raise InvalidIndexError("offsets must be integers")
-        if not 0 <= value <= MAX_OFFSET:
-            raise InvalidIndexError(
-                f"offset {value!r} is outside the supported range"
-            )
-        offsets.append(value)
+        try:
+            second = next(iterator)
+        except StopIteration:
+            chained = (first,)
+        else:
+            if type(second) is bool:
+                raise InvalidIndexError("offsets must be integers")
+            chained = itertools.chain((first, second), iterator)
+
+    try:
+        offsets = array("Q", chained)
+    except TypeError as e:
+        raise InvalidIndexError("offsets must be integers") from e
+    except OverflowError as e:
+        raise InvalidIndexError("offset is outside the supported range") from e
+
     return validate_offset_array(offsets)
 
 
