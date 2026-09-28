@@ -138,6 +138,36 @@ def test_prepublication_failure_preserves_destination_and_cleans_temp(
     assert {path.name for path in tmp_path.iterdir()} == {destination.name}
 
 
+def test_prepublication_failure_with_failed_cleanup_adds_note(
+    tmp_path, monkeypatch
+) -> None:
+    destination = tmp_path / "index.sqlite"
+    primary_failure = RuntimeError("controlled publish failure")
+    cleanup_failure = OSError("controlled unlink failure")
+
+    def mock_publish(*args, **kwargs):
+        raise primary_failure
+
+    monkeypatch.setattr(sqlite_persistence, "_publish", mock_publish)
+
+    import pathlib
+
+    def failing_unlink(self, missing_ok=False):
+        raise cleanup_failure
+
+    monkeypatch.setattr(pathlib.Path, "unlink", failing_unlink)
+
+    with pytest.raises(RuntimeError) as captured:
+        sqlite_persistence.write_sqlite_index(_offsets(0, 4), destination)
+
+    assert captured.value is primary_failure
+    assert hasattr(captured.value, "__notes__")
+    assert any(
+        "temporary cleanup failed: controlled unlink failure" in note
+        for note in captured.value.__notes__
+    )
+
+
 def test_sqlite_engine_failure_is_translated_with_cause(tmp_path, monkeypatch) -> None:
     failure = sqlite3.OperationalError("controlled connect failure")
 
