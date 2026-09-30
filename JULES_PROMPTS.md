@@ -297,12 +297,15 @@ Remember: Good tests are the safety net that allows confident refactoring. Write
 
 # Reports
 
-1.
-    💡 **What:** Replaced `struct.iter_unpack` and `struct.pack` list comprehensions with `array.frombytes()`/`array.tobytes()` and `array.byteswap()` in `_decode_little_endian` and `_encode_little_endian`.
-    🎯 **Why:** Big-endian systems need to read/write little-endian unsigned 64-bit integers. `iter_unpack` is significantly slower than doing a native byte swap on the `array` itself. 
-    📊 **Measured Improvement:** Measured ~18x faster decode (0.154s to 0.008s) and ~30x faster encode (0.415s to 0.013s) for a million items on a simulated big-endian system, using an ad-hoc local script.
-2.
-    🎯 **What:** Renamed the newly created `common.py` to `fs.py` and documented its precise responsibility in `docs/dev/layout/src.md`.
-    💡 **Why:** To comply with the project's layout rules which forbid "dumping-ground" modules like `common.py` and require all modules to have a documented canonical responsibility.
-    ✅ **Verification:** Verified by inspecting the updated files, running layout/grep checks, and successfully passing the unit test suite (`pytest tests/unit`).
-    ✨ **Result:** A cleaner, rule-compliant architecture for shared filesystem utilities within the persistence package.
+## 1.
+
+- 💡 **What:** Replaced `struct.iter_unpack` and `struct.pack` list comprehensions with `array.frombytes()`/`array.tobytes()` and `array.byteswap()` in `_decode_little_endian` and `_encode_little_endian`.
+- 🎯 **Why:** Big-endian systems need to read/write little-endian unsigned 64-bit integers. `iter_unpack` is significantly slower than doing a native byte swap on the `array` itself. 
+- 📊 **Measured Improvement:** Measured ~18x faster decode (0.154s to 0.008s) and ~30x faster encode (0.415s to 0.013s) for a million items on a simulated big-endian system, using an ad-hoc local script.
+
+## 2.
+
+- 🎯 **What:** Renamed the newly created `common.py` to `fs.py` and documented its precise responsibility in `docs/dev/layout/src.md`.
+- 💡 **Why:** To comply with the project's layout rules which forbid "dumping-ground" modules like `common.py` and require all modules to have a documented canonical responsibility.
+- ✅ **Verification:** Verified by inspecting the updated files, running layout/grep checks, and successfully passing the unit test suite (`pytest tests/unit`).
+- ✨ **Result:** A cleaner, rule-compliant architecture for shared filesystem utilities within the persistence package.
