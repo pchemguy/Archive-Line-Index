@@ -127,11 +127,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Round-trip all canonical examples, validate byte shape/range/order and opposite-endian conversion, preserve input arrays and existing destinations, and clean owned temporary files.
             - Contracts: PER-01–07; IDX-06.
             - Verified result: RED: raw provider absent; write/close fault exposed cleanup masking the primary write error. GREEN: exact encoding/roundtrips, corruption, opposite-endian read/write simulation, no input mutation, partial writes and pre/post-publication outcomes pass with all regressions; owned-file cleanup preserves primary errors. Ruff/strict mypy pass.
-        - [ ] T-018 — Implement transactional self-contained SQLite writing
+        - [x] T-018 — Implement transactional self-contained SQLite writing
             - Scope: persistence/sqlite.py writer and transaction/publication failure checks.
             - Depends on: T-007, T-016.
             - Acceptance/evidence: Write the canonical dedicated schema and complete values, validate integrity/count/bounds, close handles and eliminate data dependence on temporary WAL/journal sidecars before publication.
             - Contracts: PER-01–05; persistence SQLite contract.
+            - Verified result: RED: SQLite writer absent. GREEN: canonical schema/ordered values, committed integrity/count/bounds, self-contained DELETE-journal output, pre-I/O validation, whole-file replacement, engine cause preservation and pre/post-publication failure tests pass with all regressions. Owned connection/sidecars close before publication; Ruff/strict mypy pass.
         - [ ] T-019 — Implement read-only SQLite schema and value validation
             - Scope: persistence/sqlite.py reader and malformed-database checks.
             - Depends on: T-018.
