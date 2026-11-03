@@ -1,3 +1,15 @@
 .obsidian
 .trash
 *.tkn
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage*
+htmlcov/
+dist/
+build/
+.venv/
+*.egg-info/

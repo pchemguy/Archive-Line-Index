@@ -30,3 +30,7 @@ Outcome: the complete design/contract/PLAN/layout/TASKS suite is accepted and wh
 - All nine DOCS issues are closed with verified evidence. The prospective merged tree passed package/hash/link/structure checks; no product requirements, tasks or implementation changed during integration.
 - Finish/verify the containing explicit two-parent integration commit, publish/read back main, then close/read back sdd-docs-main. These external effects occur after this checkpoint and must be reconciled from actual state.
 - If these transitions have already completed, reuse their observed identities rather than replay them. Return on the default branch and pause for the selected implementation range; eligible-phase activation and execution belong to that later handoff.
+
+## Active implementation selection
+
+The human authorized T-001 through T-014, stopping before T-015. Preparation main commit `9c90eebc8aaca66f8f086cb69f93f0dbb7c571ee` and documentation milestone #1 closure were verified before branching to `phase/1-plain-file-library`. Phase activation verified label `sdd-phase-1-Plain-file-library`, native milestones #2–5 and task issues #10–24 (T-001–T-015 respectively). T-015 is projected only and remains unstarted. The selected partial phase must remain unmerged and unreleased. Later task commits and checkoffs supersede the earlier preparation-only snapshot above; boundary tasks refresh this handoff.

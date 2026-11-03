@@ -4,6 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "archive-line-index"
+version = "0.1.0"
 description = "Sequential archive payload streaming and byte-line indexing."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -15,7 +16,7 @@ dependencies = [
 dev = [
     "build",
     "mypy",
-    "pytest",
+    "pytest>=9",
     "pytest-cov",
     "pytest-asyncio",
     "pytest-timeout",
@@ -31,7 +32,7 @@ tools = [
     "uv",
 ]
 test = [
-    "pytest",
+    "pytest>=9",
     "pytest-cov",
     "pytest-benchmark",
     "pytest-asyncio",
@@ -60,6 +61,7 @@ addopts = ["-ra", "-q", "--strict-config", "--strict-markers"]
 pythonpath = ["src"]
 testpaths = ["tests"]
 asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
 timeout = "60"
 markers = [
     "integration: tests that start worker processes",
