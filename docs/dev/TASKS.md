@@ -10,7 +10,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 ## Phase 1 — Plain-file library
 
-- [ ] Phase 1 — Plain-file library
+- [x] Phase 1 — Plain-file library
     - [x] Milestone 1.1 — Plain content access
         - [x] T-001 — Establish the typed package and executable check foundation
             - Scope: pyproject.toml, package __init__/errors owners, test/shared-fixture setup and generated-file exclusions; establish initial 0.1.0 metadata without CLI wiring.
@@ -102,12 +102,13 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
             - Verified result: Whole milestone code review completed; incompatible buffer-provider error translation repaired after RED regression. GREEN: 253 tests, 99% coverage, Ruff lint/format, strict mypy including helper, isolated wheel/sdist build, source rebuild, both clean installed runtimes/examples and native SHA256SUMS checks pass. Report and HANDOFF included. Stop before T-015; no phase completion/integration/tag/release.
             - Report: `docs/dev/reports/phases/1/1.3.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 1.4 — Phase review
-        - [ ] T-015 — Review test and report phase 1
+    - [x] Milestone 1.4 — Phase review
+        - [x] T-015 — Review test and report phase 1
             - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence.
             - Depends on: T-006, T-009, T-014. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
             - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.1.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
             - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Verified result: Phase-wide source review and all applicable exits pass: 253 tests, 99% coverage, Ruff/strict mypy, isolated native build, source rebuild and six refreshed installed/artifact/example checks. Earlier task composition and delivery milestone closures verified. Release notes/report/HANDOFF included. Integration, tag and hosted release remain pending actual readback; Phase 2 is unselected.
             - Report: `docs/dev/reports/phases/1/PHASE-REPORT.md`; include HANDOFF with this boundary.
 
 ## Phase 2 — Paired persistence and CLI

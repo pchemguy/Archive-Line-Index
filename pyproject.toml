@@ -64,6 +64,7 @@ only-include = [
     "scripts",
     "pyproject.toml",
     "README.md",
+    "RELEASE-NOTES.md",
     "LICENSE",
     "AI_DISCLOSURE.md",
     "SDD-MANAGER.md",
