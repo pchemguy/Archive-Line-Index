@@ -1,0 +1,317 @@
+# Implementation tasks
+
+## Execution boundaries
+
+[PLAN](PLAN.md) owns phase/milestone outcomes and exits; [layout](layout.md) owns physical placement; [SPEC](SPEC.md) and the [component/API design](DECOMPOSITION.md) own contracts and interfaces. All tasks below are proposed and unchecked. Each task includes its own focused tests and professional documentation within the stated scope; no task is complete solely because its source file exists.
+
+The first selected implementation range requires accepted preparation integrated into the default branch and verified eligible-phase tracking. A phase’s first task additionally requires its predecessor’s verified integration and published source/wheel GitHub release. Task dependencies below do not waive those gates or authorize a range. Phase review tasks prepare notes/artifacts and evidence; post-task integration, exact-source release finalization, tag publication and hosted-byte verification are completed under PLAN’s standing phase release policy before a successor starts. A partial range pauses without a phase release.
+
+Dedicated milestone/phase reviews perform code review separately from test execution, repair blocking/contract issues and retain evidence. Folded milestone exits carry the same review/report/HANDOFF obligations in their final delivery task. Review units count toward an authorized next-N selection, but are excluded from delivery-task counts.
+
+## Phase 1 — Plain-file library
+
+- [ ] Phase 1 — Plain-file library
+    - [ ] Milestone 1.1 — Plain content access
+        - [ ] T-001 — Establish the typed package and executable check foundation
+            - Scope: pyproject.toml, package __init__/errors owners, test/shared-fixture setup and generated-file exclusions; establish initial 0.1.0 metadata without CLI wiring.
+            - Depends on: accepted preparation/phase activation; no earlier product task.
+            - Acceptance/evidence: Observe focused failing package/error checks before implementation; make pytest, configured Ruff/mypy and minimal package imports runnable in a scoped environment. Document actual tool/runtime limits; export no unimplemented APIs.
+            - Contracts: API-01–02, API-04–05; layout root/source/test owners.
+        - [ ] T-002 — Implement path normalization and bounded format candidates
+            - Scope: sources.py and formats.py with their focused unit checks.
+            - Depends on: T-001.
+            - Acceptance/evidence: Validate Source kinds, inspect at most 512 bytes and preserve candidate evidence/precedence without plain fallback for recognized claims. Full archive validity/rejection remains with selection/adapters in their delivery phases.
+            - Contracts: API-02, ARC-01–02; internal source-selection interfaces.
+        - [ ] T-003 — Implement the backend reader contract and plain selection
+            - Scope: backends/base.py, plain.py and registry.py with adapter/selection checks.
+            - Depends on: T-001, T-002.
+            - Acceptance/evidence: Read original bytes through owned handles, report validated EOF, close idempotently and reject recognized undelivered adapters explicitly. Preserve the protocol used by future adapters.
+            - Contracts: STR-01–02, STR-04–05; internal BackendReader.
+        - [ ] T-004 — Implement bounded stream reads state and cleanup
+            - Scope: stream.py and controlled-reader unit checks.
+            - Depends on: T-003.
+            - Acceptance/evidence: Cover bounded/zero reads, capability/rejection surfaces, terminal EOF, retained delivery failures, closed-state precedence and cleanup without converting failures to EOF.
+            - Contracts: STR-01–02, STR-04–05; public ContentStream and internal construction ownership.
+        - [ ] T-005 — Complete readinto unbounded reads and inclusive size limits
+            - Scope: stream.py extensions and focused buffer/limit/ownership checks.
+            - Depends on: T-004.
+            - Acceptance/evidence: Verify byte-capacity buffers, unchanged tails, unbounded-read late failure, declared/actual inclusive limits and failed-construction cleanup. No excessive byte is returned or copied.
+            - Contracts: STR-01–04; API-02, API-04.
+        - [ ] T-006 — Review test and report milestone 1.1
+            - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
+            - Depends on: T-001, T-002, T-003, T-004, T-005.
+            - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
+            - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Report: `docs/dev/reports/phases/1/1.1.md`; include HANDOFF at this boundary.
+    - [ ] Milestone 1.2 — Canonical line indexing
+        - [ ] T-007 — Implement canonical offset validation and checked construction
+            - Scope: offsets.py and focused unit checks.
+            - Depends on: T-001, T-006.
+            - Acceptance/evidence: Validate concrete Q/eight-byte arrays, first offsets/singletons, strict ordering, sentinel interpretation and signed-range bounds; keep incomplete construction distinct from completed-array validation.
+            - Contracts: IDX-01, IDX-05–06; canonical offset model.
+        - [ ] T-008 — Implement bounded LF scanning over borrowed readers
+            - Scope: scanner.py, ReadableBinary/default/options and scanner unit checks.
+            - Depends on: T-007.
+            - Acceptance/evidence: Use native block search, produce exact LF/CRLF/lone-CR/unterminated offsets, accept legal short reads and reject invalid read results without closing or restoring the caller stream.
+            - Contracts: IDX-01–02, IDX-04–05; API-02–03.
+        - [ ] T-009 — Complete BOM and scanner failure boundary behavior
+            - Scope: scanner.py refinements and shared short-read corpora.
+            - Depends on: T-007, T-008.
+            - Acceptance/evidence: Verify all initial/later/incomplete BOM cases and tiny-buffer splits, offset overflow/allocation/read failures and long-line bounded storage. Return no partial array.
+            - Contracts: IDX-01–06; SYS-03, SYS-06.
+            - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
+            - Report: `docs/dev/reports/phases/1/1.2.md`; include HANDOFF at this boundary.
+    - [ ] Milestone 1.3 — Installed source-based indexing
+        - [ ] T-010 — Compose public plain-file stream and index APIs
+            - Scope: api.py and package-root re-exports with public integration checks.
+            - Depends on: T-006, T-009.
+            - Acceptance/evidence: Validate all options before source acquisition; verify stream ownership transfer, build cleanup and direct/source index equivalence. Delivered exports import without future adapter modules.
+            - Contracts: API-01–04; SYS-02–06, SYS-10.
+        - [ ] T-011 — Verify built plain-library distributions outside the checkout
+            - Scope: Packaging metadata/build selection and installed-package/distribution integration owners.
+            - Depends on: T-010.
+            - Acceptance/evidence: Build wheel/sdist at 0.1.0, install actual wheel bytes outside repository paths, exercise delivered public APIs and rebuild the wheel from source distribution without undeclared runtime tools.
+            - Contracts: API-05; SYS-11–12; layout packaging boundary.
+        - [ ] T-012 — Implement native release artifact inventory validation
+            - Scope: scripts/check_release_artifacts.py, its unit tests and relevant build exclusions.
+            - Depends on: T-011.
+            - Acceptance/evidence: Reject mismatched native filenames/version/tag metadata, missing source/wheel or unsafe distribution entries; verify SHA256SUMS against real candidate bytes. Synthetic failure cases must fail before corrected inventory passes.
+            - Contracts: PLAN phase release gate; native wheel/sdist naming and inventory owners.
+        - [ ] T-013 — Complete documented installed plain-index workflows
+            - Scope: Root README, public module documentation and executable documentation examples.
+            - Depends on: T-010, T-011, T-012.
+            - Acceptance/evidence: Run complete stream-only/direct-scan/source-based examples against the installed artifact, document phase-scoped capabilities and resource/memory limits, and retain reproducible package/check instructions.
+            - Contracts: API-03–05; SYS-02–03, SYS-10–12.
+        - [ ] T-014 — Review test and report milestone 1.3
+            - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
+            - Depends on: T-010, T-011, T-012, T-013.
+            - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
+            - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Report: `docs/dev/reports/phases/1/1.3.md`; include HANDOFF at this boundary.
+    - [ ] Milestone 1.4 — Phase review
+        - [ ] T-015 — Review test and report phase 1
+            - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence.
+            - Depends on: T-006, T-009, T-014. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
+            - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.1.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
+            - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Report: `docs/dev/reports/phases/1/PHASE-REPORT.md`; include HANDOFF with this boundary.
+
+## Phase 2 — Paired persistence and CLI
+
+- [ ] Phase 2 — Paired persistence and CLI
+    - [ ] Milestone 2.1 — Independent index persistence
+        - [ ] T-016 — Implement temporary siblings and protected file publication
+            - Scope: persistence/fs.py with publication unit/fault-injection checks.
+            - Depends on: T-015.
+            - Acceptance/evidence: Verify ownership, exclusive no-clobber creation including dangling/concurrent destinations, explicit replacement and distinct pre/post-publication cleanup outcomes. No weak rename fallback is permitted.
+            - Contracts: PER-03–05; persistence commit-point contract.
+        - [ ] T-017 — Implement raw little-endian index storage
+            - Scope: persistence/raw.py and focused serialization/corruption checks.
+            - Depends on: T-007, T-016.
+            - Acceptance/evidence: Round-trip all canonical examples, validate byte shape/range/order and opposite-endian conversion, preserve input arrays and existing destinations, and clean owned temporary files.
+            - Contracts: PER-01–07; IDX-06.
+        - [ ] T-018 — Implement transactional self-contained SQLite writing
+            - Scope: persistence/sqlite.py writer and transaction/publication failure checks.
+            - Depends on: T-007, T-016.
+            - Acceptance/evidence: Write the canonical dedicated schema and complete values, validate integrity/count/bounds, close handles and eliminate data dependence on temporary WAL/journal sidecars before publication.
+            - Contracts: PER-01–05; persistence SQLite contract.
+        - [ ] T-019 — Implement read-only SQLite schema and value validation
+            - Scope: persistence/sqlite.py reader and malformed-database checks.
+            - Depends on: T-018.
+            - Acceptance/evidence: Reject altered schemas, corruption and invalid arrays; retain operational/ordinary error distinctions and return a newly owned canonical array without modifying the input.
+            - Contracts: PER-01–02, PER-06; API-04.
+        - [ ] T-020 — Expose and integrate independent persistence APIs
+            - Scope: Package-root persistence exports and cross-format public/installed integration checks.
+            - Depends on: T-017, T-018, T-019.
+            - Acceptance/evidence: Load/store without payload sources and establish exact original/SQLite/raw equivalence including EOF. Verify all public persistence imports and defaults without a combined transaction.
+            - Contracts: SYS-07–10; API-01–04; PER-01–07.
+        - [ ] T-021 — Review test and report milestone 2.1
+            - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
+            - Depends on: T-016, T-017, T-018, T-019, T-020.
+            - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
+            - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Report: `docs/dev/reports/phases/2/2.1.md`; include HANDOFF at this boundary.
+    - [ ] Milestone 2.2 — Importable paired-output command
+        - [ ] T-022 — Implement importable single-target paired indexing
+            - Scope: cli.py main/parser and focused successful invocation/help checks.
+            - Depends on: T-021.
+            - Acceptance/evidence: Use the existing builder once and pass the same array to SQLite then raw; return integer results, avoid import-time work/SystemExit for normal outcomes, and print success only after both writes.
+            - Contracts: CLI-01, CLI-03; public CLI signature; SYS-13.
+        - [ ] T-023 — Implement shared output stems and both-path preflight
+            - Scope: cli.py path/options handling and focused naming/alias checks.
+            - Depends on: T-022.
+            - Acceptance/evidence: Cover default input directory/final-suffix stem, explicit output stem, both extensions, spaces/hyphen-prefixed targets, protected outputs, dangling paths and source aliases before scanning.
+            - Contracts: CLI-02, CLI-04; explicit overwrite/naming contract.
+        - [ ] T-024 — Complete CLI errors interruption and partial-publication reporting
+            - Scope: cli.py error/status flow and real in-process integration checks.
+            - Depends on: T-022, T-023.
+            - Acceptance/evidence: Verify help/usage/operational/interruption statuses and streams, no success summary on failure, no raw write after SQLite failure, and accurate already-published paths/cleanup notes. Preserve library exception behavior.
+            - Contracts: CLI-01–05; API-04; PER-05.
+            - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
+            - Report: `docs/dev/reports/phases/2/2.2.md`; include HANDOFF at this boundary.
+    - [ ] Milestone 2.3 — Installed command workflow
+        - [ ] T-025 — Wire console and guarded module execution
+            - Scope: __main__.py, pyproject console metadata/version 0.2.0 and import/entry checks.
+            - Depends on: T-024.
+            - Acceptance/evidence: Console and python -m use cli.main; importing package/CLI/runner performs no argv parsing, path I/O, printing or process exit. Installed entry metadata matches the accepted design.
+            - Contracts: CLI-03, CLI-06; API-01, API-05.
+        - [ ] T-026 — Verify installed paired commands and native artifacts
+            - Scope: Installed CLI, metadata and persistence integration checks plus package inventory.
+            - Depends on: T-025.
+            - Acceptance/evidence: Run console/module/imported forms outside checkout, load both outputs and compare values, cover real filesystem failure/interruption, rebuild source/wheel and verify version/checksum inventory.
+            - Contracts: SYS-07–13; CLI-01–06; PER-03–07.
+        - [ ] T-027 — Document and demonstrate the paired-output workflow
+            - Scope: README, CLI/public docstrings and executable examples.
+            - Depends on: T-025, T-026.
+            - Acceptance/evidence: Demonstrate one-target default/explicit naming and overwrite behavior with actual outputs, explain independent publication/partial failure and provide installed usage for all invocation forms.
+            - Contracts: CLI-01–06; API-05; SYS-13.
+            - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
+            - Report: `docs/dev/reports/phases/2/2.3.md`; include HANDOFF at this boundary.
+    - [ ] Milestone 2.4 — Phase review
+        - [ ] T-028 — Review test and report phase 2
+            - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence.
+            - Depends on: T-021, T-024, T-027. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
+            - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.2.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
+            - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Report: `docs/dev/reports/phases/2/PHASE-REPORT.md`; include HANDOFF with this boundary.
+
+## Phase 3 — ZIP and TAR workflows
+
+- [ ] Phase 3 — ZIP and TAR workflows
+    - [ ] Milestone 3.1 — ZIP source integration
+        - [ ] T-029 — Implement ZIP metadata and member validation
+            - Scope: backends/zip.py opening/selection and archive-factory/unit checks.
+            - Depends on: T-028.
+            - Acceptance/evidence: Accept sole empty/nested regular members, account for directories/metadata files and reject count/special/encrypted cases through the required public categories with cleanup on opening failure.
+            - Contracts: ARC-01, ARC-03–04; API-04.
+        - [ ] T-030 — Implement ZIP reader completion and resource cleanup
+            - Scope: backends/zip.py bounded delivery/finalization and corruption/limit checks.
+            - Depends on: T-029.
+            - Acceptance/evidence: Return exact bytes through BackendReader, surface CRC/truncation errors instead of EOF, preserve declared/actual size handling and release member/archive resources on every exit.
+            - Contracts: ARC-04–05; STR-01–05.
+        - [ ] T-031 — Integrate ZIP selection with public stream and indexing
+            - Scope: backends/registry.py and ZIP public workflow integration checks.
+            - Depends on: T-030.
+            - Acceptance/evidence: Enable signature/suffix-selected ZIP without changing scanner/persistence; verify plain/ZIP equivalence, misleading names, late errors and no completed index on failure.
+            - Contracts: SYS-01, SYS-04–06; ARC-01–05; IDX-01–06.
+        - [ ] T-032 — Verify installed ZIP paired indexing and usage
+            - Scope: Installed CLI/content integration and ZIP examples/documentation.
+            - Depends on: T-031.
+            - Acceptance/evidence: Exercise actual ZIP through console/module/imported workflows, load identical SQLite/raw results and retain the previously working plain/persistence surface under installed artifacts.
+            - Contracts: CLI-01–06 for ZIP; SYS-01, SYS-07–13.
+        - [ ] T-033 — Review test and report milestone 3.1
+            - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
+            - Depends on: T-029, T-030, T-031, T-032.
+            - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
+            - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Report: `docs/dev/reports/phases/3/3.1.md`; include HANDOFF at this boundary.
+    - [ ] Milestone 3.2 — Sequential TAR integration
+        - [ ] T-034 — Implement sequential plain-TAR payload delivery
+            - Scope: backends/tar.py and TAR reader/fixture checks.
+            - Depends on: T-033.
+            - Acceptance/evidence: Expose a sole regular payload through sequential iteration with exact bytes, empty/nested-member support, correct handle ownership and early close.
+            - Contracts: ARC-01, ARC-03; STR-01, STR-05.
+        - [ ] T-035 — Implement TAR trailing-entry and structure validation
+            - Scope: backends/tar.py finalization and late-invalid-member tests.
+            - Depends on: T-034.
+            - Acceptance/evidence: Keep validation after payload delivery, reject additional files/special entries and malformed trailing structure before validated EOF, and return no completed index after late failure.
+            - Contracts: ARC-03–05; STR-02, STR-04–05; SYS-04.
+        - [ ] T-036 — Complete required compressed-TAR filters and integrity
+            - Scope: backends/tar.py gzip/bzip2/xz paths and compressed failure checks.
+            - Depends on: T-035.
+            - Acceptance/evidence: Support required filters/suffix forms, reject compressed non-TAR payloads, preserve unavailable-codec errors and verify available header/trailer/truncation checks and cleanup.
+            - Contracts: ARC-01–05; STR-01–05.
+        - [ ] T-037 — Integrate TAR selection with source and CLI workflows
+            - Scope: backends/registry.py and TAR public/paired-CLI integration checks.
+            - Depends on: T-036.
+            - Acceptance/evidence: Compare exact arrays and both persisted outputs across plain/ZIP/TAR filters; ensure arbitrary chunk boundaries and late validation propagate through the generic facade.
+            - Contracts: SYS-01, SYS-03–10, SYS-13; CLI-01–06; IDX-01–06.
+        - [ ] T-038 — Complete installed standard-archive artifacts and examples
+            - Scope: Version 0.3.0 metadata, installed cross-format checks and user documentation.
+            - Depends on: T-037.
+            - Acceptance/evidence: Build/install/rebuild native candidates, verify inventory/checksums and demonstrate supported ZIP/TAR variants plus corruption/ownership regressions without exposing 7z as delivered.
+            - Contracts: API-05; SYS-11–12; ARC-01–05; phase release gate.
+        - [ ] T-039 — Review test and report milestone 3.2
+            - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
+            - Depends on: T-034, T-035, T-036, T-037, T-038.
+            - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
+            - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Report: `docs/dev/reports/phases/3/3.2.md`; include HANDOFF at this boundary.
+    - [ ] Milestone 3.3 — Phase review
+        - [ ] T-040 — Review test and report phase 3
+            - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence.
+            - Depends on: T-033, T-039. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
+            - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.3.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
+            - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Report: `docs/dev/reports/phases/3/PHASE-REPORT.md`; include HANDOFF with this boundary.
+
+## Phase 4 — 7z and complete-system delivery
+
+- [ ] Phase 4 — 7z and complete-system delivery
+    - [ ] Milestone 4.1 — Bounded 7z streaming
+        - [ ] T-041 — Implement bounded producer messages and cancellation endpoint
+            - Scope: backends/producer.py message/endpoint operations and controlled-producer unit checks.
+            - Depends on: T-040.
+            - Acceptance/evidence: Validate positive finite settings, subdivide callback buffers, enforce queue capacity and cancellation checks, and keep success/failure/data outcomes distinct without a full-queue close sentinel.
+            - Contracts: STR-05–06; internal QueueProducer/message model.
+        - [ ] T-042 — Implement the worker-backed reader lifecycle
+            - Scope: backends/producer.py reader/startup/join operations and lifecycle checks.
+            - Depends on: T-041.
+            - Acceptance/evidence: Start one outer non-daemon worker, preserve FIFO data and terminal outcome, bound positive reads, retain failures, unblock package waits and join on successful close including startup failure ownership.
+            - Contracts: STR-01–06; BackendReader/start_queue_reader contract.
+        - [ ] T-043 — Implement 7z member selection and callback extraction
+            - Scope: backends/sevenzip.py, actual dependency suitability checks and supported dependency constraint.
+            - Depends on: T-042.
+            - Acceptance/evidence: Inspect sole-member metadata, adapt the library writer callback without disk extraction, transfer archive ownership once and exercise real empty/normal payload plus codec/callback behavior on a recorded dependency version.
+            - Contracts: ARC-01, ARC-03–04, ARC-06; public error boundary.
+        - [ ] T-044 — Integrate 7z with selection and common stream limits
+            - Scope: backends/sevenzip.py/registry.py and common-stream dependency integration checks.
+            - Depends on: T-043.
+            - Acceptance/evidence: Deliver exact bytes with declared/actual limits, transport extraction errors without false EOF and release worker/archive resources on opening/delivery/early-close paths.
+            - Contracts: ARC-04–06; STR-01–06; SYS-04–06.
+        - [ ] T-045 — Verify real 7z backpressure and terminal failure cleanup
+            - Scope: Real-dependency streaming/resource checks and any localized adapter corrections.
+            - Depends on: T-044.
+            - Acceptance/evidence: Demonstrate progressive bounded delivery with a slow consumer, callback subdivisions, full-queue cancellation, empty content and CRC/truncation failure, with no surviving owned thread after successful close.
+            - Contracts: ARC-06; STR-02–06; SYS-05–06.
+        - [ ] T-046 — Review test and report milestone 4.1
+            - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
+            - Depends on: T-041, T-042, T-043, T-044, T-045.
+            - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
+            - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Report: `docs/dev/reports/phases/4/4.1.md`; include HANDOFF at this boundary.
+    - [ ] Milestone 4.2 — 7z indexing and complete distribution
+        - [ ] T-047 — Integrate 7z indexing and paired CLI failure ownership
+            - Scope: 7z public indexing/CLI integration checks with localized adapter/facade corrections.
+            - Depends on: T-046.
+            - Acceptance/evidence: Use existing builder/scanner/writers for actual 7z corpora, verify LF/BOM offsets and pair equivalence, and ensure late source/producer failure returns no completed index or CLI output publication.
+            - Contracts: CLI-01–06 for 7z; SYS-01, SYS-03–10, SYS-13; IDX-01–06.
+        - [ ] T-048 — Verify full-format lifecycle and independent instance behavior
+            - Scope: Cross-format/resource integration checks and localized contract-completion fixes.
+            - Depends on: T-047.
+            - Acceptance/evidence: Compare all supported source families, independent concurrent instances, inclusive limits, terminal integrity and actual exceptional cleanup; retain measured dependency/host capability limits rather than claiming unavailable-native verification.
+            - Contracts: SYS-01–10, SYS-12–13; ARC-01–06; STR-01–06; PER-01–07.
+        - [ ] T-049 — Finalize complete public guidance and agent orientation
+            - Scope: README, public module/API examples and root AGENTS temporary reference.
+            - Depends on: T-047, T-048.
+            - Acceptance/evidence: Run complete supported-format/CLI examples, verify delivered export/ownership documentation and remove the temporary legacy reference at reimplementation closure. Product documents contain no migration narrative.
+            - Contracts: API-01–05; CLI-01–06; PLAN final closure and layout documentation owners.
+        - [ ] T-050 — Verify complete source and wheel release candidates
+            - Scope: Version 0.4.0 build metadata, native inventory and installed distribution checks.
+            - Depends on: T-048, T-049.
+            - Acceptance/evidence: Build/install full artifacts, rebuild from source distribution, verify complete exports/entry points and runtime dependency constraints, reject development/log/credential entries and validate actual names/checksums against tag metadata.
+            - Contracts: SYS-11–12; API-05; CLI-06; phase release gate.
+        - [ ] T-051 — Review test and report milestone 4.2
+            - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
+            - Depends on: T-047, T-048, T-049, T-050.
+            - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
+            - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Report: `docs/dev/reports/phases/4/4.2.md`; include HANDOFF at this boundary.
+    - [ ] Milestone 4.3 — Phase and final review
+        - [ ] T-052 — Review test and report phase 4 and the complete implementation
+            - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence. Include the final implementation report and cumulative TODO resolution/deferral evidence.
+            - Depends on: T-046, T-051. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
+            - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.4.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
+            - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Report: `docs/dev/reports/phases/4/PHASE-REPORT.md`; include HANDOFF with this boundary.
+            - Final evidence: `docs/dev/reports/IMPLEMENTATION-REPORT.md` aggregates all unresolved/deferred TODOs, options, owners and resolution provenance; full-scope acceptance must be supported.

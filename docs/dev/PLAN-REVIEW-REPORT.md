@@ -2,7 +2,7 @@
 
 ## Current gate
 
-State: **Ready for layout acceptance with combined PLAN/layout QC**. The plan conforms to the accepted design/SPEC and preserves the complete intended scope through bounded useful increments. The human accepted PLAN on 2026-11-03 and explicitly added per-phase GitHub releases with source/wheel artifacts; that directed release amendment is included in the reviewed identity below. Physical allocation is reviewed in Revision 2 against the accepted PLAN/design/SPEC. Layout human acceptance remains pending, so TASKS derivation remains blocked until that checkpoint and DOCS-007 publication/closure.
+State: **Ready for layout acceptance with combined PLAN/layout QC**. The plan conforms to the accepted design/SPEC and preserves the complete intended scope through bounded useful increments. The human accepted PLAN on 2026-11-03 and explicitly added per-phase GitHub releases with source/wheel artifacts; that directed release amendment is included in the reviewed identity below. Physical allocation is reviewed in Revision 2 against the accepted PLAN/design/SPEC. The human accepted the exact layout set from `e958956700083721653a0a2baf11523b1141a7bd` on 2026-11-03. Acceptance checkpoint `63a5669f2cce55b86f168360c9c8e4acffc6f2db` is published and DOCS-007 issue #7 is closed with evidence/readback. PLAN/layout prerequisites for TASKS derivation are satisfied.
 
 Review date: 2026-11-03. The authoring agent performed the strategy/contract review; no independent implementation audit or product execution is claimed. No confirmed strategy finding remains unresolved.
 
