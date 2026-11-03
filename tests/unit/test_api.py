@@ -98,3 +98,19 @@ def test_filesystem_and_undelivered_archive_failures(tmp_path: Path) -> None:
     path.write_bytes(b"invalid claimed archive")
     with pytest.raises(ali.UnsupportedFormatError):
         build_line_index(path)
+
+
+def test_build_preserves_scan_failure_when_close_also_fails(tmp_path: Path) -> None:
+    path = tmp_path / "p"
+    path.write_bytes(b"plain")
+    error = MemoryError("scan allocation")
+    r = Reader(close_failures=1)
+    with (
+        patch("archive_line_index.api.open_backend", return_value=r),
+        patch("archive_line_index.api.scan_line_offsets", side_effect=error),
+    ):
+        with pytest.raises(MemoryError) as caught:
+            build_line_index(path)
+    assert caught.value is error and "close fault" in error.__notes__[0]
+    assert r.closes == 1
+    r.close()

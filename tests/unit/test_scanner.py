@@ -203,3 +203,14 @@ def test_append_allocation_failure_returns_no_partial_index(
     with pytest.raises(MemoryError, match="append allocation"):
         scan_line_offsets(source, buffer_size=2)
     assert not source.closed
+
+
+def test_late_borrowed_read_error_does_not_return_a_partial_index() -> None:
+    from tests.helpers.readers import Reader
+
+    error = OSError("late caller failure")
+    source = Reader(b"a\n", b"b", error)
+    with pytest.raises(OSError) as caught:
+        scan_line_offsets(source, buffer_size=2)  # type: ignore[arg-type]
+    assert caught.value is error and source.closes == 0
+    assert all(0 < n <= 2 for n in source.requests)

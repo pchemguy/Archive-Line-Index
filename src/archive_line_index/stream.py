@@ -121,7 +121,7 @@ class ContentStream:
                 view = original.cast("B")
             finally:
                 original.release()
-        except (TypeError, ValueError) as error:
+        except (TypeError, ValueError, BufferError) as error:
             raise TypeError("buffer must support writable contiguous bytes") from error
         with view:
             self._check_failure()

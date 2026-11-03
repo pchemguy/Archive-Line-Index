@@ -70,7 +70,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Verified result: RED: 21 initial-BOM checks failed before refinement. GREEN: 198 tests, 99% coverage (scanner 100%), Ruff and strict mypy pass. Whole milestone review found no blockers; 32 MiB generated line stays below 128 KiB peak with <=8 KiB reads; overflow/allocation/borrowed ownership verified. Folded review report and HANDOFF included.
             - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
             - Report: `docs/dev/reports/phases/1/1.2.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 1.3 — Installed source-based indexing
+    - [x] Milestone 1.3 — Installed source-based indexing
         - [x] T-010 — Compose public plain-file stream and index APIs
             - Scope: api.py and package-root re-exports with public integration checks.
             - Depends on: T-006, T-009.
@@ -95,11 +95,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Run complete stream-only/direct-scan/source-based examples against the installed artifact, document phase-scoped capabilities and resource/memory limits, and retain reproducible package/check instructions.
             - Contracts: API-03–05; SYS-02–03, SYS-10–12.
             - Verified result: RED: README lacked the three complete workflows (both installed-artifact example checks failed). GREEN: 5 installed example/runtime/inventory tests pass using native and source-rebuilt wheels; README relative links verified. Phase-scoped capabilities, resource/memory/error behavior, native build/install/check instructions and public API docstrings updated; Markdown prose unwrapped. Ruff and strict mypy pass.
-        - [ ] T-014 — Review test and report milestone 1.3
+        - [x] T-014 — Review test and report milestone 1.3
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-010, T-011, T-012, T-013.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Whole milestone code review completed; incompatible buffer-provider error translation repaired after RED regression. GREEN: 253 tests, 99% coverage, Ruff lint/format, strict mypy including helper, isolated wheel/sdist build, source rebuild, both clean installed runtimes/examples and native SHA256SUMS checks pass. Report and HANDOFF included. Stop before T-015; no phase completion/integration/tag/release.
             - Report: `docs/dev/reports/phases/1/1.3.md`; include HANDOFF at this boundary.
     - [ ] Milestone 1.4 — Phase review
         - [ ] T-015 — Review test and report phase 1

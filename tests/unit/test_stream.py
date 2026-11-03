@@ -267,3 +267,21 @@ def test_released_buffer_is_type_error_without_backend_work() -> None:
         with pytest.raises(TypeError):
             s.readinto(view)
         assert not r.requests
+
+
+def test_incompatible_buffer_provider_has_type_error_without_progress() -> None:
+    import sys
+
+    if sys.version_info < (3, 12):
+        pytest.skip("Python-level buffer protocol requires Python 3.12")
+
+    class IncompatibleBuffer:
+        def __buffer__(self, flags: int) -> memoryview:
+            raise BufferError("buffer unavailable")
+
+    r = Reader(b"x")
+    with make_content_stream(r, max_uncompressed_size=None) as s:
+        with pytest.raises(TypeError):
+            s.readinto(IncompatibleBuffer())
+        assert not r.requests
+        assert s.read(1) == b"x"
