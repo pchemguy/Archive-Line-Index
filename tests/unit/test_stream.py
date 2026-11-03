@@ -126,3 +126,116 @@ def test_delivery_failure_survives_cleanup_failure() -> None:
 def test_backend_constructor_is_not_public() -> None:
     with pytest.raises(TypeError):
         ContentStream()
+
+
+def test_unbounded_short_reads_and_late_failure() -> None:
+    with make_content_stream(Reader(b"a", b"bc"), max_uncompressed_size=None) as s:
+        assert s.read(-99) == b"abc"
+        assert s.read() == b""
+    error = ExtractionError("late integrity failure")
+    r = Reader(b"valid prefix", error)
+    s = make_content_stream(r, max_uncompressed_size=None)
+    with pytest.raises(ExtractionError) as caught:
+        s.read()
+    assert caught.value is error and r.closes == 1
+    s.close()
+
+
+def test_readinto_byte_capacity_and_unchanged_tail() -> None:
+    from array import array
+
+    r = Reader(b"abcdef")
+    with make_content_stream(r, max_uncompressed_size=None) as s:
+        storage = array("I", [0xFFFFFFFF, 0xFFFFFFFF])
+        raw = memoryview(storage).cast("B")
+        assert s.readinto(storage) == 6
+        assert bytes(raw) == b"abcdef\xff\xff"
+        assert r.requests == [8]
+        assert s.readinto(storage) == 0
+        assert bytes(raw) == b"abcdef\xff\xff"
+
+
+@pytest.mark.parametrize(
+    "buffer", [b"readonly", object(), memoryview(bytearray(4))[::2]]
+)
+def test_readinto_rejection_has_no_progress(buffer: object) -> None:
+    r = Reader(b"abc")
+    with make_content_stream(r, max_uncompressed_size=None) as s:
+        with pytest.raises(TypeError):
+            s.readinto(buffer)
+        assert not r.requests
+        assert s.readinto(bytearray()) == 0
+        assert not r.requests
+        target = bytearray(b"?????")
+        assert s.readinto(target) == 3
+        assert target == b"abc??"
+
+
+def test_readinto_closed_failure_and_argument_priority() -> None:
+    r = Reader(OSError("failed"))
+    s = make_content_stream(r, max_uncompressed_size=None)
+    with pytest.raises(OSError):
+        s.readinto(bytearray(1))
+    with pytest.raises(TypeError):
+        s.readinto(b"invalid")
+    with pytest.raises(OSError):
+        s.readinto(bytearray())
+    s.close()
+    with pytest.raises(ValueError):
+        s.readinto(b"invalid")
+
+
+@pytest.mark.parametrize("data,limit", [(b"", 0), (b"abc", 3), (b"abc", 100)])
+def test_inclusive_actual_limits(data: bytes, limit: int) -> None:
+    r = Reader(data)
+    with make_content_stream(r, max_uncompressed_size=limit) as s:
+        assert s.read() == data
+        assert r.completed
+
+
+@pytest.mark.parametrize("operation", ["read", "readinto", "unbounded"])
+def test_crossing_actual_limit_returns_no_triggering_data(operation: str) -> None:
+    from archive_line_index.errors import SizeLimitExceededError
+
+    r = Reader(b"a", b"bc", declared_size=0)
+    s = make_content_stream(r, max_uncompressed_size=2)
+    assert s.read(1) == b"a"
+    target = bytearray(b"????")
+    with pytest.raises(SizeLimitExceededError):
+        if operation == "readinto":
+            s.readinto(target)
+        else:
+            s.read(-1 if operation == "unbounded" else 99)
+    assert target == b"????"
+    assert r.closes == 1 and not s.closed
+    s.close()
+
+
+def test_declared_oversize_rejects_before_delivery_and_cleans() -> None:
+    from archive_line_index.errors import SizeLimitExceededError
+
+    r = Reader(b"abc", declared_size=3)
+    with pytest.raises(SizeLimitExceededError):
+        make_content_stream(r, max_uncompressed_size=2)
+    assert not r.requests and r.closes == 1
+
+
+@pytest.mark.parametrize(
+    "limit,exc", [(True, TypeError), (1.1, TypeError), (-1, ValueError)]
+)
+def test_invalid_construction_limit_consumes_reader(
+    limit: object, exc: type[Exception]
+) -> None:
+    r = Reader()
+    with pytest.raises(exc):
+        make_content_stream(r, max_uncompressed_size=limit)  # type: ignore[arg-type]
+    assert r.closes == 1 and not r.requests
+
+
+def test_exact_limit_still_requires_terminal_validation() -> None:
+    r = Reader(b"x", ExtractionError("footer"), declared_size=1)
+    with make_content_stream(r, max_uncompressed_size=1) as s:
+        assert s.read(1) == b"x"
+        assert s.read(0) == b""
+        with pytest.raises(ExtractionError, match="footer"):
+            s.read(1)

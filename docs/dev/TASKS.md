@@ -36,11 +36,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Cover bounded/zero reads, capability/rejection surfaces, terminal EOF, retained delivery failures, closed-state precedence and cleanup without converting failures to EOF.
             - Contracts: STR-01–02, STR-04–05; public ContentStream and internal construction ownership.
             - Verified result: RED: common stream absent. GREEN: 51 tests pass covering bounded/zero reads, invalid backend results, terminal validation, retained failure, closed/argument priority, unsupported operations, cleanup notes and retry. Ruff and strict mypy pass; unbounded/readinto/limits remain T-005.
-        - [ ] T-005 — Complete readinto unbounded reads and inclusive size limits
+        - [x] T-005 — Complete readinto unbounded reads and inclusive size limits
             - Scope: stream.py extensions and focused buffer/limit/ownership checks.
             - Depends on: T-004.
             - Acceptance/evidence: Verify byte-capacity buffers, unchanged tails, unbounded-read late failure, declared/actual inclusive limits and failed-construction cleanup. No excessive byte is returned or copied.
             - Contracts: STR-01–04; API-02, API-04.
+            - Verified result: RED: 16 buffer/unbounded/limit checks failed against T-004. GREEN: 68 tests pass with byte-capacity/tail checks, inclusive declared/actual limits, exact-limit finalization, retained late failures and reader-consuming construction cleanup. Ruff and strict mypy pass.
         - [ ] T-006 — Review test and report milestone 1.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-001, T-002, T-003, T-004, T-005.
