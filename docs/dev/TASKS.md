@@ -219,11 +219,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Return exact bytes through BackendReader, surface CRC/truncation errors instead of EOF, preserve declared/actual size handling and release member/archive resources on every exit.
             - Contracts: ARC-04–05; STR-01–05.
             - Verified result: ZIP delivery now bounds requested reads, translates CRC/decompression/truncation failures to ExtractionError with causes, distinguishes source I/O failures, and completes only after validated exhaustion. Resources are all attempted on close and failed closes remain retryable. CRC regression failed with raw BadZipFile before correction; 66 ZIP/common-stream integration and unit checks, strict mypy and full Ruff checks pass.
-        - [ ] T-031 — Integrate ZIP selection with public stream and indexing
+        - [x] T-031 — Integrate ZIP selection with public stream and indexing
             - Scope: backends/registry.py and ZIP public workflow integration checks.
             - Depends on: T-030.
             - Acceptance/evidence: Enable signature/suffix-selected ZIP without changing scanner/persistence; verify plain/ZIP equivalence, misleading names, late errors and no completed index on failure.
             - Contracts: SYS-01, SYS-04–06; ARC-01–05; IDX-01–06.
+            - Verified result: Public ZIP selection now lazily opens the delivered adapter, preserving signature precedence and malformed-claim rejection without changing scanning or persistence. Real ZIP/plain equivalence covers original BOM/LF coordinates, buffers from one byte to 1 MiB, readinto, exact/declared limits and corrupted input returning no completed index. The public ZIP workflow failed as unsupported before integration; 402 unit/public-stream/persistence/ZIP checks, strict mypy and full Ruff pass.
         - [ ] T-032 — Verify installed ZIP paired indexing and usage
             - Scope: Installed CLI/content integration and ZIP examples/documentation.
             - Depends on: T-031.

@@ -9,7 +9,7 @@ from archive_line_index.errors import UnsupportedFormatError
 from archive_line_index.formats import FormatCandidate, FormatKind
 
 
-@pytest.mark.parametrize("kind", [FormatKind.ZIP, FormatKind.TAR, FormatKind.SEVEN_Z])
+@pytest.mark.parametrize("kind", [FormatKind.TAR, FormatKind.SEVEN_Z])
 def test_undelivered_family_is_explicitly_unsupported(
     tmp_path: Path, kind: FormatKind
 ) -> None:
