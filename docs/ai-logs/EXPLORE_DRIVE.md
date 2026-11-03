@@ -27,8 +27,9 @@ urls:
 > 
 > Inspect legacy repo. Pay special attention to
 > 
-> https://github.com/pchemguy/Archive-Line-Index-Legacy/blob/main/README.md
-> https://github.com/pchemguy/Archive-Line-Index-Legacy/blob/main/docs/architecture.md
-> https://github.com/pchemguy/Archive-Line-Index-Legacy/blob/main/docs/dev/SPEC.md
+> - https://github.com/pchemguy/Archive-Line-Index-Legacy/blob/main/README.md
+> - https://github.com/pchemguy/Archive-Line-Index-Legacy/blob/main/docs/architecture.md
+> - https://github.com/pchemguy/Archive-Line-Index-Legacy/blob/main/docs/dev/SPEC.md
+> - https://github.com/pchemguy/Archive-Line-Index/blob/main/pyproject.toml
 > 
-> Then generate project brief.
+> Update the root `AGENTS.md` as necessary based on `pyproject.toml` tooling and generate project brief. 
