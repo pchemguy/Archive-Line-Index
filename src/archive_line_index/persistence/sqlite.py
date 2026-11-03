@@ -160,7 +160,7 @@ def _check_schema(connection: sqlite3.Connection) -> None:
 
 
 def read_sqlite_index(source: Source) -> array[int]:
-    """Read a dedicated stable database without mutating it or creating sidecars.
+    """Read a stable dedicated database through a read-only SQLite connection.
 
     Returns a new canonical array, including EOF. Schema/content/corruption defects
     raise InvalidIndexError; other engine failures raise PersistenceError with a
@@ -172,7 +172,7 @@ def read_sqlite_index(source: Source) -> array[int]:
         raise InvalidIndexError("Native unsigned Q offsets require eight-byte items")
     with open_binary_file(path, "rb"):
         pass
-    uri = path.absolute().as_uri() + "?mode=ro&immutable=1"
+    uri = path.absolute().as_uri() + "?mode=ro"
     try:
         with _connection(uri, readonly=True) as connection:
             _check_integrity(connection)

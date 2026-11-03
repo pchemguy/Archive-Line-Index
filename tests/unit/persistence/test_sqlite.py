@@ -289,3 +289,26 @@ def test_sidecar_cleanup_is_owned_and_preserves_primary(tmp_path: Path) -> None:
     assert any("sidecar cleanup" in n for n in caught.value.__notes__)
     assert unrelated.read_bytes() == b"unrelated" and not destination.exists()
     assert list(tmp_path.iterdir()) == [unrelated]
+
+
+def test_reader_observes_committed_wal_without_modifying_data(tmp_path: Path) -> None:
+    from archive_line_index.persistence.sqlite import read_sqlite_index
+
+    path = tmp_path / "p"
+    connection = sqlite3.connect(path)
+    try:
+        connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("CREATE TABLE line_index(offset INTEGER PRIMARY KEY)")
+        connection.execute("INSERT INTO line_index VALUES (0)")
+        connection.commit()
+        connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        connection.execute("INSERT INTO line_index VALUES (9)")
+        connection.commit()
+        wal = Path(str(path) + "-wal")
+        before = path.read_bytes(), wal.read_bytes()
+        names = {p.name for p in tmp_path.iterdir()}
+        assert read_sqlite_index(path).tolist() == [0, 9]
+        assert (path.read_bytes(), wal.read_bytes()) == before
+        assert {p.name for p in tmp_path.iterdir()} == names
+    finally:
+        connection.close()

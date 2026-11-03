@@ -113,7 +113,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 ## Phase 2 — Paired persistence and CLI
 
-- [ ] Phase 2 — Paired persistence and CLI
+- [x] Phase 2 — Paired persistence and CLI
     - [x] Milestone 2.1 — Independent index persistence
         - [x] T-016 — Implement temporary siblings and protected file publication
             - Scope: persistence/fs.py with publication unit/fault-injection checks.
@@ -194,12 +194,13 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Verified result: RED: both installed documentation checks lacked five complete workflows. GREEN: 398 tests, 96% coverage (CLI/runner 100%), Ruff/strict mypy; five README examples run on native and source-rebuilt installed wheels. Whole installed-command/doc milestone review, links/docstrings and naming/overwrite/partial-publication guidance pass. Report/HANDOFF included; no blockers.
             - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
             - Report: `docs/dev/reports/phases/2/2.3.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 2.4 — Phase review
-        - [ ] T-028 — Review test and report phase 2
+    - [x] Milestone 2.4 — Phase review
+        - [x] T-028 — Review test and report phase 2
             - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence.
             - Depends on: T-021, T-024, T-027. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
             - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.2.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
             - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Verified result: Phase-wide code review/exit checks complete; committed-WAL stale-read defect repaired after observed RED regression. Restored environment: 399 tests, 96% coverage, Ruff/strict mypy and helper checks pass. Isolated Hatchling source/wheel build, source rebuild/installed commands/examples and native inventory/checksum checks pass. Task audit, phase report, release notes and HANDOFF included; integration/tag/hosted release pending actual readback.
             - Report: `docs/dev/reports/phases/2/PHASE-REPORT.md`; include HANDOFF with this boundary.
 
 ## Phase 3 — ZIP and TAR workflows

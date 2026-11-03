@@ -1,21 +1,19 @@
 # Project handoff
 
-Checkpoint: T-027 verifies Phase 2 milestone 2.3 on `phase/2-persistence-cli`. Publish/read back the containing task commit, close issue #36 and milestone #8 if those effects are still pending, then continue the selected range.
+Checkpoint: T-028 completes the verified Phase 2 review on `phase/2-persistence-cli`. Publication/issue/milestone closure and authorized main integration/release remain pending actual readback. Recover later effects from Git/provider state before replay.
 
-## Scope and branch
+## Authorization and result
 
-The human requested complete Phase 2: T-016–T-028, verified main integration and a 0.2.0 GitHub release with source/wheel/checksums/download verification. Stop before Phase 3; T-029 and later remain unselected. Branch creation/integration parent is published main `eaa2dcfdfd756d367c15b9ec4eb763dda2e49c97`. Phase 1 is integrated and its v0.1.0 release/source/hosted hashes and closed milestones were reverified before activation. Preserve earlier branches/release tags. Markdown prose/list items remain unwrapped.
+The human selected complete Phase 2 (T-016–T-028), main integration and the 0.2.0 release with source/wheel/checksums/download verification. Stop before Phase 3; T-029 and later remain unselected. Markdown prose/list items remain unwrapped. Accepted design/contracts/PLAN/layout and TASKS retain their ownership; root AGENTS/pyproject own operational configuration.
 
-Accepted design/contracts/PLAN/layout remain unchanged; TASKS changes are completion evidence only, preserving the accepted QC/conformance basis. Root AGENTS/pyproject own operational instructions/configuration.
+Phase 2 delivers independent canonical SQLite/raw storage, importable single-target CLI, console/module wiring, default/explicit stems, both-path/source-alias protection and partial-publication/interruption diagnostics. All five README examples and the three invocation forms pass on native/source-rebuilt clean installed artifacts. The phase review corrected a reproduced committed-WAL visibility defect by using ordinary read-only SQLite mode. See [Phase 2 report](reports/phases/2/PHASE-REPORT.md) and its milestone links.
 
-## Delivered and verified
+The sandbox interruption preserved the three uncommitted T-028 files; its recovery patch was also saved in issue #37. Access returned and the source/remote/checks were reconciled without rollback or partial completion commits. Fresh verification: 399 tests, 96% coverage, Ruff lint/format, strict mypy (including helper) pass. Linux/CPython 3.12.14 is the actual host; --no-native-parser avoids the container's mypy discovery issue without weakening strict checking. Native Windows/macOS/Python 3.11/big-endian execution and archive adapters remain unverified/later scope.
 
-Version 0.2.0 delivers independent SQLite/raw persistence, importable paired CLI and console/module execution. The CLI scans once, applies both-path/source-alias protection and reports completed publications accurately on errors/interruption. Native and independently source-rebuilt wheels exercise all three invocation forms outside checkout, including missing-parent errors and real SIGINT cleanup. All five README Python examples pass against both variants, with clear purpose/input/output/interface and naming/overwrite/partial-publication guidance. See [2.1](reports/phases/2/2.1.md), [2.2](reports/phases/2/2.2.md) and [2.3](reports/phases/2/2.3.md).
+## Git and tracking
 
-Verification: 398 tests, 96% production coverage, CLI/module runner 100%, Ruff lint/format and strict mypy pass on Linux/CPython 3.12.14. Use --no-native-parser for this container's mypy issue; strict checks remain enabled. Native Windows/macOS/Python 3.11/big-endian execution is unverified; archives remain later phases. Phase 2 review/release notes and exact-source final artifacts remain T-028 and subsequent integration/release effects.
+Creation/integration parent main: `eaa2dcfdfd756d367c15b9ec4eb763dda2e49c97`. Published source before T-028: `08f251e75cfd44bc3bd82aad4679b234e4c41e57`. Preserve previous phase/design/manual branches and v0.1.0 at `2d0435cc731d608843ad71cfa9c7688d1d8b5d09`. Native Phase 2 milestones #6–9 and issues #25–37 are associated with the phase label. T-016–T-027 are individually published/read back with their issues closed; milestones #6–8 are verified closed. All 12 initial closing commits pass the parent-diff composition audit.
 
-## Tracking and continuation
+## Next effects
 
-Phase label `sdd-phase-2-Paired-persistence-and-CLI`; native milestones #6/#7/#8/#9 map to 2.1/2.2/2.3/2.4. Issues #25–37 map to T-016–T-028. All initial associations were read back before task work. T-016–T-026 are published/read back and issues #25–35 closed/completed; milestones #6/#7 are closed. T-027 closes its folded review/report/checkoff in this commit.
-
-After publication/readback, close/read back #36 and verify all three milestone #8 members completed before closure/readback. Reuse completed effects after interruption. Then execute only T-028, including its phase review/report/HANDOFF and release-note preparation; verify/publish it, close #37/#9, integrate the complete phase and publish/read back the exact-source 0.2.0 source/wheel/checksum release. Stop before Phase 3.
+Publish/read back this T-028 result/report/initial checkoff commit, then close/read back #37 and sole-member milestone #9. Integrate the complete phase into refreshed main with an explicit two-parent merge, verify and publish. Finalize a direct default-branch release commit using the exact root RELEASE-NOTES.md body; publish it, build/check/install from that exact source and tag v0.2.0 there. Use one protected API publisher for source/wheel/SHA256SUMS, complete draft verification before publication, then verify body/latest/tag and downloaded bytes. Preserve root notes and only remove the owned ignored highlights draft after consumption. Record the final result/report, push/read back main and stop before Phase 3.
