@@ -173,7 +173,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Verified result: RED: operational/interruption/partial-publication cases escaped, and parser resource failures reproduced during review. GREEN: 383 tests, 96% coverage (CLI 100%), Ruff/strict mypy pass. Real imported workflows and raw interruption cleanup preserve/report complete outputs; expected status/streams/notes and unexpected-error propagation verified. Folded review report/HANDOFF included.
             - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
             - Report: `docs/dev/reports/phases/2/2.2.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 2.3 — Installed command workflow
+    - [x] Milestone 2.3 — Installed command workflow
         - [x] T-025 — Wire console and guarded module execution
             - Scope: __main__.py, pyproject console metadata/version 0.2.0 and import/entry checks.
             - Depends on: T-024.
@@ -186,11 +186,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Run console/module/imported forms outside checkout, load both outputs and compare values, cover real filesystem failure/interruption, rebuild source/wheel and verify version/checksum inventory.
             - Contracts: SYS-07–13; CLI-01–06; PER-03–07.
             - Verified result: Exact installed native/source-rebuilt 0.2.0 artifacts pass 12 command tests: console/module/imported invocation, default/explicit/space/hyphen names, protected outputs and authorized replacement, help/usage, real missing-parent failure and SIGINT inside raw cleanup with retained SQLite. Both output readers agree. Native metadata/inventory/checksum checks and Ruff pass; prior strict source checks unchanged.
-        - [ ] T-027 — Document and demonstrate the paired-output workflow
+        - [x] T-027 — Document and demonstrate the paired-output workflow
             - Scope: README, CLI/public docstrings and executable examples.
             - Depends on: T-025, T-026.
             - Acceptance/evidence: Demonstrate one-target default/explicit naming and overwrite behavior with actual outputs, explain independent publication/partial failure and provide installed usage for all invocation forms.
             - Contracts: CLI-01–06; API-05; SYS-13.
+            - Verified result: RED: both installed documentation checks lacked five complete workflows. GREEN: 398 tests, 96% coverage (CLI/runner 100%), Ruff/strict mypy; five README examples run on native and source-rebuilt installed wheels. Whole installed-command/doc milestone review, links/docstrings and naming/overwrite/partial-publication guidance pass. Report/HANDOFF included; no blockers.
             - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
             - Report: `docs/dev/reports/phases/2/2.3.md`; include HANDOFF at this boundary.
     - [ ] Milestone 2.4 — Phase review

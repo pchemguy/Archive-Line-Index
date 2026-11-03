@@ -1,18 +1,21 @@
 # Archive Line Index
 
-Archive Line Index is a Python library for building compact byte-offset indexes of line-oriented data and reading source content as a sequential binary stream. An index records where each line starts and where the content ends, allowing consumers to identify line byte ranges without decoding text or retaining complete lines in memory. Streaming and index construction are independently usable.
+Archive Line Index is a Python library and minimal CLI for building compact byte-offset indexes of line-oriented data, streaming source bytes, and storing or reloading indexes in SQLite or raw binary form. An index records where each line starts and where the content ends, allowing consumers to identify line byte ranges without decoding text or retaining complete lines in memory. Streaming, indexing and persistence are independently usable.
 
-Inputs are filesystem paths or caller-supplied blocking binary readers. Index construction returns an in-memory `array("Q")` of unsigned eight-byte offsets: one start per line, followed by an end-of-file sentinel. For example, `b"a\nb"` produces `[0, 2, 3]`, describing the byte ranges `[0, 2)` and `[2, 3)`. Streaming returns the original payload bytes through `read` or `readinto`.
+Payload inputs are filesystem paths or caller-supplied blocking binary readers. Python index construction returns an in-memory `array("Q")` of unsigned eight-byte offsets: one start per line, followed by an end-of-file sentinel. For example, `b"a\nb"` produces `[0, 2, 3]`, describing the byte ranges `[0, 2)` and `[2, 3)`. Streaming returns original payload bytes through `read` or `readinto`. Persistence stores the completed array at an explicit path; the CLI indexes one target once and writes both `.sqlite3` and `.u64` files.
 
-The Python interfaces are imported from `archive_line_index`:
+Library functions are imported from `archive_line_index`; the importable CLI callable is `archive_line_index.cli.main`.
 
 | Interface | Input | Output and ownership |
 | --- | --- | --- |
 | `open_content_stream` | Filesystem path (`str` or text path-like object) | Owned `ContentStream` for sequential binary reads; the caller closes it. |
 | `scan_line_offsets` | Blocking binary reader with `read(size) -> bytes` | Completed offset array; the reader is borrowed and remains open. |
-| `build_line_index` | Filesystem path (`str` or text path-like object) | Completed offset array; source opening and closure are managed by the library. |
+| `build_line_index` | Filesystem path | Completed offset array; source opening and closure are managed by the library. |
+| `write_sqlite_index`, `write_raw_index` | Completed offset array and explicit destination path | One complete index file; the input array is borrowed and unchanged. |
+| `read_sqlite_index`, `read_raw_index` | Stored index path | A newly owned, validated offset array; no payload source is needed. |
+| `cli.main` / console / module | One target and optional shared output stem/overwrite flag | Integer status and paired SQLite/raw files from one scan. |
 
-The current 0.1.0 library requires Python 3.11 or later and supports plain files and caller-supplied binary readers. Planned capabilities include single-payload ZIP/TAR/7z archive inputs, independent SQLite/raw index readers and writers, and an importable single-target CLI that produces both `.sqlite3` and `.u64` index files. These capabilities are not available in this version.
+The current 0.2.0 package requires Python 3.11 or later and supports plain payload files, caller-supplied binary readers, both persistence formats and all three CLI invocation forms. ZIP/TAR/7z archive payload delivery remains planned and is rejected explicitly until its adapters are delivered.
 
 The library preserves payload bytes. LF is the only line terminator, CRLF retains both bytes, and the final offset is an EOF sentinel. An optional initial UTF-8 BOM policy changes the first line's start to 3 while retaining coordinates in the original bytes. No text decoding or line-ending normalization occurs.
 
@@ -23,10 +26,10 @@ From a checkout, build the native artifacts and install the wheel:
 ```bash
 python -m pip install build
 python -m build
-python -m pip install dist/archive_line_index-0.1.0-py3-none-any.whl
+python -m pip install dist/archive_line_index-0.2.0-py3-none-any.whl
 ```
 
-The source distribution is `dist/archive_line_index-0.1.0.tar.gz` and can independently rebuild the wheel. The declared runtime dependency is py7zr; development tools and separate archive executables are not required to use the installed library. Archive support is delivered in later versions.
+The source distribution is `dist/archive_line_index-0.2.0.tar.gz` and can independently rebuild the wheel. The declared runtime dependency is py7zr; development tools and separate archive executables are not required to use the installed library. Archive support is delivered in later versions.
 
 ## Stream without indexing
 
@@ -94,6 +97,71 @@ with TemporaryDirectory() as directory:
 
 Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. Recognized archive signatures/suffixes raise `UnsupportedFormatError` until their adapters are delivered; they are never silently treated as plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
 
+## Store and reload an index independently
+
+SQLite uses a dedicated rowid table `line_index(offset INTEGER PRIMARY KEY)`, with one row per offset including EOF. Raw files contain only consecutive little-endian unsigned 64-bit values, with no header. Both readers validate the complete representation before returning an array; neither requires the payload source.
+
+```python
+from array import array
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from archive_line_index import (
+    read_raw_index,
+    read_sqlite_index,
+    write_raw_index,
+    write_sqlite_index,
+)
+
+with TemporaryDirectory() as directory:
+    root = Path(directory)
+    offsets = array("Q", [0, 2, 3])
+    write_sqlite_index(offsets, root / "index.sqlite3")
+    write_raw_index(offsets, root / "index.u64")
+    assert read_sqlite_index(root / "index.sqlite3") == offsets
+    assert read_raw_index(root / "index.u64") == offsets
+```
+
+Writers protect existing destinations by default, including dangling symlinks and names created at publication time. `overwrite=True` authorizes atomic replacement of the whole file; SQLite replacement also replaces any old unrelated tables. Each file is built and validated in an owned temporary sibling, closed and independently published. A failure before publication preserves the previous destination. A cleanup failure after publication retains the complete new file and reports that fact in an exception note. There is no cross-file transaction or rollback of an earlier completed publication.
+
+## Index one target through the CLI
+
+Given an existing `data/events.txt` and an existing `results` directory:
+
+```bash
+archive-line-index data/events.txt
+python -m archive_line_index data/events.txt --output results/custom
+archive-line-index data/events.txt --overwrite
+archive-line-index -- -events.txt
+```
+
+The first command creates `data/events.sqlite3` and `data/events.u64`. Defaults use the input directory and remove only the final suffix: `events.tar.gz` would use stem `events.tar`, while an extensionless name or dotfile keeps its normal path stem. `--output results/custom` appends both extensions to that shared stem. Parent directories are not created automatically. Quote paths containing spaces; `--` permits a target beginning with a hyphen.
+
+Both destinations are checked before scanning. An existing output requires `--overwrite`; any output alias of the input is rejected even with overwrite. The command scans once, writes SQLite first and raw second, and reports both paths and the line count only after both succeed. Help returns 0, usage errors 2, expected operational errors 1 and interruption 130. Diagnostics go to stderr and identify known completed outputs, including post-publication cleanup notes; a nonzero status does not imply both files are absent.
+
+The same callable can be used without exiting the Python caller:
+
+```python
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from archive_line_index import read_raw_index, read_sqlite_index
+from archive_line_index.cli import main
+
+with TemporaryDirectory() as directory:
+    root = Path(directory)
+    target = root / "events.txt"
+    target.write_bytes(b"a\nb")
+    assert main([str(target)]) == 0
+    assert read_sqlite_index(root / "events.sqlite3").tolist() == [0, 2, 3]
+    assert read_raw_index(root / "events.u64").tolist() == [0, 2, 3]
+    assert main([str(target), "--overwrite"]) == 0
+    assert main([str(target), "--output", str(root / "custom")]) == 0
+    assert read_sqlite_index(root / "custom.sqlite3") == read_raw_index(root / "custom.u64")
+```
+
+Importing the package, CLI or module runner performs no command execution. An explicit argv must be a sequence of strings; `None` uses process arguments. Library APIs continue to raise exceptions directly and do not acquire CLI printing or process-exit behavior.
+
 ## Memory and failure behavior
 
 The default scanner buffer is 1 MiB. Working payload storage is bounded by the current block and at most three BOM-probe bytes; no complete line is assembled. The offset array grows by eight bytes per line start plus the EOF sentinel, excluding object/allocation overhead. Offsets lie in `0..2^63 - 1`. Streaming alone has no indexing-range restriction.
@@ -111,8 +179,8 @@ python -m ruff format --check src tests scripts
 python -m mypy
 python -m pytest --cov=archive_line_index --cov-report=term-missing
 python -m build
-python scripts/check_release_artifacts.py --dist dist --tag v0.1.0 --write-checksums
-python scripts/check_release_artifacts.py --dist dist --tag v0.1.0
+python scripts/check_release_artifacts.py --dist dist --tag v0.2.0 --write-checksums
+python scripts/check_release_artifacts.py --dist dist --tag v0.2.0
 ```
 
 Use a clean `dist` directory for the native source/wheel pair and generated `SHA256SUMS`. The checker verifies names/tag/embedded metadata, safe contents, source/wheel package equality and checksums; it does not publish a release. Installed integration tests build both artifacts, independently rebuild from the source distribution, and exercise clean runtimes outside the checkout. If mypy's native parser fails during container process discovery, `python -m mypy --no-native-parser` retains strict checking with its supported Python parser.

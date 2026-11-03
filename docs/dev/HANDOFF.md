@@ -1,6 +1,6 @@
 # Project handoff
 
-Checkpoint: T-024 verifies Phase 2 milestone 2.2 on `phase/2-persistence-cli`. Publish/read back the containing task commit, close issue #33 and milestone #7 if those effects are still pending, then continue the selected range.
+Checkpoint: T-027 verifies Phase 2 milestone 2.3 on `phase/2-persistence-cli`. Publish/read back the containing task commit, close issue #36 and milestone #8 if those effects are still pending, then continue the selected range.
 
 ## Scope and branch
 
@@ -10,12 +10,12 @@ Accepted design/contracts/PLAN/layout remain unchanged; TASKS changes are comple
 
 ## Delivered and verified
 
-Independent SQLite/raw persistence and importable single-target CLI are implemented. The CLI scans once, writes SQLite then raw, derives both output paths, protects source aliases/existing outputs and reports normal/error/interruption/partial-publication statuses. The whole CLI capability review repaired parser resource-status handling; all blockers are resolved. See [milestone 2.1](reports/phases/2/2.1.md) and [milestone 2.2](reports/phases/2/2.2.md).
+Version 0.2.0 delivers independent SQLite/raw persistence, importable paired CLI and console/module execution. The CLI scans once, applies both-path/source-alias protection and reports completed publications accurately on errors/interruption. Native and independently source-rebuilt wheels exercise all three invocation forms outside checkout, including missing-parent errors and real SIGINT cleanup. All five README Python examples pass against both variants, with clear purpose/input/output/interface and naming/overwrite/partial-publication guidance. See [2.1](reports/phases/2/2.1.md), [2.2](reports/phases/2/2.2.md) and [2.3](reports/phases/2/2.3.md).
 
-Verification: 383 tests, 96% production coverage, CLI 100%, Ruff lint/format and strict mypy pass on Linux/CPython 3.12.14. Use --no-native-parser for this container's mypy process-discovery issue; strict checks remain enabled. Native Windows/macOS/Python 3.11/big-endian execution is unverified. Console/module wiring and 0.2.0 metadata remain T-025; installed command/doc completion is T-026–T-027. Archives remain later phases.
+Verification: 398 tests, 96% production coverage, CLI/module runner 100%, Ruff lint/format and strict mypy pass on Linux/CPython 3.12.14. Use --no-native-parser for this container's mypy issue; strict checks remain enabled. Native Windows/macOS/Python 3.11/big-endian execution is unverified; archives remain later phases. Phase 2 review/release notes and exact-source final artifacts remain T-028 and subsequent integration/release effects.
 
 ## Tracking and continuation
 
-Phase label `sdd-phase-2-Paired-persistence-and-CLI`; native milestones #6/#7/#8/#9 map to 2.1/2.2/2.3/2.4. Issues #25–37 map to T-016–T-028. All initial associations were read back before task work. T-016–T-023 are published/read back and issues #25–32 closed/completed; milestone #6 is closed. T-024 closes its folded review/report/checkoff in this commit.
+Phase label `sdd-phase-2-Paired-persistence-and-CLI`; native milestones #6/#7/#8/#9 map to 2.1/2.2/2.3/2.4. Issues #25–37 map to T-016–T-028. All initial associations were read back before task work. T-016–T-026 are published/read back and issues #25–35 closed/completed; milestones #6/#7 are closed. T-027 closes its folded review/report/checkoff in this commit.
 
-After publication/readback, close/read back issue #33 and verify all three milestone #7 members completed before closure/readback. Reuse completed effects after interruption. Continue T-025–T-028, with reports/HANDOFF at T-027/T-028, then integrate/release Phase 2 and stop before Phase 3.
+After publication/readback, close/read back #36 and verify all three milestone #8 members completed before closure/readback. Reuse completed effects after interruption. Then execute only T-028, including its phase review/report/HANDOFF and release-note preparation; verify/publish it, close #37/#9, integrate the complete phase and publish/read back the exact-source 0.2.0 source/wheel/checksum release. Stop before Phase 3.
