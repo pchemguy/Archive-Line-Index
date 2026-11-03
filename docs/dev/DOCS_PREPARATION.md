@@ -10,19 +10,9 @@
 
 ## Scope and decisions
 
-The human requested a new design suite and subsequent implementation in
-`pchemguy/Archive-Line-Index`, using legacy material from
-`pchemguy/Archive-Line-Index-Legacy` as adaptable input. This is main preparation,
-not a transfer of legacy completion status. Scope/functionality/decisions may be
-retained where appropriate; proposal content requires the current checkpoints.
-The immediate outputs are root AGENTS tooling guidance and the project brief.
+The human requested a new design suite and subsequent implementation in `pchemguy/Archive-Line-Index`, using legacy material from `pchemguy/Archive-Line-Index-Legacy` as adaptable input. This is main preparation, not a transfer of legacy completion status. Scope/functionality/decisions may be retained where appropriate; proposal content requires the current checkpoints. The immediate outputs are root AGENTS tooling guidance and the project brief.
 
-The new repository baseline is
-`c6398d8e51c60cabddc21997188e0a9cc040272d`; the inspected legacy baseline is
-`5eacaddd46dcd6ac064bd082a2bde456c57f33a6`. Read-only inspection covered the legacy
-README, architecture, root SPEC and relevant public-API, archive, stream,
-line-index and persistence contracts; the new pyproject owns tooling inputs.
-Historical logs were excluded.
+The new repository baseline is `c6398d8e51c60cabddc21997188e0a9cc040272d`; the inspected legacy baseline is `5eacaddd46dcd6ac064bd082a2bde456c57f33a6`. Read-only inspection covered the legacy README, architecture, root SPEC and relevant public-API, archive, stream, line-index and persistence contracts; the new pyproject owns tooling inputs. Historical logs were excluded.
 
 ## Decisions and document evidence
 
@@ -48,25 +38,11 @@ Initialization commit `79975f0b67ec5a086a69de5f69f1dd143853f564` was pushed and 
 
 ## Proposal assessment
 
-The PROJECT proposal retains the two independent capabilities, byte fidelity,
-archive validation, LF/BOM/EOF semantics, bounded payload buffering, explicit
-resource ownership and independent validated persistence. Its intended platforms
-and exclusions come from the legacy scope, rather than from demonstrated new
-implementation. Architecture, detailed interfaces and contracts remain open for
-their own design checkpoints; legacy source/test layout and test-pass claims have
-not been adopted.
+The PROJECT proposal retains the two independent capabilities, byte fidelity, archive validation, LF/BOM/EOF semantics, bounded payload buffering, explicit resource ownership and independent validated persistence. Its intended platforms and exclusions come from the legacy scope, rather than from demonstrated new implementation. Architecture, detailed interfaces and contracts remain open for their own design checkpoints; legacy source/test layout and test-pass claims have not been adopted.
 
-Root AGENTS project guidance was updated after DOCS-001 preservation, under the
-human's explicit request. Commands are derived from pyproject and labeled as
-intended rather than validated: no source/tests or declared development tools
-were available. Missing version metadata is recorded for later packaging work;
-pyproject itself is unchanged. README now provides truthful status and links.
+Root AGENTS project guidance was updated after DOCS-001 preservation, under the human's explicit request. Commands are derived from pyproject and labeled as intended rather than validated: no source/tests or declared development tools were available. Missing version metadata is recorded for later packaging work; pyproject itself is unchanged. README now provides truthful status and links.
 
-Checks: TOML parsed successfully; existing AGENTS policy prefix preserved;
-project brief assessed against the inspected inputs; authored Markdown headings,
-indentation, links and credential exclusion checked; git diff whitespace check
-passed. No product tests, lint/type checks, distribution build or native-platform
-verification ran. No dependencies were installed.
+Checks: TOML parsed successfully; existing AGENTS policy prefix preserved; project brief assessed against the inspected inputs; authored Markdown headings, indentation, links and credential exclusion checked; git diff whitespace check passed. No product tests, lint/type checks, distribution build or native-platform verification ran. No dependencies were installed.
 
 ## Guidance correction and closure obligation
 

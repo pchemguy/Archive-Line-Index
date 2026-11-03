@@ -1,12 +1,8 @@
 # Project handoff
 
-Checkpoint: main preparation initialization (DOCS-001).
-This snapshot describes that checkpoint. Recover subsequent work from the linked
-records and Git before continuing; its containing commit identifies the snapshot.
+Checkpoint: main preparation initialization (DOCS-001). This snapshot describes that checkpoint. Recover subsequent work from the linked records and Git before continuing; its containing commit identifies the snapshot.
 
-Outcome: existing root guidance and provenance scaffold retained; documentation
-tracking verified and current preparation records established. No product source
-or legacy completion state has been imported.
+Outcome: existing root guidance and provenance scaffold retained; documentation tracking verified and current preparation records established. No product source or legacy completion state has been imported.
 
 ## Workflow and sources
 
