@@ -1,6 +1,5 @@
 ---
-urls:
-    - "<CONVERSATION_URL>"
+url: https://chatgpt.com/c/6ae9c01f-a5b0-83eb-a7a6-d418a0ba2581'
 ---
 
 > [!IMPORTANT]
