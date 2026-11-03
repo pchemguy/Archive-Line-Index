@@ -50,11 +50,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Verified result: Whole-milestone code review completed independently of test execution; no blockers. Real-file mixed read demonstration and cleanup regressions pass: 76 tests, 99% coverage; Ruff lint/format and strict mypy pass. Report and HANDOFF included; issues #10–14 verified completed before boundary.
             - Report: `docs/dev/reports/phases/1/1.1.md`; include HANDOFF at this boundary.
     - [ ] Milestone 1.2 — Canonical line indexing
-        - [ ] T-007 — Implement canonical offset validation and checked construction
+        - [x] T-007 — Implement canonical offset validation and checked construction
             - Scope: offsets.py and focused unit checks.
             - Depends on: T-001, T-006.
             - Acceptance/evidence: Validate concrete Q/eight-byte arrays, first offsets/singletons, strict ordering, sentinel interpretation and signed-range bounds; keep incomplete construction distinct from completed-array validation.
             - Contracts: IDX-01, IDX-05–06; canonical offset model.
+            - Verified result: RED: offset provider absent. GREEN: 92 tests pass; concrete Q/eight-byte representation, valid 0/3 singletons, EOF structure, strict ordering and signed maximum tested; append construction remains separate from completed validation. Ruff and strict mypy pass; milestone #2 closure verified first.
         - [ ] T-008 — Implement bounded LF scanning over borrowed readers
             - Scope: scanner.py, ReadableBinary/default/options and scanner unit checks.
             - Depends on: T-007.
