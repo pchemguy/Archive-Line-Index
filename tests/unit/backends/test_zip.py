@@ -94,3 +94,142 @@ def test_invalid_open_preserves_cause_and_releases_source(tmp_path: Path) -> Non
     assert handle.closed
     with pytest.raises(FileNotFoundError):
         open_zip_backend(tmp_path / "missing")
+
+
+@pytest.mark.parametrize(
+    "compression",
+    [zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED, zipfile.ZIP_BZIP2, zipfile.ZIP_LZMA],
+)
+def test_bounded_delivery_and_terminal_validation(
+    tmp_path: Path, compression: int
+) -> None:
+    from archive_line_index.backends.zip import open_zip_backend
+
+    p = tmp_path / "data.zip"
+    payload = b"\0a\n\xff" * 4000
+    with zipfile.ZipFile(p, "w", compression=compression) as archive:
+        archive.writestr("data", payload)
+    reader = open_zip_backend(p)
+    chunks = []
+    while block := reader.read(13):
+        assert len(block) <= 13
+        chunks.append(block)
+    assert b"".join(chunks) == payload
+    assert reader.completed
+    assert reader.read(1) == b""
+    reader.close()
+    p.unlink()
+
+
+def test_crc_failure_is_extraction_error_not_eof(tmp_path: Path) -> None:
+    from archive_line_index.backends.zip import open_zip_backend
+    from archive_line_index.errors import ExtractionError
+    from archive_line_index.stream import make_content_stream
+
+    p = make_zip(tmp_path / "bad.zip", [("data", b"unchanged\n", stat.S_IFREG)])
+    raw = bytearray(p.read_bytes())
+    raw[30 + len("data")] ^= 1
+    p.write_bytes(raw)
+    reader = open_zip_backend(p)
+    stream = make_content_stream(reader, max_uncompressed_size=None)
+    with pytest.raises(ExtractionError) as first:
+        stream.read()
+    assert isinstance(first.value.__cause__, zipfile.BadZipFile)
+    assert not reader.completed
+    with pytest.raises(ExtractionError) as second:
+        stream.read(1)
+    assert second.value is first.value
+    stream.close()
+    p.unlink()
+
+
+def test_open_member_codec_failure_releases_all_handles(tmp_path: Path) -> None:
+    from archive_line_index.backends.zip import open_zip_backend
+
+    p = make_zip(tmp_path / "a.zip", [("data", b"x", stat.S_IFREG)])
+    handle = p.open("rb")
+    with (
+        patch.object(Path, "open", return_value=handle),
+        patch.object(zipfile.ZipFile, "open", side_effect=NotImplementedError("codec")),
+    ):
+        with pytest.raises(UnsupportedFormatError) as error:
+            open_zip_backend(p)
+    assert isinstance(error.value.__cause__, NotImplementedError)
+    assert handle.closed
+
+
+def test_declared_limit_and_invalid_read_sizes(tmp_path: Path) -> None:
+    from archive_line_index.backends.zip import open_zip_backend
+    from archive_line_index.errors import SizeLimitExceededError
+    from archive_line_index.stream import make_content_stream
+
+    p = make_zip(tmp_path / "a.zip", [("data", b"1234", stat.S_IFREG)])
+    reader = open_zip_backend(p)
+    with pytest.raises(SizeLimitExceededError):
+        make_content_stream(reader, max_uncompressed_size=3)
+    reader = open_zip_backend(p)
+    try:
+        for size, error in [(0, ValueError), (-1, ValueError), (True, TypeError)]:
+            with pytest.raises(error):
+                reader.read(size)
+        assert reader.read(1) == b"1"
+    finally:
+        reader.close()
+
+
+def test_delivery_filesystem_failure_retains_original_type(tmp_path: Path) -> None:
+    from archive_line_index.backends.zip import open_zip_backend
+
+    p = make_zip(tmp_path / "a.zip", [("data", b"data" * 10000, stat.S_IFREG)])
+    handle = p.open("rb")
+    with patch.object(Path, "open", return_value=handle):
+        reader = open_zip_backend(p)
+    failure = PermissionError("source device")
+    with patch.object(handle, "read", side_effect=failure):
+        with pytest.raises(PermissionError) as error:
+            reader.read(10000)
+    assert error.value is failure
+    assert not reader.completed
+    reader.close()
+    assert handle.closed
+
+
+def test_close_attempts_all_resources_and_can_retry(tmp_path: Path) -> None:
+    from archive_line_index.backends.zip import open_zip_backend
+
+    p = make_zip(tmp_path / "a.zip", [("data", b"x", stat.S_IFREG)])
+    handle = p.open("rb")
+    with patch.object(Path, "open", return_value=handle):
+        reader = open_zip_backend(p)
+    with patch.object(zipfile.ZipExtFile, "close", side_effect=OSError("member close")):
+        with pytest.raises(OSError, match="member close"):
+            reader.close()
+    assert handle.closed
+    reader.close()
+    reader.close()
+
+
+@pytest.mark.parametrize(
+    "compression", [zipfile.ZIP_DEFLATED, zipfile.ZIP_BZIP2, zipfile.ZIP_LZMA]
+)
+def test_corrupt_compressed_member_cannot_complete(
+    tmp_path: Path, compression: int
+) -> None:
+    from archive_line_index.backends.zip import open_zip_backend
+    from archive_line_index.errors import ExtractionError
+
+    p = tmp_path / "bad.zip"
+    with zipfile.ZipFile(p, "w", compression=compression) as archive:
+        archive.writestr("data", b"a\n" * 20000)
+    raw = bytearray(p.read_bytes())
+    start = 30 + len("data")
+    raw[start + 3] ^= 0xFF
+    p.write_bytes(raw)
+    reader = open_zip_backend(p)
+    try:
+        with pytest.raises(ExtractionError):
+            while reader.read(128):
+                pass
+        assert not reader.completed
+    finally:
+        reader.close()

@@ -9,9 +9,14 @@ from __future__ import annotations
 import stat
 import zipfile
 from pathlib import Path
-from typing import IO, Protocol
+from typing import IO, BinaryIO, Protocol, cast
 
-from ..errors import ArchiveStructureError, InvalidArchiveError, UnsupportedFormatError
+from ..errors import (
+    ArchiveStructureError,
+    ExtractionError,
+    InvalidArchiveError,
+    UnsupportedFormatError,
+)
 from .base import BackendReader, validate_positive_size
 
 
@@ -51,18 +56,60 @@ def _select_member(archive: zipfile.ZipFile) -> zipfile.ZipInfo:
     return members[0]
 
 
+class _Source:
+    """Remember source I/O failures to distinguish them from codec OSErrors."""
+
+    def __init__(self, source: BinaryIO) -> None:
+        self.handle = source
+        self.failure: OSError | None = None
+
+    def read(self, size: int = -1) -> bytes:
+        try:
+            return self.handle.read(size)
+        except OSError as error:
+            self.failure = error
+            raise
+
+    def seek(self, offset: int, whence: int = 0) -> int:
+        try:
+            return self.handle.seek(offset, whence)
+        except OSError as error:
+            self.failure = error
+            raise
+
+    def tell(self) -> int:
+        return self.handle.tell()
+
+    def seekable(self) -> bool:
+        return self.handle.seekable()
+
+
 class _ZipReader:
     def __init__(
-        self, member: IO[bytes], resources: list[_Closable], declared_size: int
+        self,
+        member: IO[bytes],
+        resources: list[_Closable],
+        declared_size: int,
+        source: _Source,
     ) -> None:
         self._member = member
+        self._source = source
         self._resources = resources
         self.declared_size = declared_size
         self.completed = False
 
     def read(self, size: int, /) -> bytes:
         validate_positive_size(size)
-        data = self._member.read(size)
+        try:
+            data = self._member.read(size)
+        except (MemoryError, KeyboardInterrupt, SystemExit):
+            raise
+        except Exception as error:
+            if error is self._source.failure:
+                raise
+            raise ExtractionError(
+                "ZIP payload delivery or integrity validation failed"
+            ) from error
         if not data:
             self.completed = True
         return data
@@ -82,7 +129,8 @@ def open_zip_backend(path: Path) -> BackendReader:
     resources: list[_Closable] = [source]
     try:
         try:
-            archive = zipfile.ZipFile(source)
+            tracked = _Source(source)
+            archive = zipfile.ZipFile(cast(BinaryIO, tracked))
             resources.insert(0, archive)
             info = _select_member(archive)
             member = archive.open(info)
@@ -91,7 +139,7 @@ def open_zip_backend(path: Path) -> BackendReader:
             raise InvalidArchiveError("Cannot open ZIP payload") from error
         except (NotImplementedError, RuntimeError) as error:
             raise UnsupportedFormatError("ZIP compression is unavailable") from error
-        return _ZipReader(member, resources, info.file_size)
+        return _ZipReader(member, resources, info.file_size, tracked)
     except BaseException as error:
         try:
             _close_resources(resources)

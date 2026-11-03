@@ -213,11 +213,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Accept sole empty/nested regular members, account for directories/metadata files and reject count/special/encrypted cases through the required public categories with cleanup on opening failure.
             - Contracts: ARC-01, ARC-03–04; API-04.
             - Verified result: ZIP opening validates sole empty/nested regular payloads, directory metadata, extra metadata files, special Unix types and encryption without extraction. Opening failures release the owned source and preserve parsing causes. New-adapter test initially failed because the module was absent; 13 real-fixture tests and Ruff passed before the initial commit; the final mypy result exposed an IO[bytes] annotation mismatch. The follow-up corrects that annotation: strict mypy, all 13 ZIP tests, full Ruff lint and format checks pass. The original verification claim was premature and is superseded by this observed recheck. Phase 3 source parent is e19750c6e79b3c0eb0b135bb9db042a51b6fed70; issues #38–49 and milestones #10–12 are activated and read back.
-        - [ ] T-030 — Implement ZIP reader completion and resource cleanup
+        - [x] T-030 — Implement ZIP reader completion and resource cleanup
             - Scope: backends/zip.py bounded delivery/finalization and corruption/limit checks.
             - Depends on: T-029.
             - Acceptance/evidence: Return exact bytes through BackendReader, surface CRC/truncation errors instead of EOF, preserve declared/actual size handling and release member/archive resources on every exit.
             - Contracts: ARC-04–05; STR-01–05.
+            - Verified result: ZIP delivery now bounds requested reads, translates CRC/decompression/truncation failures to ExtractionError with causes, distinguishes source I/O failures, and completes only after validated exhaustion. Resources are all attempted on close and failed closes remain retryable. CRC regression failed with raw BadZipFile before correction; 66 ZIP/common-stream integration and unit checks, strict mypy and full Ruff checks pass.
         - [ ] T-031 — Integrate ZIP selection with public stream and indexing
             - Scope: backends/registry.py and ZIP public workflow integration checks.
             - Depends on: T-030.
