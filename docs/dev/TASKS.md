@@ -225,11 +225,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Enable signature/suffix-selected ZIP without changing scanner/persistence; verify plain/ZIP equivalence, misleading names, late errors and no completed index on failure.
             - Contracts: SYS-01, SYS-04–06; ARC-01–05; IDX-01–06.
             - Verified result: Public ZIP selection now lazily opens the delivered adapter, preserving signature precedence and malformed-claim rejection without changing scanning or persistence. Real ZIP/plain equivalence covers original BOM/LF coordinates, buffers from one byte to 1 MiB, readinto, exact/declared limits and corrupted input returning no completed index. The public ZIP workflow failed as unsupported before integration; 402 unit/public-stream/persistence/ZIP checks, strict mypy and full Ruff pass.
-        - [ ] T-032 — Verify installed ZIP paired indexing and usage
+        - [x] T-032 — Verify installed ZIP paired indexing and usage
             - Scope: Installed CLI/content integration and ZIP examples/documentation.
             - Depends on: T-031.
             - Acceptance/evidence: Exercise actual ZIP through console/module/imported workflows, load identical SQLite/raw results and retain the previously working plain/persistence surface under installed artifacts.
             - Contracts: CLI-01–06 for ZIP; SYS-01, SYS-07–13.
+            - Verified result: ZIP console/module/imported paired indexing and corruption rejection pass on both native and independently source-rebuilt installed wheels outside the checkout. Six complete README examples execute, including nested compressed ZIP indexing; the exact scanner excerpt remains unchanged. README now distinguishes delivered ZIP from planned TAR/7z. All 22 selected installed/documentation/plain CLI checks, strict mypy and Ruff pass; no new runtime behavior or test-first claim is introduced by this documentation/integration task.
         - [ ] T-033 — Review test and report milestone 3.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-029, T-030, T-031, T-032.

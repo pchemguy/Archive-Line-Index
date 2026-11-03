@@ -15,7 +15,7 @@ Library functions are imported from `archive_line_index`; the importable CLI cal
 | `read_sqlite_index`, `read_raw_index` | Stored index path | A newly owned, validated offset array; no payload source is needed. |
 | `cli.main` / console / module | One target and optional shared output stem/overwrite flag | Integer status and paired SQLite/raw files from one scan. |
 
-The current 0.2.0 package requires Python 3.11 or later and supports plain payload files, caller-supplied binary readers, both persistence formats and all three CLI invocation forms. ZIP/TAR/7z archive payload delivery remains planned and is rejected explicitly until its adapters are delivered.
+The current implementation requires Python 3.11 or later and supports plain payload files, single-payload ZIP archives, caller-supplied binary readers, both persistence formats and all three CLI invocation forms. TAR/7z archive payload delivery remains planned and is rejected explicitly until its adapters are delivered.
 
 The library preserves payload bytes. LF is the only line terminator, CRLF retains both bytes, and the final offset is an EOF sentinel. An optional initial UTF-8 BOM policy changes the first line's start to 3 while retaining coordinates in the original bytes. No text decoding or line-ending normalization occurs.
 
@@ -29,7 +29,7 @@ python -m build
 python -m pip install dist/archive_line_index-0.2.0-py3-none-any.whl
 ```
 
-The source distribution is `dist/archive_line_index-0.2.0.tar.gz` and can independently rebuild the wheel. The declared runtime dependency is py7zr; development tools and separate archive executables are not required to use the installed library. Archive support is delivered in later versions.
+The source distribution is `dist/archive_line_index-0.2.0.tar.gz` and can independently rebuild the wheel. The declared runtime dependency is py7zr; development tools and separate archive executables are not required to use the installed library. ZIP uses the Python standard library; TAR/7z support follows in later versions.
 
 ## Stream without indexing
 
@@ -108,7 +108,27 @@ with TemporaryDirectory() as directory:
     assert offsets.tolist() == [0, 7, 8, 13]
 ```
 
-Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. Recognized archive signatures/suffixes raise `UnsupportedFormatError` until their adapters are delivered; they are never silently treated as plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
+Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. ZIP signatures/suffixes select the ZIP adapter. Recognized TAR/7z candidates raise `UnsupportedFormatError` until their adapters are delivered; they are never silently treated as plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
+
+## Index a ZIP payload
+
+ZIP archives must contain exactly one regular file, optionally nested under directories. Empty payloads are valid; directory entries are ignored, while extra files (including metadata files), links and other special entries are rejected. Member names are never extracted to filesystem paths. Detected encryption and unavailable codecs are unsupported; malformed archives and payload integrity failures retain distinct error categories. Member CRC validation must complete before indexing succeeds.
+
+```python
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from zipfile import ZIP_DEFLATED, ZipFile
+
+from archive_line_index import build_line_index
+
+with TemporaryDirectory() as directory:
+    target = Path(directory) / "records.zip"
+    with ZipFile(target, "w", compression=ZIP_DEFLATED) as archive:
+        archive.writestr("nested/records.txt", b"alpha\nbeta")
+    assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
+```
+
+The CLI accepts the same archive target and persists offsets in the uncompressed payload's byte coordinates. For `records.zip`, its default outputs are `records.sqlite3` and `records.u64` beside the archive. Signature evidence takes precedence over a conflicting suffix, and invalid suffix-claimed ZIP input cannot fall back to plain bytes.
 
 ## Store and reload an index independently
 
