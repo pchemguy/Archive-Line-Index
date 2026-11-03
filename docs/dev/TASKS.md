@@ -174,11 +174,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
             - Report: `docs/dev/reports/phases/2/2.2.md`; include HANDOFF at this boundary.
     - [ ] Milestone 2.3 — Installed command workflow
-        - [ ] T-025 — Wire console and guarded module execution
+        - [x] T-025 — Wire console and guarded module execution
             - Scope: __main__.py, pyproject console metadata/version 0.2.0 and import/entry checks.
             - Depends on: T-024.
             - Acceptance/evidence: Console and python -m use cli.main; importing package/CLI/runner performs no argv parsing, path I/O, printing or process exit. Installed entry metadata matches the accepted design.
             - Contracts: CLI-03, CLI-06; API-01, API-05.
+            - Verified result: RED: version/console metadata and module entry tests failed before wiring. GREEN: 0.2.0 metadata installs shared cli.main console entry; guarded module runner converts its status only when executed. Package/CLI/runner imports do no argv parsing/inspection/path I/O/printing/exiting. Updated native metadata checks and all regressions, Ruff/strict mypy pass; milestone #7 closure verified.
         - [ ] T-026 — Verify installed paired commands and native artifacts
             - Scope: Installed CLI, metadata and persistence integration checks plus package inventory.
             - Depends on: T-025.

@@ -1,5 +1,7 @@
 """Delivered package-root exports are explicit and independent of future adapters."""
 
+import pytest
+
 import archive_line_index as ali
 
 
@@ -27,3 +29,58 @@ def test_exact_delivered_exports() -> None:
     }
     for name in ali.__all__:
         assert getattr(ali, name) is not None
+
+
+def test_version_and_console_metadata() -> None:
+    import tomllib
+    from pathlib import Path
+
+    project = tomllib.loads(
+        (Path(__file__).resolve().parents[2] / "pyproject.toml").read_text()
+    )["project"]
+    assert project["version"] == "0.2.0"
+    assert project["scripts"] == {"archive-line-index": "archive_line_index.cli:main"}
+
+
+def test_imports_have_no_cli_execution(monkeypatch: pytest.MonkeyPatch) -> None:
+    import argparse
+    import importlib
+    import sys
+    from pathlib import Path
+    from unittest.mock import patch
+
+    import archive_line_index.cli as cli
+
+    class UnreadableArgv:
+        def __getitem__(self, key: object) -> object:
+            raise AssertionError("argv read during import")
+
+    monkeypatch.setattr(sys, "argv", UnreadableArgv())
+    with (
+        patch.object(
+            argparse.ArgumentParser, "parse_args", side_effect=AssertionError("parsed")
+        ),
+        patch.object(Path, "open", side_effect=AssertionError("opened")),
+        patch.object(Path, "stat", side_effect=AssertionError("inspected")),
+        patch("builtins.print", side_effect=AssertionError("printed")),
+    ):
+        importlib.reload(ali)
+        importlib.reload(cli)
+        importlib.import_module("archive_line_index.__main__")
+
+
+def test_module_runner_converts_main_status_to_exit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import runpy
+    import sys
+    from unittest.mock import patch
+
+    monkeypatch.delitem(sys.modules, "archive_line_index.__main__", raising=False)
+    with (
+        patch("archive_line_index.cli.main", return_value=17) as main,
+        pytest.raises(SystemExit) as caught,
+    ):
+        runpy.run_module("archive_line_index", run_name="__main__")
+    assert caught.value.code == 17
+    main.assert_called_once_with()
