@@ -9,7 +9,7 @@ from __future__ import annotations
 import stat
 import zipfile
 from pathlib import Path
-from typing import BinaryIO, Protocol
+from typing import IO, Protocol
 
 from ..errors import ArchiveStructureError, InvalidArchiveError, UnsupportedFormatError
 from .base import BackendReader, validate_positive_size
@@ -53,7 +53,7 @@ def _select_member(archive: zipfile.ZipFile) -> zipfile.ZipInfo:
 
 class _ZipReader:
     def __init__(
-        self, member: BinaryIO, resources: list[_Closable], declared_size: int
+        self, member: IO[bytes], resources: list[_Closable], declared_size: int
     ) -> None:
         self._member = member
         self._resources = resources
