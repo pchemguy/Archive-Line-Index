@@ -6,7 +6,7 @@
 - Current pass and scope: onepass; new design and implementation of Archive Line Index informed by the legacy repository.
 - Approval basis: each necessary document checkpoint remains active. No future document approval or implementation range is preapproved.
 - Tracking/publication selection: root AGENTS enables documentation and implementation tracking by default; the human explicitly requested creation of the documentation milestone and nine issues on 2026-11-03. Publish/read back each owned commit.
-- Next boundary: publish PROJECT acceptance and verify DOCS-002 issue closure, then prepare ARCHITECTURE and pause for human acceptance before DECOMPOSITION.
+- Next boundary: publish the ARCHITECTURE proposal and pause for human acceptance before DECOMPOSITION.
 
 ## Scope and decisions
 
@@ -20,7 +20,8 @@ The new repository baseline is `c6398d8e51c60cabddc21997188e0a9cc040272d`; the i
 | --- | --- |
 | DOCS-001 | All four root guidance/disclosure/discovery files retained byte for byte in initialization; task/control/HANDOFF records created from SDD Manager 0.16.1 guidance. Pre-write projection and preservation checks verified before initialization; milestone `sdd-docs-main` #1 and DOCS-001–009 issues #1–9 have exact predefined content and verified associations. |
 | DOCS-002 | PROJECT SHA-256 `b2c2e55722e5bd68aef98b0dd82ef1116d71826730edc2ad98a1f4a9fe482b85`, published unchanged since commit `68457f1c5e51a5899bd5868ca464c41c11d9d7d2`, accepted by the human on 2026-11-03: “PROJECT is ok”. Brief consistency and formatting checks passed. DOCS-002 checked with the acceptance record; issue closure follows verified publication. |
-| DOCS-003–009 | Pending their prerequisites and interactive checkpoints. |
+| DOCS-003 | ARCHITECTURE proposal SHA-256 `08a65b86da46847a99bea949590c0b04f614f86acf52e9942e1c86762e773b67`; checked against accepted PROJECT for responsibility ownership, dependencies, lifecycle, resource limits and document boundaries. Human acceptance pending; task unchecked and issue open. |
+| DOCS-004–009 | Pending their prerequisites and interactive checkpoints. |
 
 ## Initialization
 
@@ -33,7 +34,7 @@ The new repository baseline is `c6398d8e51c60cabddc21997188e0a9cc040272d`; the i
 
 ## Pending transitions
 
-Initialization commit `79975f0b67ec5a086a69de5f69f1dd143853f564` was pushed and its exact remote ref verified; DOCS-001 issue #1 is closed as completed with evidence and independent readback. Publish/read back the PROJECT acceptance checkpoint, then close/read back DOCS-002 issue #2 with the accepted content identity and published commit. ARCHITECTURE preparation follows that closure; its review remains interactive. No implementation range is selected.
+Initialization commit `79975f0b67ec5a086a69de5f69f1dd143853f564` was pushed and its exact remote ref verified; DOCS-001 issue #1 is closed as completed with evidence and independent readback. PROJECT acceptance checkpoint `97a692c83208d8abd876ad74b74074a66f78bed9` is published with exact remote readback; DOCS-002 issue #2 is closed as completed with evidence and independent readback. Publish/read back ARCHITECTURE, then await acceptance. DOCS-003 remains unchecked and issue #3 open. No implementation range is selected.
 
 
 ## Proposal assessment
@@ -49,3 +50,7 @@ Checks: TOML parsed successfully; existing AGENTS policy prefix preserved; proje
 The human requested concise operational project guidance, preserving AGENTS.md's single-line prose style and removing configuration restatement, repeated instruction-discovery guidance and transient verification commentary. The legacy reference is temporary and must be removed at reimplementation closure. Product documents must contain no migration narrative or history. PROJECT is accepted; later document checkpoints remain interactive.
 
 The human requested removal of hard wrapping from PROJECT. Only whitespace changed; wording, headings and list membership were preserved. Root guidance now applies the no-hard-wrap rule to Markdown prose and list items. PROJECT is accepted; later document checkpoints remain interactive.
+
+## Architecture proposal assessment
+
+ARCHITECTURE assigns content access, stream behavior, scanning, offset validation and persistence to distinct owners with directed dependencies. It proposes a bounded queue/extraction-thread bridge for 7z, explicitly distinguishes cooperative cancellation from fixed-time termination, and identifies dependency suitability checks. Persistence separates protected creation from replacement and requires explicit filesystem failure semantics in SPEC. No public signatures, physical module tree or implementation task sequence is defined at this stage. The proposal contains no migration narrative and uses unwrapped Markdown prose. Review covered accepted scope, cohesion, dependency direction, ownership, completion semantics, resource accounting and navigation. Human acceptance is pending; no implementation verification is claimed.
