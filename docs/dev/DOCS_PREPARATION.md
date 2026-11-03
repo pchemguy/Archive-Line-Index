@@ -67,3 +67,7 @@ project brief assessed against the inspected inputs; authored Markdown headings,
 indentation, links and credential exclusion checked; git diff whitespace check
 passed. No product tests, lint/type checks, distribution build or native-platform
 verification ran. No dependencies were installed.
+
+## Guidance correction and closure obligation
+
+The human requested concise operational project guidance, preserving AGENTS.md's single-line prose style and removing configuration restatement, repeated instruction-discovery guidance and transient verification commentary. The legacy reference is temporary and must be removed at reimplementation closure. Product documents must contain no migration narrative or history. PROJECT acceptance remains pending.
