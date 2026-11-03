@@ -56,11 +56,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Validate concrete Q/eight-byte arrays, first offsets/singletons, strict ordering, sentinel interpretation and signed-range bounds; keep incomplete construction distinct from completed-array validation.
             - Contracts: IDX-01, IDX-05–06; canonical offset model.
             - Verified result: RED: offset provider absent. GREEN: 92 tests pass; concrete Q/eight-byte representation, valid 0/3 singletons, EOF structure, strict ordering and signed maximum tested; append construction remains separate from completed validation. Ruff and strict mypy pass; milestone #2 closure verified first.
-        - [ ] T-008 — Implement bounded LF scanning over borrowed readers
+        - [x] T-008 — Implement bounded LF scanning over borrowed readers
             - Scope: scanner.py, ReadableBinary/default/options and scanner unit checks.
             - Depends on: T-007.
             - Acceptance/evidence: Use native block search, produce exact LF/CRLF/lone-CR/unterminated offsets, accept legal short reads and reject invalid read results without closing or restoring the caller stream.
             - Contracts: IDX-01–02, IDX-04–05; API-02–03.
+            - Verified result: RED: scanner provider absent. GREEN: bounded LF scanning and borrowing checks pass with all regressions; exact LF/CRLF/lone-CR/unterminated cases, tiny buffers, short reads, invalid options/results and unchanged caller error/ownership covered. Ruff and strict mypy pass. Initial BOM refinements remain T-009.
         - [ ] T-009 — Complete BOM and scanner failure boundary behavior
             - Scope: scanner.py refinements and shared short-read corpora.
             - Depends on: T-007, T-008.
