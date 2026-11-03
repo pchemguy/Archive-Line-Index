@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from collections.abc import Sequence
 from pathlib import Path
@@ -45,6 +46,23 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _preflight(target: Path, outputs: tuple[Path, Path], *, overwrite: bool) -> None:
+    source_name = os.path.normcase(os.path.abspath(target))
+    for output in outputs:
+        if os.path.normcase(os.path.abspath(output)) == source_name:
+            raise ValueError(
+                f"Output names the source: {output}; select a distinct output stem"
+            )
+        try:
+            same = os.path.samefile(target, output)
+        except FileNotFoundError:
+            same = False
+        if same:
+            raise ValueError(f"Output aliases the source: {output}")
+        if not overwrite and os.path.lexists(output):
+            raise FileExistsError(f"Protected destination exists: {output}")
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Index one filesystem target once and write SQLite then raw from one array.
 
@@ -76,6 +94,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     sqlite = Path(str(stem) + ".sqlite3")
     raw = Path(str(stem) + ".u64")
+    try:
+        _preflight(target, (sqlite, raw), overwrite=options.overwrite)
+    except (OSError, ValueError) as error:
+        print(f"Indexing failed: {error}", file=sys.stderr)
+        return 1
     offsets = build_line_index(target)
     write_sqlite_index(offsets, sqlite, overwrite=options.overwrite)
     write_raw_index(offsets, raw, overwrite=options.overwrite)

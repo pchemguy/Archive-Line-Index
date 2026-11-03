@@ -73,3 +73,114 @@ def test_invalid_python_argv_raises_type_error(argv: object) -> None:
 def test_none_argv_uses_process_arguments(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("sys.argv", ["program", "--help"])
     assert main() == 0
+
+
+@pytest.mark.parametrize(
+    "name,stem",
+    [
+        ("events.tar.gz", "events.tar"),
+        ("events", "events"),
+        (".hidden", ".hidden"),
+        ("name with spaces.txt", "name with spaces"),
+        ("events.zip", "events"),
+    ],
+)
+def test_default_final_suffix_stems(tmp_path: Path, name: str, stem: str) -> None:
+    with (
+        patch("archive_line_index.cli.build_line_index", return_value=array("Q", [0])),
+        patch("archive_line_index.cli.write_sqlite_index") as sqlite,
+        patch("archive_line_index.cli.write_raw_index") as raw,
+    ):
+        assert main([str(tmp_path / name)]) == 0
+    assert sqlite.call_args.args[1] == tmp_path / (stem + ".sqlite3")
+    assert raw.call_args.args[1] == tmp_path / (stem + ".u64")
+
+
+def test_explicit_stem_is_appended_and_hyphen_target_after_separator(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    with (
+        patch(
+            "archive_line_index.cli.build_line_index", return_value=array("Q", [0])
+        ) as build,
+        patch("archive_line_index.cli.write_sqlite_index") as sqlite,
+        patch("archive_line_index.cli.write_raw_index") as raw,
+    ):
+        assert main(["-o", "results/custom.v1", "--", "-payload.txt"]) == 0
+    build.assert_called_once_with(Path("-payload.txt"))
+    assert sqlite.call_args.args[1] == Path("results/custom.v1.sqlite3")
+    assert raw.call_args.args[1] == Path("results/custom.v1.u64")
+    assert not (tmp_path / "results").exists()
+
+
+@pytest.mark.parametrize("suffix", [".sqlite3", ".u64"])
+def test_either_existing_output_blocks_before_scan(
+    tmp_path: Path, suffix: str, capsys: pytest.CaptureFixture[str]
+) -> None:
+    output = tmp_path / ("payload" + suffix)
+    output.write_bytes(b"protected")
+    with patch(
+        "archive_line_index.cli.build_line_index", side_effect=AssertionError("scanned")
+    ):
+        assert main([str(tmp_path / "payload.txt")]) == 1
+    out, err = capsys.readouterr()
+    assert not out and str(output) in err
+    assert output.read_bytes() == b"protected"
+
+
+@pytest.mark.parametrize("suffix", [".sqlite3", ".u64"])
+def test_default_source_collision_rejected_even_overwrite(
+    tmp_path: Path, suffix: str
+) -> None:
+    source = tmp_path / ("payload" + suffix)
+    source.write_bytes(b"source")
+    with patch(
+        "archive_line_index.cli.build_line_index", side_effect=AssertionError("scanned")
+    ):
+        assert main([str(source), "--overwrite"]) == 1
+    assert source.read_bytes() == b"source"
+
+
+@pytest.mark.parametrize("kind", ["hardlink", "symlink", "dangling"])
+def test_output_alias_and_dangling_protection(tmp_path: Path, kind: str) -> None:
+    import os
+
+    source = tmp_path / "payload.txt"
+    source.write_bytes(b"source")
+    output = tmp_path / "payload.u64"
+    try:
+        if kind == "hardlink":
+            os.link(source, output)
+        else:
+            output.symlink_to(source if kind == "symlink" else tmp_path / "missing")
+    except (OSError, NotImplementedError):
+        pytest.skip("link creation unavailable")
+    with patch(
+        "archive_line_index.cli.build_line_index", side_effect=AssertionError("scanned")
+    ):
+        argv = [str(source)] + ([] if kind == "dangling" else ["--overwrite"])
+        assert main(argv) == 1
+    assert source.read_bytes() == b"source"
+
+
+def test_explicit_overwrite_allows_distinct_outputs(tmp_path: Path) -> None:
+    for suffix in (".sqlite3", ".u64"):
+        (tmp_path / ("out" + suffix)).write_bytes(b"old")
+    with (
+        patch("archive_line_index.cli.build_line_index", return_value=array("Q", [0])),
+        patch("archive_line_index.cli.write_sqlite_index") as sqlite,
+        patch("archive_line_index.cli.write_raw_index") as raw,
+    ):
+        assert (
+            main(
+                [
+                    str(tmp_path / "input.txt"),
+                    "-o",
+                    str(tmp_path / "out"),
+                    "--overwrite",
+                ]
+            )
+            == 0
+        )
+    assert sqlite.call_args.kwargs == raw.call_args.kwargs == {"overwrite": True}

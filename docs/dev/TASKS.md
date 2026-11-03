@@ -159,11 +159,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Use the existing builder once and pass the same array to SQLite then raw; return integer results, avoid import-time work/SystemExit for normal outcomes, and print success only after both writes.
             - Contracts: CLI-01, CLI-03; public CLI signature; SYS-13.
             - Verified result: RED: CLI module absent. GREEN: one builder call and identical array passed to SQLite then raw, zero/BOM-only line counts, success-after-both-writes, help/usage statuses without path I/O/SystemExit, argv validation and sys.argv defaults pass with regressions. Ruff/strict mypy pass; milestone #6 closure verified first.
-        - [ ] T-023 — Implement shared output stems and both-path preflight
+        - [x] T-023 — Implement shared output stems and both-path preflight
             - Scope: cli.py path/options handling and focused naming/alias checks.
             - Depends on: T-022.
             - Acceptance/evidence: Cover default input directory/final-suffix stem, explicit output stem, both extensions, spaces/hyphen-prefixed targets, protected outputs, dangling paths and source aliases before scanning.
             - Contracts: CLI-02, CLI-04; explicit overwrite/naming contract.
+            - Verified result: RED: seven preflight cases scanned protected/alias sources. GREEN: final-suffix/default/explicit stems, appended extensions, spaces, hyphen targets with --, both protected paths, dangling links and lexical/hard/symlink source aliases are checked before scanning; distinct overwrite remains explicit. Full regressions, Ruff/strict mypy pass.
         - [ ] T-024 — Complete CLI errors interruption and partial-publication reporting
             - Scope: cli.py error/status flow and real in-process integration checks.
             - Depends on: T-022, T-023.
