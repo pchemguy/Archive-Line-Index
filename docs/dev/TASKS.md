@@ -71,11 +71,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
             - Report: `docs/dev/reports/phases/1/1.2.md`; include HANDOFF at this boundary.
     - [ ] Milestone 1.3 — Installed source-based indexing
-        - [ ] T-010 — Compose public plain-file stream and index APIs
+        - [x] T-010 — Compose public plain-file stream and index APIs
             - Scope: api.py and package-root re-exports with public integration checks.
             - Depends on: T-006, T-009.
             - Acceptance/evidence: Validate all options before source acquisition; verify stream ownership transfer, build cleanup and direct/source index equivalence. Delivered exports import without future adapter modules.
             - Contracts: API-01–04; SYS-02–06, SYS-10.
+            - Verified result: RED: facade absent. GREEN: public source/direct equivalence, early validation, exact phase exports, source acquisition errors, scan-failure cleanup and close-failure propagation pass with all regressions; Ruff and strict mypy pass. Milestone #3 closure verified before execution; no later archive adapter imports.
         - [ ] T-011 — Verify built plain-library distributions outside the checkout
             - Scope: Packaging metadata/build selection and installed-package/distribution integration owners.
             - Depends on: T-010.
