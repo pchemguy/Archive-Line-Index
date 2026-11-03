@@ -24,11 +24,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Validate Source kinds, inspect at most 512 bytes and preserve candidate evidence/precedence without plain fallback for recognized claims. Full archive validity/rejection remains with selection/adapters in their delivery phases.
             - Contracts: API-02, ARC-01–02; internal source-selection interfaces.
             - Verified result: RED: source/detector modules absent. GREEN: 26 tests pass, including text-only paths, 512-byte inspection, all suffixes/magic families, signature precedence and TAR checksum/zero-prefix discrimination; Ruff lint/format and strict mypy pass.
-        - [ ] T-003 — Implement the backend reader contract and plain selection
+        - [x] T-003 — Implement the backend reader contract and plain selection
             - Scope: backends/base.py, plain.py and registry.py with adapter/selection checks.
             - Depends on: T-001, T-002.
             - Acceptance/evidence: Read original bytes through owned handles, report validated EOF, close idempotently and reject recognized undelivered adapters explicitly. Preserve the protocol used by future adapters.
             - Contracts: STR-01–02, STR-04–05; internal BackendReader.
+            - Verified result: RED: adapter package absent. GREEN: 36 tests pass; byte fidelity, positive bounded reads, terminal EOF, metadata-failure cleanup, idempotent close and explicit rejection of ZIP/TAR/7z selection; Ruff and strict mypy pass.
         - [ ] T-004 — Implement bounded stream reads state and cleanup
             - Scope: stream.py and controlled-reader unit checks.
             - Depends on: T-003.
