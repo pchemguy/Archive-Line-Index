@@ -1,6 +1,18 @@
 # Archive Line Index
 
-Archive Line Index provides sequential binary payload access and exact byte-line offsets for Python 3.11 or later. The current 0.1.0 library supports plain files and caller-supplied blocking binary readers. Archive adapters, index persistence and the single-target CLI are scheduled capabilities; they are not available in this version.
+Archive Line Index is a Python library for building compact byte-offset indexes of line-oriented data and reading source content as a sequential binary stream. An index records where each line starts and where the content ends, allowing consumers to identify line byte ranges without decoding text or retaining complete lines in memory. Streaming and index construction are independently usable.
+
+Inputs are filesystem paths or caller-supplied blocking binary readers. Index construction returns an in-memory `array("Q")` of unsigned eight-byte offsets: one start per line, followed by an end-of-file sentinel. For example, `b"a\nb"` produces `[0, 2, 3]`, describing the byte ranges `[0, 2)` and `[2, 3)`. Streaming returns the original payload bytes through `read` or `readinto`.
+
+The Python interfaces are imported from `archive_line_index`:
+
+| Interface | Input | Output and ownership |
+| --- | --- | --- |
+| `open_content_stream` | Filesystem path (`str` or text path-like object) | Owned `ContentStream` for sequential binary reads; the caller closes it. |
+| `scan_line_offsets` | Blocking binary reader with `read(size) -> bytes` | Completed offset array; the reader is borrowed and remains open. |
+| `build_line_index` | Filesystem path (`str` or text path-like object) | Completed offset array; source opening and closure are managed by the library. |
+
+The current 0.1.0 library requires Python 3.11 or later and supports plain files and caller-supplied binary readers. Planned capabilities include single-payload ZIP/TAR/7z archive inputs, independent SQLite/raw index readers and writers, and an importable single-target CLI that produces both `.sqlite3` and `.u64` index files. These capabilities are not available in this version.
 
 The library preserves payload bytes. LF is the only line terminator, CRLF retains both bytes, and the final offset is an EOF sentinel. An optional initial UTF-8 BOM policy changes the first line's start to 3 while retaining coordinates in the original bytes. No text decoding or line-ending normalization occurs.
 
