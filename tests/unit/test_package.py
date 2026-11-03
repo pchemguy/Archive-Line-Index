@@ -5,6 +5,10 @@ import archive_line_index as ali
 
 def test_exact_delivered_exports() -> None:
     assert set(ali.__all__) == {
+        "read_raw_index",
+        "write_raw_index",
+        "read_sqlite_index",
+        "write_sqlite_index",
         "Source",
         "ReadableBinary",
         "DEFAULT_BUFFER_SIZE",

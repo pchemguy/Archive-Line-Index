@@ -23,7 +23,7 @@ assert metadata.version("py7zr")
 names = {d.metadata["Name"].lower() for d in metadata.distributions()}
 assert not names.intersection({"pytest", "mypy", "ruff", "build", "hatchling", "flowmark"})
 assert not any(k == "py7zr" or k.startswith("archive_line_index.backends.zip") or k.startswith("archive_line_index.backends.sevenzip") for k in sys.modules)
-expected = {"Source", "ReadableBinary", "DEFAULT_BUFFER_SIZE", "ContentStream", "open_content_stream", "scan_line_offsets", "build_line_index", "ArchiveLineIndexError", "UnsupportedFormatError", "InvalidArchiveError", "ArchiveStructureError", "SizeLimitExceededError", "ExtractionError", "InvalidIndexError", "PersistenceError"}
+expected = {"read_raw_index", "write_raw_index", "read_sqlite_index", "write_sqlite_index", "Source", "ReadableBinary", "DEFAULT_BUFFER_SIZE", "ContentStream", "open_content_stream", "scan_line_offsets", "build_line_index", "ArchiveLineIndexError", "UnsupportedFormatError", "InvalidArchiveError", "ArchiveStructureError", "SizeLimitExceededError", "ExtractionError", "InvalidIndexError", "PersistenceError"}
 assert set(ali.__all__) == expected
 payload = b"\\xef\\xbb\\xbfabc\\r\\n\\nlast"
 path = Path("payload.bin")
@@ -42,6 +42,13 @@ except ali.SizeLimitExceededError:
 else:
     raise AssertionError("limit ignored")
 path.unlink()
+from array import array
+values = array("Q", [0, 2, 7])
+ali.write_sqlite_index(values, "standalone.sqlite3")
+ali.write_raw_index(values, "standalone.u64")
+assert ali.read_sqlite_index("standalone.sqlite3") == ali.read_raw_index("standalone.u64") == values
+Path("standalone.sqlite3").unlink()
+Path("standalone.u64").unlink()
 print("installed workflows passed")
 """).strip()
         == "installed workflows passed"

@@ -139,11 +139,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Reject altered schemas, corruption and invalid arrays; retain operational/ordinary error distinctions and return a newly owned canonical array without modifying the input.
             - Contracts: PER-01–02, PER-06; API-04.
             - Verified result: RED: 21 reader cases failed before implementation. GREEN: canonical read-only roundtrips, altered tables/types/columns/indexes/views/triggers/rowid layouts, corrupt content and invalid arrays pass with all regressions; inputs/sidecars are unchanged. Missing paths retain filesystem errors; other engine failures preserve categorized causes. Ruff/strict mypy pass.
-        - [ ] T-020 — Expose and integrate independent persistence APIs
+        - [x] T-020 — Expose and integrate independent persistence APIs
             - Scope: Package-root persistence exports and cross-format public/installed integration checks.
             - Depends on: T-017, T-018, T-019.
             - Acceptance/evidence: Load/store without payload sources and establish exact original/SQLite/raw equivalence including EOF. Verify all public persistence imports and defaults without a combined transaction.
             - Contracts: SYS-07–10; API-01–04; PER-01–07.
+            - Verified result: RED: seven public persistence workflows failed before exports. GREEN: original/SQLite/raw arrays agree for all line/BOM cases; independent reads/writes/protection/replacement work without payload paths. Exact public exports and both clean installed artifact variants cover all four persistence functions; Ruff/strict mypy and all regressions pass.
         - [ ] T-021 — Review test and report milestone 2.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-016, T-017, T-018, T-019, T-020.
