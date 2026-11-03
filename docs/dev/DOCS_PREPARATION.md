@@ -29,7 +29,7 @@ Historical logs were excluded.
 | Task | Current evidence / decision basis |
 | --- | --- |
 | DOCS-001 | All four root guidance/disclosure/discovery files retained byte for byte in initialization; task/control/HANDOFF records created from SDD Manager 0.16.1 guidance. Pre-write projection and preservation checks verified before initialization; milestone `sdd-docs-main` #1 and DOCS-001–009 issues #1–9 have exact predefined content and verified associations. |
-| DOCS-002 | PROJECT proposal pending; no human acceptance. |
+| DOCS-002 | PROJECT proposal SHA-256 `1420dd94b7e467627b3df7e47d22d55626962db3538d35c946efce52937eb176`; reviewed against the pinned legacy inputs and target tooling. Preserves the principal functional scope as a proposal; exact APIs and internal structure remain open. Human acceptance pending; task unchecked and issue open. |
 | DOCS-003–009 | Pending their prerequisites and interactive checkpoints. |
 
 ## Initialization
@@ -43,5 +43,27 @@ Historical logs were excluded.
 
 ## Pending transitions
 
-Publish/read back initialization and close/read back DOCS-001 before dependent
-PROJECT work. No document is accepted and no implementation is authorized yet.
+Initialization commit `79975f0b67ec5a086a69de5f69f1dd143853f564` was pushed and its exact remote ref verified; DOCS-001 issue #1 is closed as completed with evidence and independent readback. Publish/read back the PROJECT proposal with root AGENTS tooling guidance and README, then wait for human acceptance. DOCS-002 remains unchecked and issue #2 open; no implementation range is selected.
+
+
+## Proposal assessment
+
+The PROJECT proposal retains the two independent capabilities, byte fidelity,
+archive validation, LF/BOM/EOF semantics, bounded payload buffering, explicit
+resource ownership and independent validated persistence. Its intended platforms
+and exclusions come from the legacy scope, rather than from demonstrated new
+implementation. Architecture, detailed interfaces and contracts remain open for
+their own design checkpoints; legacy source/test layout and test-pass claims have
+not been adopted.
+
+Root AGENTS project guidance was updated after DOCS-001 preservation, under the
+human's explicit request. Commands are derived from pyproject and labeled as
+intended rather than validated: no source/tests or declared development tools
+were available. Missing version metadata is recorded for later packaging work;
+pyproject itself is unchanged. README now provides truthful status and links.
+
+Checks: TOML parsed successfully; existing AGENTS policy prefix preserved;
+project brief assessed against the inspected inputs; authored Markdown headings,
+indentation, links and credential exclusion checked; git diff whitespace check
+passed. No product tests, lint/type checks, distribution build or native-platform
+verification ran. No dependencies were installed.
