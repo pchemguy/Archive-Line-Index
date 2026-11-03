@@ -2,7 +2,7 @@
 
 ## Result and reviewed boundary
 
-T-001–T-015 deliver the 0.1.0 plain-file library: owned sequential binary streams, generic borrowed-reader LF/BOM scanning, canonical Q/eight-byte offsets, source-based index building, typed exports, professional executable documentation and native source/wheel verification. This report completes T-015's review; default-branch integration, tag and hosted release remain pending until their actual readback below.
+T-001–T-015 deliver the 0.1.0 plain-file library: owned sequential binary streams, generic borrowed-reader LF/BOM scanning, canonical Q/eight-byte offsets, source-based index building, typed exports, professional executable documentation and native source/wheel verification. T-015, default-branch integration and the published 0.1.0 release are complete; the verified integration/release results are recorded below.
 
 The human's “Finalize Phase 1” instruction supersedes the earlier stop before T-015 and authorizes the phase review, integration and 0.1.0 GitHub release. It does not select Phase 2. Creation/integration parent: main `9c90eebc8aaca66f8f086cb69f93f0dbb7c571ee`; reviewed published source: `15c36f54b49801ee7fe5f2889290ee7f8d4e9593`, plus this task's release notes and source-distribution selection. No runtime code changed during this phase review.
 
@@ -48,3 +48,21 @@ T-015 `0fa719b0b08de33cee1124627cf59077230a21a3` is published/read back. Issue #
 Merged-state verification passes: 253 tests, including native source rebuild and both installed workflows/examples/inventory, plus staged/unstaged diff checks. Runtime source is identical to the reviewed phase tip. Main publication and release preparation follow this merge commit.
 
 Integration `f1365f0457a616917628c8b2a0c8d9bb72b64f14` is published and exact remote main readback matches. Its first parent is the accepted preparation main and second parent is T-015. All Phase 1 issues/milestones are closed. The next direct main commit uses the exact finalized release-note body; tag/package/hosted effects remain pending.
+
+## Published release outcome
+
+Phase 1 is finalized. Explicit integration `f1365f0457a616917628c8b2a0c8d9bb72b64f14` and direct default-branch release commit `2d0435cc731d608843ad71cfa9c7688d1d8b5d09` are published. Tag `v0.1.0` resolves to that exact release commit on main's first-parent history. The release commit body, retained RELEASE-NOTES.md and hosted release body match exactly.
+
+GitHub release [v0.1.0](https://github.com/pchemguy/Archive-Line-Index/releases/tag/v0.1.0) (ID 432848257) is published, non-prerelease and independently confirmed as latest. One direct API publisher created the draft, uploaded and verified all assets before publication; no competing workflow exists. Transient prepublication GET 503 failures were reconciled against the unchanged draft before retrying. No duplicate release/assets or tag moves occurred.
+
+| Asset | Bytes | SHA256 | Download |
+| --- | --- | --- | --- |
+| `archive_line_index-0.1.0-py3-none-any.whl` | 16464 | `6358d2101acec02b0b9643ed721a44d700ff4af89229f52101e0e80560faf176` | [Download](https://github.com/pchemguy/Archive-Line-Index/releases/download/v0.1.0/archive_line_index-0.1.0-py3-none-any.whl) |
+| `archive_line_index-0.1.0.tar.gz` | 109618 | `e7ddd6e501f111d2a6a1991a72c8861588048e89425a3e84b7f5d9df0ab6b716` | [Download](https://github.com/pchemguy/Archive-Line-Index/releases/download/v0.1.0/archive_line_index-0.1.0.tar.gz) |
+| `SHA256SUMS` | 206 | `5c08fdccd844434c78865ba2e2e3a01d5036d4bcab82396b1fc11283d7bb8d62` | [Download](https://github.com/pchemguy/Archive-Line-Index/releases/download/v0.1.0/SHA256SUMS) |
+
+Every hosted asset was downloaded and its actual byte length/SHA256 matched the exact-source local file; the downloaded SHA256SUMS is byte-identical to the local inventory. Native wheel and independently source-rebuilt wheel completed installed workflows and all three README examples outside the checkout, with py7zr 1.1.4 installed and no development tools in either runtime. Their wheel hashes also matched. The source artifact's production/configuration/README/release-note bytes were checked against the pinned Git source before rebuilding. Native Windows/macOS/Python 3.11 execution remains unverified.
+
+Initial highlights coverage includes all 41 reachable commits through the release source, with a verified null previous-release baseline; incremental task/integration/release-document changes add no unreviewed product claims. The owned ignored highlights checkpoint is eligible for removal now that exact hosted-body consumption is verified. Root RELEASE-NOTES.md remains tracked and retained.
+
+All Phase 1 checkoffs, issues #10–24 and milestones #2–5 are complete/closed. This final evidence commit updates reports only and does not change the published tag or package source. Stop before Phase 2; T-016 and later tasks remain unchecked and unprojected.

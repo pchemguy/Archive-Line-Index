@@ -1,21 +1,25 @@
 # Project handoff
 
-Checkpoint: Phase 1 integration `f1365f0457a616917628c8b2a0c8d9bb72b64f14` is verified and published on main. All 15 task issues and four milestones are closed. This containing default-branch commit finalizes the 0.1.0 release message; its publication, exact-source build, tag and hosted assets require readback. Recover subsequent effects before replay.
+Checkpoint: Phase 1 is finalized, integrated on main and released as [v0.1.0](https://github.com/pchemguy/Archive-Line-Index/releases/tag/v0.1.0). This containing report commit records verified external effects; publish/read back it if still pending, then stop.
 
-## Authorization and boundary
+## Current outcome and boundary
 
-The human now requested “Finalize Phase 1”, superseding the earlier stop before T-015. Complete its publication, tracking closure, default-branch integration and 0.1.0 GitHub release with explicit wheel/source/SHA256SUMS assets, then stop. Phase 2 is not selected and must not be activated or executed. Markdown prose/list items remain unwrapped.
+T-001–T-015 and all Phase 1 milestones are complete. The human authorized Phase 1 finalization; Phase 2 has not been selected. Do not activate or execute T-016 or later without a new instruction. All Phase 1 task issues #10–24 and native milestones #2–5 are closed/completed. Accepted design/contracts/PLAN/layout/TASKS retain their ownership; TASKS contains the executable checkoffs. Markdown prose/list items remain unwrapped.
 
-## Verified result
+The 0.1.0 library provides owned plain-file binary streaming, generic borrowed-reader LF/BOM scanning, canonical Q/eight-byte offsets and source-based index building, with validation, inclusive limits and cleanup/failure guarantees. Typed exports, native packaging/inventory checks and executable README purpose/input/output/interface examples are delivered. Product CLI/persistence and archive adapters remain later-phase work. The temporary legacy reference in AGENTS remains until full reimplementation closure.
 
-T-001–T-015 provide plain-file ContentStream access, generic borrowed-reader LF/BOM scanning, canonical offsets, source-based building, typed exports and installed-library examples. See [Phase 1 report](reports/phases/1/PHASE-REPORT.md) and its milestone links. Cross-module code review found no remaining blockers; 253 tests, 99% coverage, Ruff lint/format and strict mypy pass. Isolated native build and six refreshed installed/artifact/example checks pass. Root RELEASE-NOTES.md contains the curated 0.1.0 message and is included in the source distribution. Runtime code is unchanged by T-015.
+## Git and release identities
 
-Actual host: Linux/bash, CPython 3.12.14. Mypy needs `--no-native-parser` for the container process-discovery issue; strict checks remain enabled. Native Windows/macOS/Python 3.11 execution and archive dependency behavior are unverified. CLI/persistence and archive delivery remain later-phase capabilities. Root AGENTS/pyproject and accepted design/contracts/PLAN/layout/TASKS remain governing sources.
+- Phase branch: `phase/1-plain-file-library`, preserved at published T-015 `0fa719b0b08de33cee1124627cf59077230a21a3`.
+- Creation parent: accepted preparation main `9c90eebc8aaca66f8f086cb69f93f0dbb7c571ee`.
+- Published explicit two-parent integration: `f1365f0457a616917628c8b2a0c8d9bb72b64f14`.
+- Published main release commit and `v0.1.0` target: `2d0435cc731d608843ad71cfa9c7688d1d8b5d09`.
+- GitHub release ID 432848257: published, non-prerelease, verified latest. The later evidence commit leaves the tag/source unchanged. Preserve design and manual-provenance branches.
 
-## Git, tracking and next effects
+## Verification and evidence
 
-Creation parent/default main is `9c90eebc8aaca66f8f086cb69f93f0dbb7c571ee`; published source before T-015 was `15c36f54b49801ee7fe5f2889290ee7f8d4e9593`, including the requested README purpose/input/output/interface overview. The actual containing task commit identifies the next phase tip. All 14 earlier task commits passed a parent-diff composition audit; their issues #10–23 and delivery milestones #2–4 are closed. Preserve phase/design/manual provenance branches.
+[Phase report](reports/phases/1/PHASE-REPORT.md) records review, acceptance mapping, task composition, integration and full release asset URLs/sizes/hashes. The source distribution, wheel and SHA256SUMS were built from the exact release commit, uploaded and then downloaded with matching bytes. Release commit body, root RELEASE-NOTES.md and hosted body match exactly. Both native and independently source-rebuilt wheels pass installed workflows and all three README examples in clean runtimes outside checkout; runtime py7zr 1.1.4 was recorded. No dev tools or source-path injection are required for installed use.
 
-All 15 task issues #10–24 and milestones #2–5 are closed/completed. Merge purpose is Phase 1 completion into creation parent/default main. Pinned receiving parent: `9c90eebc8aaca66f8f086cb69f93f0dbb7c571ee`; incoming published tip: `0fa719b0b08de33cee1124627cf59077230a21a3`. No conflicts occurred. The explicit merge `f1365f0457a616917628c8b2a0c8d9bb72b64f14` passed 253 merged-state tests and was published/read back.
+Phase source checks: 253 tests, 99% production coverage, Ruff lint/format and strict mypy pass; merged-state suite also passes. Linux/bash and CPython 3.12.14 were used. Mypy requires its supported `--no-native-parser` fallback for this container's native process-discovery failure. Native Windows/macOS/Python 3.11 runtime checks and archive dependency behavior remain unverified. Root AGENTS/pyproject provide operational instructions/configuration.
 
-This direct default-branch release commit uses RELEASE-NOTES.md as its exact message body. Publish/read back it before tagging, and pin its exact SHA for all release effects. Build/check/install artifacts from that exact commit, publish/read back v0.1.0 and use one protected API publisher because the connector lacks release/asset mutations. Verify complete draft assets before publishing, then body/latest/tag and downloaded-byte hashes. Retain release notes; consume only the owned ignored highlights draft after body verification. Record release identity and hashes in the phase report, publish the final outcome and stop without Phase 2.
+The final notes file remains tracked. Only the workflow-owned ignored highlights draft is removed after exact published-body verification. Pending effects for this containing evidence commit are its main publication/readback; no release retry is needed. Once published, return the completed Phase 1 result and pause before Phase 2.
