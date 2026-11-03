@@ -48,4 +48,17 @@ Follow `sdd-manage`'s preparation and phase-activation workflows for required tr
 
 ## Project guidance
 
-Maintain project-specific navigation and validated setup/check commands here as they become established. Do not invent commands, paths, requirements or completion claims.
+Use Python 3.11 or later. Run checks from the repository root with the selected Python interpreter; `pyproject.toml` owns tool configuration.
+
+| Check | Command |
+| --- | --- |
+| Lint | `python -m ruff check src tests` |
+| Formatting | `python -m ruff format --check src tests` |
+| Types | `python -m mypy` |
+| Tests | `python -m pytest` |
+| Coverage | `python -m pytest --cov=archive_line_index --cov-report=term-missing` |
+| Build | `python -m build` |
+
+Use Ruff to format Python, mypy for type checking, pytest for tests and Flowmark for Markdown formatting. Write Google-style Python docstrings. Do not hard-wrap any Markdown file unless the human explicitly requests it. Keep prose paragraphs and list items on single source lines.
+
+Temporary reference: [legacy project](https://github.com/pchemguy/Archive-Line-Index-Legacy). Remove this reference when reimplementation is complete.
