@@ -2,7 +2,7 @@
 
 ## Current gate
 
-State: **Ready for the amended design/SPEC acceptance checkpoint**, based on the CLI-expanded contract set and its consistency with the corresponding revised design. The human authorized the scope expansion and upstream edits; approval of the exact amended document set remains pending. PLAN authoring must wait for that approval and DOCS-005 completion/publication/issue closure. There are no unresolved confirmed document findings. This is document readiness, not implementation or dependency verification.
+State: **Ready for the amended design/SPEC acceptance checkpoint**, based on the CLI-expanded contract set and its consistency with the corresponding revised design. The human explicitly accepted the exact amended set from `e75a91b338590113eea94074ce0a377ceaffb6a5` on 2026-11-03. Acceptance is recorded in `4a7da7178131da01d974ff84319d402a35e0bcb5`, published with exact readback; DOCS-005 issue #5 is closed with evidence and readback. SPEC/design readiness and acceptance prerequisites for PLAN are satisfied. There are no unresolved confirmed document findings. This is document readiness, not implementation or dependency verification.
 
 Review date: 2026-11-03. Review performed by the authoring agent through design/contract comparison, boundary analysis and document checks. The review was not an independent implementation audit.
 
@@ -20,7 +20,7 @@ The following SHA-256 identities identify the corrected proposed scope exactly. 
 | [spec/persistence.md](spec/persistence.md) | `bb89f91105d4f1593c1ba2462559cf2004cb85a46f28a75d9a2fd8bddfe588bb` |
 | [spec/public-api.md](spec/public-api.md) | `611e302b15dc7206ab2367e6bd0054874977fb03f408f8f28a5623a45f3b1303` |
 
-The current governing set includes the human-authorized CLI scope amendment. The prior accepted design is contained by `f2630445eafd76ead0b9be44e780c0274b25f873`; original review identities from `88cbac38edf1db0970ff239b1b00d402f00b8c5e` are retained in the Revision 1 baseline below. Current revised design states require acceptance together with the amended SPEC.
+The current governing set includes the human-authorized CLI scope amendment. The prior accepted design is contained by `f2630445eafd76ead0b9be44e780c0274b25f873`; original review identities from `88cbac38edf1db0970ff239b1b00d402f00b8c5e` are retained in the Revision 1 baseline below. Current revised design states were accepted together with the amended SPEC; the decision is retained in DOCS_PREPARATION.
 
 | Governing artifact | SHA-256 |
 | --- | --- |
@@ -91,4 +91,4 @@ The proposal writes both SQLite (`.sqlite3`) and raw little-endian (`.u64`) outp
 
 Recheck covered every changed scope/exclusion statement, separate package-root versus CLI-submodule exports, downward dependencies, ownership of the completed array, default/explicit stems, both outputs and input aliases, existing destinations, second-writer failure, late writer cleanup errors and installed entry-point behavior. The library still receives explicit destination paths; CLI naming does not alter persistence semantics. SQLite is written first, followed by raw; a later failure retains and identifies any already published output. Both paths are preflighted before scanning, and only both successful writes yield the success summary. One integrated acceptance condition and six CLI conditions extend the set from 42 to 49 uniquely identified conditions. No unresolved confirmed finding remains in this amended scope.
 
-The current reviewed identities cover SPEC and six children. Governing hashes match the revised design, local links resolve, Markdown prose/list items remain unwrapped and the unchanged core contract/model surfaces are retained. No production CLI implementation, entry-point metadata change or runtime test was performed; implementation and packaging remain future work. The amended upstream set and SPEC must be accepted before dependent PLAN authoring.
+The current reviewed identities cover SPEC and six children. Governing hashes match the revised design, local links resolve, Markdown prose/list items remain unwrapped and the unchanged core contract/model surfaces are retained. No production CLI implementation, entry-point metadata change or runtime test was performed; implementation and packaging remain future work. Acceptance of the exact amended upstream/SPEC set is recorded in DOCS_PREPARATION; no contract bytes changed in recording that decision.
