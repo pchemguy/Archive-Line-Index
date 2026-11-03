@@ -114,7 +114,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 ## Phase 2 — Paired persistence and CLI
 
 - [ ] Phase 2 — Paired persistence and CLI
-    - [ ] Milestone 2.1 — Independent index persistence
+    - [x] Milestone 2.1 — Independent index persistence
         - [x] T-016 — Implement temporary siblings and protected file publication
             - Scope: persistence/fs.py with publication unit/fault-injection checks.
             - Depends on: T-015.
@@ -145,11 +145,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Load/store without payload sources and establish exact original/SQLite/raw equivalence including EOF. Verify all public persistence imports and defaults without a combined transaction.
             - Contracts: SYS-07–10; API-01–04; PER-01–07.
             - Verified result: RED: seven public persistence workflows failed before exports. GREEN: original/SQLite/raw arrays agree for all line/BOM cases; independent reads/writes/protection/replacement work without payload paths. Exact public exports and both clean installed artifact variants cover all four persistence functions; Ruff/strict mypy and all regressions pass.
-        - [ ] T-021 — Review test and report milestone 2.1
+        - [x] T-021 — Review test and report milestone 2.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-016, T-017, T-018, T-019, T-020.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Whole-milestone code review completed; reproduced SQL LIKE-prefix bug repaired with exact internal-prefix matching. GREEN: 333 tests, 95% coverage, Ruff/strict mypy and both installed persistence workflows pass. Race/flush/cleanup/read-failure checks preserve file/array/error ownership. Milestone report/HANDOFF included; no blockers.
             - Report: `docs/dev/reports/phases/2/2.1.md`; include HANDOFF at this boundary.
     - [ ] Milestone 2.2 — Importable paired-output command
         - [ ] T-022 — Implement importable single-target paired indexing

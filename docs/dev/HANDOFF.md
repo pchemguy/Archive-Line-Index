@@ -1,29 +1,21 @@
 # Project handoff
 
-Checkpoint: Phase 1 is finalized, integrated on main and released as [v0.1.0](https://github.com/pchemguy/Archive-Line-Index/releases/tag/v0.1.0). This containing report commit records verified external effects; publish/read back it if still pending, then stop.
+Checkpoint: T-021 verifies Phase 2 milestone 2.1 on `phase/2-persistence-cli`. Publish/read back the containing task commit, close issue #30 and milestone #6 if those effects are still pending, then continue the selected range.
 
-## Current outcome and boundary
+## Scope and branch
 
-T-001–T-015 and all Phase 1 milestones are complete. The human authorized Phase 1 finalization; Phase 2 has not been selected. Do not activate or execute T-016 or later without a new instruction. All Phase 1 task issues #10–24 and native milestones #2–5 are closed/completed. Accepted design/contracts/PLAN/layout/TASKS retain their ownership; TASKS contains the executable checkoffs. Markdown prose/list items remain unwrapped.
+The human requested complete Phase 2: T-016–T-028, verified main integration and a 0.2.0 GitHub release with source/wheel/checksums/download verification. Stop before Phase 3; T-029 and later remain unselected. Branch creation/integration parent is published main `eaa2dcfdfd756d367c15b9ec4eb763dda2e49c97`. Phase 1 is integrated and its v0.1.0 release/source/hosted hashes and closed milestones were reverified before activation. Preserve earlier branches/release tags. Markdown prose/list items remain unwrapped.
 
-The 0.1.0 library provides owned plain-file binary streaming, generic borrowed-reader LF/BOM scanning, canonical Q/eight-byte offsets and source-based index building, with validation, inclusive limits and cleanup/failure guarantees. Typed exports, native packaging/inventory checks and executable README purpose/input/output/interface examples are delivered. Product CLI/persistence and archive adapters remain later-phase work. The temporary legacy reference in AGENTS remains until full reimplementation closure.
+Accepted design/contracts/PLAN/layout remain unchanged; TASKS changes are completion evidence only, preserving the accepted QC/conformance basis. Root AGENTS/pyproject own operational instructions/configuration.
 
-## Git and release identities
+## Delivered and verified
 
-- Phase branch: `phase/1-plain-file-library`, preserved at published T-015 `0fa719b0b08de33cee1124627cf59077230a21a3`.
-- Creation parent: accepted preparation main `9c90eebc8aaca66f8f086cb69f93f0dbb7c571ee`.
-- Published explicit two-parent integration: `f1365f0457a616917628c8b2a0c8d9bb72b64f14`.
-- Published main release commit and `v0.1.0` target: `2d0435cc731d608843ad71cfa9c7688d1d8b5d09`.
-- GitHub release ID 432848257: published, non-prerelease, verified latest. The later evidence commit leaves the tag/source unchanged. Preserve design and manual-provenance branches.
+Independent SQLite/raw persistence is implemented with exact canonical offsets, read-only validation, endian conversion, protected publication/replacement and explicit cleanup outcomes. Public exports and both clean installed-artifact workflows pass without payload paths. Milestone code review repaired a reproduced SQL wildcard prefix bug that hid a legal extra schema object. See [milestone 2.1](reports/phases/2/2.1.md).
 
-## Verification and evidence
+Verification: 333 tests, 95% production coverage, Ruff lint/format and strict mypy pass on Linux/CPython 3.12.14. Use --no-native-parser for this container's mypy native process-discovery issue; strict checks remain enabled. Native Windows/macOS/Python 3.11/big-endian execution is unverified. Root README/command wiring and version 0.2.0 update remain their selected later tasks; archives remain later phases.
 
-[Phase report](reports/phases/1/PHASE-REPORT.md) records review, acceptance mapping, task composition, integration and full release asset URLs/sizes/hashes. The source distribution, wheel and SHA256SUMS were built from the exact release commit, uploaded and then downloaded with matching bytes. Release commit body, root RELEASE-NOTES.md and hosted body match exactly. Both native and independently source-rebuilt wheels pass installed workflows and all three README examples in clean runtimes outside checkout; runtime py7zr 1.1.4 was recorded. No dev tools or source-path injection are required for installed use.
+## Tracking and continuation
 
-Phase source checks: 253 tests, 99% production coverage, Ruff lint/format and strict mypy pass; merged-state suite also passes. Linux/bash and CPython 3.12.14 were used. Mypy requires its supported `--no-native-parser` fallback for this container's native process-discovery failure. Native Windows/macOS/Python 3.11 runtime checks and archive dependency behavior remain unverified. Root AGENTS/pyproject provide operational instructions/configuration.
+Phase label `sdd-phase-2-Paired-persistence-and-CLI`; native milestones #6/#7/#8/#9 map to 2.1/2.2/2.3/2.4. Issues #25–37 map to T-016–T-028. All initial associations were read back before task work. T-016–T-020 are published/read back and issues #25–29 closed/completed. T-021 closes its review/report/checkoff in this commit.
 
-The final notes file remains tracked. Only the workflow-owned ignored highlights draft is removed after exact published-body verification. Pending effects for this containing evidence commit are its main publication/readback; no release retry is needed. Once published, return the completed Phase 1 result and pause before Phase 2.
-
-## Active Phase 2 selection
-
-The human selected complete Phase 2 (T-016–T-028), including integration and the 0.2.0 source/wheel GitHub release, then stop before Phase 3. Branch `phase/2-persistence-cli` starts from published main `eaa2dcfdfd756d367c15b9ec4eb763dda2e49c97`. Phase 1 release identity/digests and all closed milestones were rechecked. Accepted design/contracts/PLAN/layout are unchanged; TASKS differs only in verified completion evidence, so its accepted conformance review remains applicable. Phase 2 label `sdd-phase-2-Paired-persistence-and-CLI`, native milestones #6–9 and task issues #25–37 (T-016–T-028 respectively) have verified initial associations before execution. Later task commits supersede the preceding Phase 1 stop; boundary tasks refresh this checkpoint.
+After its publication/readback, close/read back issue #30 and verify all six milestone #6 members completed before milestone closure/readback. Reuse existing completed effects after interruption. Continue T-022–T-028, including automatic reports/HANDOFF at T-024, T-027 and T-028; then integrate/release Phase 2 and stop before Phase 3.

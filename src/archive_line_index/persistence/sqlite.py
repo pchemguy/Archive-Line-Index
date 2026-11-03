@@ -140,7 +140,7 @@ def write_sqlite_index(
 
 def _check_schema(connection: sqlite3.Connection) -> None:
     objects = connection.execute(
-        "SELECT type,name,sql FROM sqlite_schema WHERE name NOT LIKE 'sqlite_%'"
+        "SELECT type,name,sql FROM sqlite_schema WHERE name NOT GLOB 'sqlite_*'"
     ).fetchall()
     if len(objects) != 1 or objects[0][:2] != ("table", "line_index"):
         raise InvalidIndexError("Expected only the dedicated line_index table")

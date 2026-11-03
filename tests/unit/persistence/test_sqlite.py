@@ -220,3 +220,72 @@ def test_reader_corruption_missing_and_engine_failure_categories(
     ):
         read_sqlite_index(path)
     assert caught.value.__cause__ is error
+
+
+def test_user_object_resembling_internal_prefix_is_not_hidden(tmp_path: Path) -> None:
+    from archive_line_index.persistence.sqlite import read_sqlite_index
+
+    path = tmp_path / "p"
+    write_sqlite_index(array("Q", [0, 9]), path)
+    connection = sqlite3.connect(path)
+    connection.execute("CREATE TABLE sqliteXextra(value TEXT)")
+    connection.close()
+    with pytest.raises(InvalidIndexError):
+        read_sqlite_index(path)
+
+
+def test_transaction_failure_keeps_primary_when_connection_cleanup_fails(
+    tmp_path: Path,
+) -> None:
+    real_connect = sqlite3.connect
+
+    class FaultyConnection(sqlite3.Connection):
+        def executemany(self, sql: str, parameters: object) -> sqlite3.Cursor:
+            raise sqlite3.OperationalError("insert primary")
+
+        def close(self) -> None:
+            super().close()
+            raise sqlite3.OperationalError("close cleanup")
+
+    def connect(database: str) -> sqlite3.Connection:
+        return real_connect(database, factory=FaultyConnection)
+
+    destination = tmp_path / "p"
+    destination.write_bytes(b"previous")
+    with (
+        patch("archive_line_index.persistence.sqlite.sqlite3.connect", connect),
+        pytest.raises(PersistenceError) as caught,
+    ):
+        write_sqlite_index(array("Q", [0, 8]), destination, overwrite=True)
+    assert "insert primary" in str(caught.value.__cause__)
+    assert any("close cleanup" in n for n in caught.value.__notes__)
+    assert destination.read_bytes() == b"previous" and list(tmp_path.iterdir()) == [
+        destination
+    ]
+
+
+def test_sidecar_cleanup_is_owned_and_preserves_primary(tmp_path: Path) -> None:
+    destination = tmp_path / "p"
+    unrelated = tmp_path / "p-wal"
+    unrelated.write_bytes(b"unrelated")
+    primary = sqlite3.OperationalError("build primary")
+    real_unlink = Path.unlink
+
+    def fail_sidecar(path: Path, missing_ok: bool = False) -> None:
+        if str(path).endswith(".tmp-journal"):
+            raise PermissionError("sidecar cleanup")
+        real_unlink(path, missing_ok=missing_ok)
+
+    with (
+        patch(
+            "archive_line_index.persistence.sqlite._check_integrity",
+            side_effect=primary,
+        ),
+        patch.object(Path, "unlink", fail_sidecar),
+        pytest.raises(PersistenceError) as caught,
+    ):
+        write_sqlite_index(array("Q", [0]), destination)
+    assert caught.value.__cause__ is primary
+    assert any("sidecar cleanup" in n for n in caught.value.__notes__)
+    assert unrelated.read_bytes() == b"unrelated" and not destination.exists()
+    assert list(tmp_path.iterdir()) == [unrelated]

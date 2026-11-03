@@ -186,3 +186,24 @@ def test_opposite_endian_reader_conversion(tmp_path: Path) -> None:
         patch("archive_line_index.persistence.raw.array", BigNativeArray),
     ):
         assert read_raw_index(path).tolist() == [0, 3, 512]
+
+
+def test_incomplete_stable_read_rejected_and_handle_closed(tmp_path: Path) -> None:
+    import io
+    from types import SimpleNamespace
+
+    class ShortFile(io.BytesIO):
+        def fileno(self) -> int:
+            return 17
+
+    handle = ShortFile(struct.pack("<Q", 0))
+    with (
+        patch.object(Path, "open", return_value=handle),
+        patch(
+            "archive_line_index.persistence.raw.os.fstat",
+            return_value=SimpleNamespace(st_size=16),
+        ),
+        pytest.raises(InvalidIndexError, match="Incomplete"),
+    ):
+        read_raw_index(tmp_path / "p")
+    assert handle.closed
