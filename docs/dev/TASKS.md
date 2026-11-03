@@ -113,81 +113,94 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 ## Phase 2 — Paired persistence and CLI
 
-- [ ] Phase 2 — Paired persistence and CLI
-    - [ ] Milestone 2.1 — Independent index persistence
-        - [ ] T-016 — Implement temporary siblings and protected file publication
+- [x] Phase 2 — Paired persistence and CLI
+    - [x] Milestone 2.1 — Independent index persistence
+        - [x] T-016 — Implement temporary siblings and protected file publication
             - Scope: persistence/fs.py with publication unit/fault-injection checks.
             - Depends on: T-015.
             - Acceptance/evidence: Verify ownership, exclusive no-clobber creation including dangling/concurrent destinations, explicit replacement and distinct pre/post-publication cleanup outcomes. No weak rename fallback is permitted.
             - Contracts: PER-03–05; persistence commit-point contract.
-        - [ ] T-017 — Implement raw little-endian index storage
+            - Verified result: RED: persistence helpers absent. GREEN: exclusive publication/replacement, dangling/commit-time destinations, unsupported primitive, owned temporary cleanup and primary-error notes pass with all regressions; Ruff/strict mypy pass. Phase 2 tracking and predecessor release verified before work.
+        - [x] T-017 — Implement raw little-endian index storage
             - Scope: persistence/raw.py and focused serialization/corruption checks.
             - Depends on: T-007, T-016.
             - Acceptance/evidence: Round-trip all canonical examples, validate byte shape/range/order and opposite-endian conversion, preserve input arrays and existing destinations, and clean owned temporary files.
             - Contracts: PER-01–07; IDX-06.
-        - [ ] T-018 — Implement transactional self-contained SQLite writing
+            - Verified result: RED: raw provider absent; write/close fault exposed cleanup masking the primary write error. GREEN: exact encoding/roundtrips, corruption, opposite-endian read/write simulation, no input mutation, partial writes and pre/post-publication outcomes pass with all regressions; owned-file cleanup preserves primary errors. Ruff/strict mypy pass.
+        - [x] T-018 — Implement transactional self-contained SQLite writing
             - Scope: persistence/sqlite.py writer and transaction/publication failure checks.
             - Depends on: T-007, T-016.
             - Acceptance/evidence: Write the canonical dedicated schema and complete values, validate integrity/count/bounds, close handles and eliminate data dependence on temporary WAL/journal sidecars before publication.
             - Contracts: PER-01–05; persistence SQLite contract.
-        - [ ] T-019 — Implement read-only SQLite schema and value validation
+            - Verified result: RED: SQLite writer absent. GREEN: canonical schema/ordered values, committed integrity/count/bounds, self-contained DELETE-journal output, pre-I/O validation, whole-file replacement, engine cause preservation and pre/post-publication failure tests pass with all regressions. Owned connection/sidecars close before publication; Ruff/strict mypy pass.
+        - [x] T-019 — Implement read-only SQLite schema and value validation
             - Scope: persistence/sqlite.py reader and malformed-database checks.
             - Depends on: T-018.
             - Acceptance/evidence: Reject altered schemas, corruption and invalid arrays; retain operational/ordinary error distinctions and return a newly owned canonical array without modifying the input.
             - Contracts: PER-01–02, PER-06; API-04.
-        - [ ] T-020 — Expose and integrate independent persistence APIs
+            - Verified result: RED: 21 reader cases failed before implementation. GREEN: canonical read-only roundtrips, altered tables/types/columns/indexes/views/triggers/rowid layouts, corrupt content and invalid arrays pass with all regressions; inputs/sidecars are unchanged. Missing paths retain filesystem errors; other engine failures preserve categorized causes. Ruff/strict mypy pass.
+        - [x] T-020 — Expose and integrate independent persistence APIs
             - Scope: Package-root persistence exports and cross-format public/installed integration checks.
             - Depends on: T-017, T-018, T-019.
             - Acceptance/evidence: Load/store without payload sources and establish exact original/SQLite/raw equivalence including EOF. Verify all public persistence imports and defaults without a combined transaction.
             - Contracts: SYS-07–10; API-01–04; PER-01–07.
-        - [ ] T-021 — Review test and report milestone 2.1
+            - Verified result: RED: seven public persistence workflows failed before exports. GREEN: original/SQLite/raw arrays agree for all line/BOM cases; independent reads/writes/protection/replacement work without payload paths. Exact public exports and both clean installed artifact variants cover all four persistence functions; Ruff/strict mypy and all regressions pass.
+        - [x] T-021 — Review test and report milestone 2.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-016, T-017, T-018, T-019, T-020.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Whole-milestone code review completed; reproduced SQL LIKE-prefix bug repaired with exact internal-prefix matching. GREEN: 333 tests, 95% coverage, Ruff/strict mypy and both installed persistence workflows pass. Race/flush/cleanup/read-failure checks preserve file/array/error ownership. Milestone report/HANDOFF included; no blockers.
             - Report: `docs/dev/reports/phases/2/2.1.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 2.2 — Importable paired-output command
-        - [ ] T-022 — Implement importable single-target paired indexing
+    - [x] Milestone 2.2 — Importable paired-output command
+        - [x] T-022 — Implement importable single-target paired indexing
             - Scope: cli.py main/parser and focused successful invocation/help checks.
             - Depends on: T-021.
             - Acceptance/evidence: Use the existing builder once and pass the same array to SQLite then raw; return integer results, avoid import-time work/SystemExit for normal outcomes, and print success only after both writes.
             - Contracts: CLI-01, CLI-03; public CLI signature; SYS-13.
-        - [ ] T-023 — Implement shared output stems and both-path preflight
+            - Verified result: RED: CLI module absent. GREEN: one builder call and identical array passed to SQLite then raw, zero/BOM-only line counts, success-after-both-writes, help/usage statuses without path I/O/SystemExit, argv validation and sys.argv defaults pass with regressions. Ruff/strict mypy pass; milestone #6 closure verified first.
+        - [x] T-023 — Implement shared output stems and both-path preflight
             - Scope: cli.py path/options handling and focused naming/alias checks.
             - Depends on: T-022.
             - Acceptance/evidence: Cover default input directory/final-suffix stem, explicit output stem, both extensions, spaces/hyphen-prefixed targets, protected outputs, dangling paths and source aliases before scanning.
             - Contracts: CLI-02, CLI-04; explicit overwrite/naming contract.
-        - [ ] T-024 — Complete CLI errors interruption and partial-publication reporting
+            - Verified result: RED: seven preflight cases scanned protected/alias sources. GREEN: final-suffix/default/explicit stems, appended extensions, spaces, hyphen targets with --, both protected paths, dangling links and lexical/hard/symlink source aliases are checked before scanning; distinct overwrite remains explicit. Full regressions, Ruff/strict mypy pass.
+        - [x] T-024 — Complete CLI errors interruption and partial-publication reporting
             - Scope: cli.py error/status flow and real in-process integration checks.
             - Depends on: T-022, T-023.
             - Acceptance/evidence: Verify help/usage/operational/interruption statuses and streams, no success summary on failure, no raw write after SQLite failure, and accurate already-published paths/cleanup notes. Preserve library exception behavior.
             - Contracts: CLI-01–05; API-04; PER-05.
+            - Verified result: RED: operational/interruption/partial-publication cases escaped, and parser resource failures reproduced during review. GREEN: 383 tests, 96% coverage (CLI 100%), Ruff/strict mypy pass. Real imported workflows and raw interruption cleanup preserve/report complete outputs; expected status/streams/notes and unexpected-error propagation verified. Folded review report/HANDOFF included.
             - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
             - Report: `docs/dev/reports/phases/2/2.2.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 2.3 — Installed command workflow
-        - [ ] T-025 — Wire console and guarded module execution
+    - [x] Milestone 2.3 — Installed command workflow
+        - [x] T-025 — Wire console and guarded module execution
             - Scope: __main__.py, pyproject console metadata/version 0.2.0 and import/entry checks.
             - Depends on: T-024.
             - Acceptance/evidence: Console and python -m use cli.main; importing package/CLI/runner performs no argv parsing, path I/O, printing or process exit. Installed entry metadata matches the accepted design.
             - Contracts: CLI-03, CLI-06; API-01, API-05.
-        - [ ] T-026 — Verify installed paired commands and native artifacts
+            - Verified result: RED: version/console metadata and module entry tests failed before wiring. GREEN: 0.2.0 metadata installs shared cli.main console entry; guarded module runner converts its status only when executed. Package/CLI/runner imports do no argv parsing/inspection/path I/O/printing/exiting. Updated native metadata checks and all regressions, Ruff/strict mypy pass; milestone #7 closure verified.
+        - [x] T-026 — Verify installed paired commands and native artifacts
             - Scope: Installed CLI, metadata and persistence integration checks plus package inventory.
             - Depends on: T-025.
             - Acceptance/evidence: Run console/module/imported forms outside checkout, load both outputs and compare values, cover real filesystem failure/interruption, rebuild source/wheel and verify version/checksum inventory.
             - Contracts: SYS-07–13; CLI-01–06; PER-03–07.
-        - [ ] T-027 — Document and demonstrate the paired-output workflow
+            - Verified result: Exact installed native/source-rebuilt 0.2.0 artifacts pass 12 command tests: console/module/imported invocation, default/explicit/space/hyphen names, protected outputs and authorized replacement, help/usage, real missing-parent failure and SIGINT inside raw cleanup with retained SQLite. Both output readers agree. Native metadata/inventory/checksum checks and Ruff pass; prior strict source checks unchanged.
+        - [x] T-027 — Document and demonstrate the paired-output workflow
             - Scope: README, CLI/public docstrings and executable examples.
             - Depends on: T-025, T-026.
             - Acceptance/evidence: Demonstrate one-target default/explicit naming and overwrite behavior with actual outputs, explain independent publication/partial failure and provide installed usage for all invocation forms.
             - Contracts: CLI-01–06; API-05; SYS-13.
+            - Verified result: RED: both installed documentation checks lacked five complete workflows. GREEN: 398 tests, 96% coverage (CLI/runner 100%), Ruff/strict mypy; five README examples run on native and source-rebuilt installed wheels. Whole installed-command/doc milestone review, links/docstrings and naming/overwrite/partial-publication guidance pass. Report/HANDOFF included; no blockers.
             - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
             - Report: `docs/dev/reports/phases/2/2.3.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 2.4 — Phase review
-        - [ ] T-028 — Review test and report phase 2
+    - [x] Milestone 2.4 — Phase review
+        - [x] T-028 — Review test and report phase 2
             - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence.
             - Depends on: T-021, T-024, T-027. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
             - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.2.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
             - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Verified result: Phase-wide code review/exit checks complete; committed-WAL stale-read defect repaired after observed RED regression. Restored environment: 399 tests, 96% coverage, Ruff/strict mypy and helper checks pass. Isolated Hatchling source/wheel build, source rebuild/installed commands/examples and native inventory/checksum checks pass. Task audit, phase report, release notes and HANDOFF included; integration/tag/hosted release pending actual readback.
             - Report: `docs/dev/reports/phases/2/PHASE-REPORT.md`; include HANDOFF with this boundary.
 
 ## Phase 3 — ZIP and TAR workflows
