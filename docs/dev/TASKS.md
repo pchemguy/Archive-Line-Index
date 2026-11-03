@@ -180,11 +180,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Console and python -m use cli.main; importing package/CLI/runner performs no argv parsing, path I/O, printing or process exit. Installed entry metadata matches the accepted design.
             - Contracts: CLI-03, CLI-06; API-01, API-05.
             - Verified result: RED: version/console metadata and module entry tests failed before wiring. GREEN: 0.2.0 metadata installs shared cli.main console entry; guarded module runner converts its status only when executed. Package/CLI/runner imports do no argv parsing/inspection/path I/O/printing/exiting. Updated native metadata checks and all regressions, Ruff/strict mypy pass; milestone #7 closure verified.
-        - [ ] T-026 — Verify installed paired commands and native artifacts
+        - [x] T-026 — Verify installed paired commands and native artifacts
             - Scope: Installed CLI, metadata and persistence integration checks plus package inventory.
             - Depends on: T-025.
             - Acceptance/evidence: Run console/module/imported forms outside checkout, load both outputs and compare values, cover real filesystem failure/interruption, rebuild source/wheel and verify version/checksum inventory.
             - Contracts: SYS-07–13; CLI-01–06; PER-03–07.
+            - Verified result: Exact installed native/source-rebuilt 0.2.0 artifacts pass 12 command tests: console/module/imported invocation, default/explicit/space/hyphen names, protected outputs and authorized replacement, help/usage, real missing-parent failure and SIGINT inside raw cleanup with retained SQLite. Both output readers agree. Native metadata/inventory/checksum checks and Ruff pass; prior strict source checks unchanged.
         - [ ] T-027 — Document and demonstrate the paired-output workflow
             - Scope: README, CLI/public docstrings and executable examples.
             - Depends on: T-025, T-026.
