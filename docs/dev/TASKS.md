@@ -77,11 +77,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Validate all options before source acquisition; verify stream ownership transfer, build cleanup and direct/source index equivalence. Delivered exports import without future adapter modules.
             - Contracts: API-01–04; SYS-02–06, SYS-10.
             - Verified result: RED: facade absent. GREEN: public source/direct equivalence, early validation, exact phase exports, source acquisition errors, scan-failure cleanup and close-failure propagation pass with all regressions; Ruff and strict mypy pass. Milestone #3 closure verified before execution; no later archive adapter imports.
-        - [ ] T-011 — Verify built plain-library distributions outside the checkout
+        - [x] T-011 — Verify built plain-library distributions outside the checkout
             - Scope: Packaging metadata/build selection and installed-package/distribution integration owners.
             - Depends on: T-010.
             - Acceptance/evidence: Build wheel/sdist at 0.1.0, install actual wheel bytes outside repository paths, exercise delivered public APIs and rebuild the wheel from source distribution without undeclared runtime tools.
             - Contracts: API-05; SYS-11–12; layout packaging boundary.
+            - Verified result: RED: source artifact included vendored .agents files. GREEN: explicit sdist selection; 3 native build/install integration tests pass against wheel and independently source-rebuilt wheel outside checkout. Clean runtimes use actual artifacts/declared py7zr dependencies with no dev tools or path injection; metadata/version/exports/plain workflows pass. Ruff and strict mypy pass; prior 215 behavior tests retained.
         - [ ] T-012 — Implement native release artifact inventory validation
             - Scope: scripts/check_release_artifacts.py, its unit tests and relevant build exclusions.
             - Depends on: T-011.

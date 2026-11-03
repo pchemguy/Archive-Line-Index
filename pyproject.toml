@@ -53,6 +53,19 @@ exclude = [
     "/**/__pycache__",
 ]
 
+[tool.hatch.build.targets.sdist]
+only-include = [
+    "src",
+    "tests",
+    "scripts",
+    "pyproject.toml",
+    "README.md",
+    "LICENSE",
+    "AI_DISCLOSURE.md",
+    "SDD-MANAGER.md",
+    "docs/dev",
+]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/archive_line_index"]
 
