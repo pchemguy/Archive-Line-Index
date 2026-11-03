@@ -67,6 +67,11 @@ def scan_line_offsets(
         ValueError: If buffer_size is nonpositive.
         InvalidIndexError: If a coordinate or native array is unrepresentable.
         MemoryError: If index allocation fails; no partial result is returned.
+
+    Caller read exceptions propagate unchanged. Working payload storage contains
+    only a current block and up to three initial probe bytes, never a full line.
+    A trailing LF creates no extra empty line; coordinates include skipped BOM
+    bytes. The last value is EOF, and len(result) - 1 is the line count.
     """
     validate_scan_options(skip_utf8_bom=skip_utf8_bom, buffer_size=buffer_size)
     if not callable(getattr(stream, "read", None)):

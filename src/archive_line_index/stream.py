@@ -14,6 +14,9 @@ class ContentStream:
 
     Instances own their reader. Callers serialize operations and close explicitly
     or use a context manager. This is a supported subset, not a full BinaryIO.
+    A delivery failure releases resources and remains observable until explicit
+    close; it never becomes successful EOF. Failed cleanup permits a close retry.
+    Capability queries remain available in EOF/FAILED states while nonclosed.
     """
 
     _reader: BackendReader | None
@@ -105,7 +108,9 @@ class ContentStream:
         """Read into writable contiguous storage, preserving its unused suffix.
 
         Capacity is measured in bytes, including for nonbyte array elements.
-        Invalid buffers raise TypeError before any reader progress.
+        Invalid buffers raise TypeError before any reader progress. Closed-state
+        ValueError takes priority; otherwise buffer validation precedes a retained
+        delivery failure. A zero-byte buffer makes no progress and proves no EOF.
         """
         self._check_open()
         try:

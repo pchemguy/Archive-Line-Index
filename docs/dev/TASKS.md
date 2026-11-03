@@ -89,11 +89,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Reject mismatched native filenames/version/tag metadata, missing source/wheel or unsafe distribution entries; verify SHA256SUMS against real candidate bytes. Synthetic failure cases must fail before corrected inventory passes.
             - Contracts: PLAN phase release gate; native wheel/sdist naming and inventory owners.
             - Verified result: RED: inventory checker absent; synthetic invalid inventories checked before real candidates. GREEN: 247 full-suite tests pass, including 28 synthetic artifact checks and real native inventory/CLI/SHA256SUMS readback. Native filenames/tag/embedded metadata, safe entries, source-wheel byte parity, required files and exact checksums enforced. Ruff and strict mypy (including helper) pass; pytest import isolation fixes duplicate test basenames.
-        - [ ] T-013 — Complete documented installed plain-index workflows
+        - [x] T-013 — Complete documented installed plain-index workflows
             - Scope: Root README, public module documentation and executable documentation examples.
             - Depends on: T-010, T-011, T-012.
             - Acceptance/evidence: Run complete stream-only/direct-scan/source-based examples against the installed artifact, document phase-scoped capabilities and resource/memory limits, and retain reproducible package/check instructions.
             - Contracts: API-03–05; SYS-02–03, SYS-10–12.
+            - Verified result: RED: README lacked the three complete workflows (both installed-artifact example checks failed). GREEN: 5 installed example/runtime/inventory tests pass using native and source-rebuilt wheels; README relative links verified. Phase-scoped capabilities, resource/memory/error behavior, native build/install/check instructions and public API docstrings updated; Markdown prose unwrapped. Ruff and strict mypy pass.
         - [ ] T-014 — Review test and report milestone 1.3
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-010, T-011, T-012, T-013.
