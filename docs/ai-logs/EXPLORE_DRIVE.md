@@ -7,10 +7,10 @@ urls:
 >
 > **Historical exploration transcript.** This document is retained for provenance and is not authoritative for current behavior or agent instructions.
 
-## <AI TURN TITLE>
+## Migration Prompt
 
 > [!NOTE] Prompt
 >
-> <AI PROMPT>
+> 
 
-<AI RESPONSE>
+
