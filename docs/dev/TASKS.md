@@ -30,11 +30,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Read original bytes through owned handles, report validated EOF, close idempotently and reject recognized undelivered adapters explicitly. Preserve the protocol used by future adapters.
             - Contracts: STR-01–02, STR-04–05; internal BackendReader.
             - Verified result: RED: adapter package absent. GREEN: 36 tests pass; byte fidelity, positive bounded reads, terminal EOF, metadata-failure cleanup, idempotent close and explicit rejection of ZIP/TAR/7z selection; Ruff and strict mypy pass.
-        - [ ] T-004 — Implement bounded stream reads state and cleanup
+        - [x] T-004 — Implement bounded stream reads state and cleanup
             - Scope: stream.py and controlled-reader unit checks.
             - Depends on: T-003.
             - Acceptance/evidence: Cover bounded/zero reads, capability/rejection surfaces, terminal EOF, retained delivery failures, closed-state precedence and cleanup without converting failures to EOF.
             - Contracts: STR-01–02, STR-04–05; public ContentStream and internal construction ownership.
+            - Verified result: RED: common stream absent. GREEN: 51 tests pass covering bounded/zero reads, invalid backend results, terminal validation, retained failure, closed/argument priority, unsupported operations, cleanup notes and retry. Ruff and strict mypy pass; unbounded/readinto/limits remain T-005.
         - [ ] T-005 — Complete readinto unbounded reads and inclusive size limits
             - Scope: stream.py extensions and focused buffer/limit/ownership checks.
             - Depends on: T-004.
