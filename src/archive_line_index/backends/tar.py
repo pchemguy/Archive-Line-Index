@@ -8,10 +8,27 @@ from __future__ import annotations
 
 import tarfile
 from pathlib import Path
-from typing import IO, Protocol
+from typing import IO, Protocol, Self
 
 from ..errors import ArchiveStructureError, ExtractionError, InvalidArchiveError
 from .base import BackendReader, validate_positive_size
+
+
+class _StrictTarInfo(tarfile.TarInfo):
+    """Do not let tarfile's permissive iterator hide damaged later headers."""
+
+    @classmethod
+    def fromtarfile(cls, archive: tarfile.TarFile) -> Self:
+        try:
+            return super().fromtarfile(archive)
+        except tarfile.HeaderError as error:
+            # tarfile exposes this concrete subtype at runtime but omits it from
+            # its public type stubs. Only a complete zero pair is terminal EOF.
+            if isinstance(error, tarfile.EOFHeaderError):  # type: ignore[attr-defined]
+                if archive.fileobj.read(512) != b"\0" * 512:
+                    raise tarfile.ReadError("Incomplete TAR end marker") from error
+                raise
+            raise tarfile.ReadError("Invalid or truncated TAR header") from error
 
 
 class _Closable(Protocol):
@@ -48,22 +65,43 @@ def _first_payload(archive: tarfile.TarFile) -> tarfile.TarInfo:
 
 class _TarReader:
     def __init__(
-        self, member: IO[bytes], resources: list[_Closable], declared_size: int
+        self,
+        member: IO[bytes],
+        resources: list[_Closable],
+        declared_size: int,
+        archive: tarfile.TarFile,
     ) -> None:
         self._member = member
+        self._archive = archive
         self._resources = resources
         self.declared_size = declared_size
         self.completed = False
 
     def read(self, size: int, /) -> bytes:
         validate_positive_size(size)
+        if self.completed:
+            return b""
         try:
             data = self._member.read(size)
             if not data:
-                self.completed = True
+                self._finish()
             return data
         except tarfile.TarError as error:
             raise ExtractionError("TAR payload delivery failed") from error
+
+    def _finish(self) -> None:
+        while (member := self._archive.next()) is not None:
+            self._archive.members.clear()  # type: ignore[attr-defined]
+            if not member.isdir():
+                raise ArchiveStructureError(
+                    "TAR contains an additional or special member"
+                )
+        while padding := self._archive.fileobj.read(64 * 1024):
+            if any(padding):
+                raise ExtractionError(
+                    "TAR contains non-padding bytes after its end marker"
+                )
+        self.completed = True
 
     def close(self) -> None:
         _close_resources(self._resources)
@@ -75,7 +113,7 @@ def open_tar_backend(path: Path) -> BackendReader:
     resources: list[_Closable] = [source]
     try:
         try:
-            archive = tarfile.open(fileobj=source, mode="r|")
+            archive = tarfile.open(fileobj=source, mode="r|", tarinfo=_StrictTarInfo)
             resources.insert(0, archive)
             info = _first_payload(archive)
             member = archive.extractfile(info)
@@ -84,7 +122,7 @@ def open_tar_backend(path: Path) -> BackendReader:
             resources.insert(0, member)
         except tarfile.TarError as error:
             raise InvalidArchiveError("Cannot open TAR payload") from error
-        return _TarReader(member, resources, info.size)
+        return _TarReader(member, resources, info.size, archive)
     except BaseException as error:
         try:
             _close_resources(resources)

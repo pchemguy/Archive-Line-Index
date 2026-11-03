@@ -245,11 +245,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Expose a sole regular payload through sequential iteration with exact bytes, empty/nested-member support, correct handle ownership and early close.
             - Contracts: ARC-01, ARC-03; STR-01, STR-05.
             - Verified result: Sequential plain-TAR payload access uses stream mode and owns source/archive/member handles without filesystem extraction. Real USTAR/PAX/GNU fixtures cover empty/nested payloads, consumed extension headers, special entries before payload, bounded reads, early close and failed-opening cleanup. New-module checks first failed because the adapter was absent; 40 TAR/ZIP tests, strict mypy and full Ruff pass. Trailing validation remains explicitly assigned to T-035 before public TAR selection.
-        - [ ] T-035 — Implement TAR trailing-entry and structure validation
+        - [x] T-035 — Implement TAR trailing-entry and structure validation
             - Scope: backends/tar.py finalization and late-invalid-member tests.
             - Depends on: T-034.
             - Acceptance/evidence: Keep validation after payload delivery, reject additional files/special entries and malformed trailing structure before validated EOF, and return no completed index after late failure.
             - Contracts: ARC-03–05; STR-02, STR-04–05; SYS-04.
+            - Verified result: TAR terminal completion now validates every trailing exposed entry, requires a complete end marker, rejects malformed/truncated later headers and drains only zero padding before EOF. A real late-member regression failed with false success before correction; additional files/special entries, incomplete payload/end markers and nonzero tails cannot return a completed index. Trailing directories and repeated EOF are valid. All 92 TAR/ZIP/common-stream checks, strict mypy and full Ruff pass.
         - [ ] T-036 — Complete required compressed-TAR filters and integrity
             - Scope: backends/tar.py gzip/bzip2/xz paths and compressed failure checks.
             - Depends on: T-035.
