@@ -133,11 +133,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Write the canonical dedicated schema and complete values, validate integrity/count/bounds, close handles and eliminate data dependence on temporary WAL/journal sidecars before publication.
             - Contracts: PER-01–05; persistence SQLite contract.
             - Verified result: RED: SQLite writer absent. GREEN: canonical schema/ordered values, committed integrity/count/bounds, self-contained DELETE-journal output, pre-I/O validation, whole-file replacement, engine cause preservation and pre/post-publication failure tests pass with all regressions. Owned connection/sidecars close before publication; Ruff/strict mypy pass.
-        - [ ] T-019 — Implement read-only SQLite schema and value validation
+        - [x] T-019 — Implement read-only SQLite schema and value validation
             - Scope: persistence/sqlite.py reader and malformed-database checks.
             - Depends on: T-018.
             - Acceptance/evidence: Reject altered schemas, corruption and invalid arrays; retain operational/ordinary error distinctions and return a newly owned canonical array without modifying the input.
             - Contracts: PER-01–02, PER-06; API-04.
+            - Verified result: RED: 21 reader cases failed before implementation. GREEN: canonical read-only roundtrips, altered tables/types/columns/indexes/views/triggers/rowid layouts, corrupt content and invalid arrays pass with all regressions; inputs/sidecars are unchanged. Missing paths retain filesystem errors; other engine failures preserve categorized causes. Ruff/strict mypy pass.
         - [ ] T-020 — Expose and integrate independent persistence APIs
             - Scope: Package-root persistence exports and cross-format public/installed integration checks.
             - Depends on: T-017, T-018, T-019.

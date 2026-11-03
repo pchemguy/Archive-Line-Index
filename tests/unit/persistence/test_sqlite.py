@@ -134,3 +134,89 @@ def test_sqlite_cleanup_failure_after_publication_is_explicit(tmp_path: Path) ->
         connection.close()
     for p in tmp_path.glob(".*.tmp"):
         p.unlink()
+
+
+@pytest.mark.parametrize("values", [[0], [3], [0, 4, 7], [3, 8], list(range(10000))])
+def test_reader_roundtrip_is_read_only(tmp_path: Path, values: list[int]) -> None:
+    from archive_line_index.persistence.sqlite import read_sqlite_index
+
+    path = tmp_path / "name with # space.sqlite3"
+    original = array("Q", values)
+    write_sqlite_index(original, path)
+    before = path.read_bytes()
+    restored = read_sqlite_index(path)
+    assert restored == original and restored is not original
+    assert path.read_bytes() == before and list(tmp_path.iterdir()) == [path]
+
+
+@pytest.mark.parametrize(
+    "schema",
+    [
+        "CREATE TABLE other(offset INTEGER PRIMARY KEY)",
+        "CREATE TABLE line_index(offset INT PRIMARY KEY)",
+        "CREATE TABLE line_index(offset INTEGER)",
+        "CREATE TABLE line_index(offset INTEGER PRIMARY KEY, extra TEXT)",
+        "CREATE TABLE line_index(offset INTEGER PRIMARY KEY) WITHOUT ROWID",
+        "CREATE TABLE line_index(offset INTEGER PRIMARY KEY DESC)",
+        "CREATE TABLE line_index(offset INTEGER PRIMARY KEY CHECK(offset>=0))",
+        "CREATE TABLE line_index(offset INTEGER PRIMARY KEY); CREATE TABLE extra(x)",
+        "CREATE TABLE line_index(offset INTEGER PRIMARY KEY); CREATE INDEX extra ON line_index(offset)",
+        "CREATE TABLE line_index(offset INTEGER PRIMARY KEY); CREATE VIEW extra AS SELECT offset FROM line_index",
+        "CREATE TABLE line_index(offset INTEGER PRIMARY KEY); CREATE TRIGGER extra AFTER INSERT ON line_index BEGIN SELECT 1; END",
+    ],
+)
+def test_reader_rejects_changed_schema_without_modification(
+    tmp_path: Path, schema: str
+) -> None:
+    from archive_line_index.persistence.sqlite import read_sqlite_index
+
+    path = tmp_path / "bad"
+    connection = sqlite3.connect(path)
+    connection.executescript(schema)
+    connection.close()
+    before = path.read_bytes()
+    with pytest.raises(InvalidIndexError):
+        read_sqlite_index(path)
+    assert path.read_bytes() == before and list(tmp_path.iterdir()) == [path]
+
+
+@pytest.mark.parametrize("values", [[], [1], [-1, 0], [3, 7, 9]])
+def test_reader_validates_ordered_model(tmp_path: Path, values: list[int]) -> None:
+    from archive_line_index.persistence.sqlite import read_sqlite_index
+
+    path = tmp_path / "p"
+    connection = sqlite3.connect(path)
+    connection.execute("CREATE TABLE line_index(offset INTEGER PRIMARY KEY)")
+    connection.executemany(
+        "INSERT INTO line_index VALUES (?)", [(v,) for v in reversed(values)]
+    )
+    connection.commit()
+    connection.close()
+    if values == [3, 7, 9]:
+        assert read_sqlite_index(path).tolist() == values
+    else:
+        with pytest.raises(InvalidIndexError):
+            read_sqlite_index(path)
+
+
+def test_reader_corruption_missing_and_engine_failure_categories(
+    tmp_path: Path,
+) -> None:
+    from archive_line_index.persistence.sqlite import read_sqlite_index
+
+    path = tmp_path / "p"
+    with pytest.raises(FileNotFoundError):
+        read_sqlite_index(path)
+    path.write_bytes(b"not a database")
+    with pytest.raises(InvalidIndexError) as caught:
+        read_sqlite_index(path)
+    assert isinstance(caught.value.__cause__, sqlite3.Error)
+    error = sqlite3.OperationalError("engine unavailable")
+    with (
+        patch(
+            "archive_line_index.persistence.sqlite.sqlite3.connect", side_effect=error
+        ),
+        pytest.raises(PersistenceError) as caught,
+    ):
+        read_sqlite_index(path)
+    assert caught.value.__cause__ is error

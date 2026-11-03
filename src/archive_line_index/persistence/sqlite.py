@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import sqlite3
 from array import array
 from collections.abc import Iterator
@@ -10,8 +11,8 @@ from pathlib import Path
 from typing import NoReturn
 
 from ..errors import InvalidIndexError, PersistenceError
-from ..offsets import validate_offsets
-from ..sources import Source
+from ..offsets import append_offset, validate_offsets
+from ..sources import Source, normalize_source
 from .fs import (
     flush_file,
     open_binary_file,
@@ -24,8 +25,12 @@ _SCHEMA = "CREATE TABLE line_index (offset INTEGER PRIMARY KEY)"
 
 
 @contextmanager
-def _connection(database: str) -> Iterator[sqlite3.Connection]:
-    connection = sqlite3.connect(database)
+def _connection(
+    database: str, *, readonly: bool = False
+) -> Iterator[sqlite3.Connection]:
+    connection = (
+        sqlite3.connect(database, uri=True) if readonly else sqlite3.connect(database)
+    )
     primary: BaseException | None = None
     try:
         yield connection
@@ -131,3 +136,57 @@ def write_sqlite_index(
         if published:
             error.add_note(f"Publication already succeeded: {path}")
         raise
+
+
+def _check_schema(connection: sqlite3.Connection) -> None:
+    objects = connection.execute(
+        "SELECT type,name,sql FROM sqlite_schema WHERE name NOT LIKE 'sqlite_%'"
+    ).fetchall()
+    if len(objects) != 1 or objects[0][:2] != ("table", "line_index"):
+        raise InvalidIndexError("Expected only the dedicated line_index table")
+    table = r'(?:line_index|"line_index"|`line_index`|\[line_index\])'
+    column = r'(?:offset|"offset"|`offset`|\[offset\])'
+    declaration = (
+        rf"CREATE\s+TABLE\s+{table}\s*\(\s*{column}\s+INTEGER\s+PRIMARY\s+KEY\s*\)\s*;?"
+    )
+    if not re.fullmatch(declaration, objects[0][2], flags=re.I):
+        raise InvalidIndexError("Noncanonical line_index declaration")
+    if connection.execute("PRAGMA table_xinfo(line_index)").fetchall() != [
+        (0, "offset", "INTEGER", 0, None, 1, 0)
+    ]:
+        raise InvalidIndexError("Noncanonical line_index columns or primary key")
+    if connection.execute("PRAGMA index_list(line_index)").fetchall():
+        raise InvalidIndexError("Unexpected line_index indexes")
+
+
+def read_sqlite_index(source: Source) -> array[int]:
+    """Read a dedicated stable database without mutating it or creating sidecars.
+
+    Returns a new canonical array, including EOF. Schema/content/corruption defects
+    raise InvalidIndexError; other engine failures raise PersistenceError with a
+    cause. Filesystem acquisition errors retain their ordinary Python types.
+    """
+    path = normalize_source(source)
+    offsets = array("Q")
+    if offsets.itemsize != 8:
+        raise InvalidIndexError("Native unsigned Q offsets require eight-byte items")
+    with open_binary_file(path, "rb"):
+        pass
+    uri = path.absolute().as_uri() + "?mode=ro&immutable=1"
+    try:
+        with _connection(uri, readonly=True) as connection:
+            _check_integrity(connection)
+            _check_schema(connection)
+            for (value,) in connection.execute(
+                "SELECT offset FROM line_index ORDER BY offset"
+            ):
+                append_offset(offsets, value)
+            validate_offsets(offsets)
+        return offsets
+    except sqlite3.Error as error:
+        # A source removed/denied between the filesystem probe and SQLite opening
+        # still has an ordinary filesystem error when the OS can establish it.
+        if getattr(error, "sqlite_errorcode", 0) & 0xFF == sqlite3.SQLITE_CANTOPEN:
+            with open_binary_file(path, "rb"):
+                pass
+        _raise_engine_error(error)
