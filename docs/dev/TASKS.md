@@ -115,11 +115,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 - [ ] Phase 2 — Paired persistence and CLI
     - [ ] Milestone 2.1 — Independent index persistence
-        - [ ] T-016 — Implement temporary siblings and protected file publication
+        - [x] T-016 — Implement temporary siblings and protected file publication
             - Scope: persistence/fs.py with publication unit/fault-injection checks.
             - Depends on: T-015.
             - Acceptance/evidence: Verify ownership, exclusive no-clobber creation including dangling/concurrent destinations, explicit replacement and distinct pre/post-publication cleanup outcomes. No weak rename fallback is permitted.
             - Contracts: PER-03–05; persistence commit-point contract.
+            - Verified result: RED: persistence helpers absent. GREEN: exclusive publication/replacement, dangling/commit-time destinations, unsupported primitive, owned temporary cleanup and primary-error notes pass with all regressions; Ruff/strict mypy pass. Phase 2 tracking and predecessor release verified before work.
         - [ ] T-017 — Implement raw little-endian index storage
             - Scope: persistence/raw.py and focused serialization/corruption checks.
             - Depends on: T-007, T-016.
