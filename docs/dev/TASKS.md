@@ -121,11 +121,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Verify ownership, exclusive no-clobber creation including dangling/concurrent destinations, explicit replacement and distinct pre/post-publication cleanup outcomes. No weak rename fallback is permitted.
             - Contracts: PER-03–05; persistence commit-point contract.
             - Verified result: RED: persistence helpers absent. GREEN: exclusive publication/replacement, dangling/commit-time destinations, unsupported primitive, owned temporary cleanup and primary-error notes pass with all regressions; Ruff/strict mypy pass. Phase 2 tracking and predecessor release verified before work.
-        - [ ] T-017 — Implement raw little-endian index storage
+        - [x] T-017 — Implement raw little-endian index storage
             - Scope: persistence/raw.py and focused serialization/corruption checks.
             - Depends on: T-007, T-016.
             - Acceptance/evidence: Round-trip all canonical examples, validate byte shape/range/order and opposite-endian conversion, preserve input arrays and existing destinations, and clean owned temporary files.
             - Contracts: PER-01–07; IDX-06.
+            - Verified result: RED: raw provider absent; write/close fault exposed cleanup masking the primary write error. GREEN: exact encoding/roundtrips, corruption, opposite-endian read/write simulation, no input mutation, partial writes and pre/post-publication outcomes pass with all regressions; owned-file cleanup preserves primary errors. Ruff/strict mypy pass.
         - [ ] T-018 — Implement transactional self-contained SQLite writing
             - Scope: persistence/sqlite.py writer and transaction/publication failure checks.
             - Depends on: T-007, T-016.
