@@ -18,11 +18,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Observe focused failing package/error checks before implementation; make pytest, configured Ruff/mypy and minimal package imports runnable in a scoped environment. Document actual tool/runtime limits; export no unimplemented APIs.
             - Contracts: API-01–02, API-04–05; layout root/source/test owners.
             - Verified result: RED: package/error import failed before implementation. GREEN: 1 pytest test; Ruff lint/format; strict mypy with --no-native-parser (container PID discovery workaround); wheel and sdist build --no-isolation. Static version 0.1.0 and py.typed delivered; Phase 1 tracking read back before work.
-        - [ ] T-002 — Implement path normalization and bounded format candidates
+        - [x] T-002 — Implement path normalization and bounded format candidates
             - Scope: sources.py and formats.py with their focused unit checks.
             - Depends on: T-001.
             - Acceptance/evidence: Validate Source kinds, inspect at most 512 bytes and preserve candidate evidence/precedence without plain fallback for recognized claims. Full archive validity/rejection remains with selection/adapters in their delivery phases.
             - Contracts: API-02, ARC-01–02; internal source-selection interfaces.
+            - Verified result: RED: source/detector modules absent. GREEN: 26 tests pass, including text-only paths, 512-byte inspection, all suffixes/magic families, signature precedence and TAR checksum/zero-prefix discrimination; Ruff lint/format and strict mypy pass.
         - [ ] T-003 — Implement the backend reader contract and plain selection
             - Scope: backends/base.py, plain.py and registry.py with adapter/selection checks.
             - Depends on: T-001, T-002.
