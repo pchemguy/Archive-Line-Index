@@ -29,7 +29,7 @@ Historical logs were excluded.
 | Task | Current evidence / decision basis |
 | --- | --- |
 | DOCS-001 | All four root guidance/disclosure/discovery files retained byte for byte in initialization; task/control/HANDOFF records created from SDD Manager 0.16.1 guidance. Pre-write projection and preservation checks verified before initialization; milestone `sdd-docs-main` #1 and DOCS-001–009 issues #1–9 have exact predefined content and verified associations. |
-| DOCS-002 | PROJECT proposal SHA-256 `1420dd94b7e467627b3df7e47d22d55626962db3538d35c946efce52937eb176`; reviewed against the pinned legacy inputs and target tooling. Preserves the principal functional scope as a proposal; exact APIs and internal structure remain open. Human acceptance pending; task unchecked and issue open. |
+| DOCS-002 | PROJECT proposal SHA-256 `b2c2e55722e5bd68aef98b0dd82ef1116d71826730edc2ad98a1f4a9fe482b85`; reviewed against the pinned legacy inputs and target tooling. Preserves the principal functional scope as a proposal; exact APIs and internal structure remain open. Human acceptance pending; task unchecked and issue open. |
 | DOCS-003–009 | Pending their prerequisites and interactive checkpoints. |
 
 ## Initialization
@@ -71,3 +71,5 @@ verification ran. No dependencies were installed.
 ## Guidance correction and closure obligation
 
 The human requested concise operational project guidance, preserving AGENTS.md's single-line prose style and removing configuration restatement, repeated instruction-discovery guidance and transient verification commentary. The legacy reference is temporary and must be removed at reimplementation closure. Product documents must contain no migration narrative or history. PROJECT acceptance remains pending.
+
+The human requested removal of hard wrapping from PROJECT. Only whitespace changed; wording, headings and list membership were preserved. Root guidance now applies the no-hard-wrap rule to Markdown prose and list items. PROJECT acceptance remains pending.
