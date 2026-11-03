@@ -2,7 +2,7 @@
 
 ## Purpose and users
 
-Archive Line Index is a synchronous Python library for developers who need to consume a large byte-oriented payload from a plain file or archive and locate its LF-delimited line ranges. Typical inputs include logs, text datasets and JSONL files; the library treats their content as bytes rather than parsing records.
+Archive Line Index is a synchronous Python library with a minimal importable command-line interface for developers who need to consume a large byte-oriented payload from a plain file or archive and locate its LF-delimited line ranges. Typical inputs include logs, text datasets and JSONL files; the library treats their content as bytes rather than parsing records.
 
 It provides two independently useful capabilities: sequential payload streaming and byte-line indexing. Callers can use the stream without building an index, or scan a caller-owned binary stream without using archive handling.
 
@@ -38,6 +38,10 @@ Callers explicitly name index files and associate them with sources. The library
 
 Existing destinations are protected by default. Explicit replacement publishes a completed output and preserves the prior destination on pre-publication failure. Filesystem guarantees and concurrent-writer behavior require precise downstream contracts; there is no transaction spanning both output formats.
 
+### Single-target command line
+
+A user can index one filesystem target with a single positional command-line argument. The CLI builds the index through the library and writes both SQLite and raw-binary indexes in the input directory using the input filename without its final extension as the default artifact stem, with an optional explicit output stem and explicit overwrite permission. Its callable entry point is importable for in-process use; importing it performs no indexing or argument parsing.
+
 ## Constraints and quality priorities
 
 - Python 3.11 or later, with Windows, Linux and macOS as intended platforms.
@@ -54,8 +58,8 @@ Existing destinations are protected by default. Explicit replacement publishes a
 - Random seeking in compressed payloads or decompression checkpoints.
 - Memory-mapped or lazy index access; persisted indexes load into memory.
 - Source identity, fingerprints, metadata or stale-index detection.
-- Automatic output naming, cross-file transactions or interprocess writer locks.
-- A command-line interface, GUI, service or public asynchronous API.
+- Automatic output naming within library persistence APIs, cross-file transactions or interprocess writer locks.
+- Batch/recursive CLI processing, stdin payloads, GUI, service or public asynchronous API.
 
 ## Design decisions still to establish
 

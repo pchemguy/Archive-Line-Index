@@ -10,6 +10,7 @@ SPEC will define exact behavior, errors and acceptance against these interfaces.
 
 | Component | Provides and owns | Requires and excludes |
 | --- | --- | --- |
+| CLI adapter and execution wrappers | Importable `archive_line_index.cli.main`, one-target argument parsing, destination choice, preflight, status messages and exit-code translation; console/module wrappers invoke the same callable | Uses the index-building facade and both persistence writers through their owning modules. Owns its completed array until persistence finishes; contains no scanning, decompression or storage implementation. Core modules do not import it. |
 | Public facade | Supported exports and the composition of source opening with scanning; validation before opening resources; ownership transfer to the returned stream | Uses source normalization, detection, backend selection, stream construction and scanning. It contains no decompression, LF scanning or persistence encoding. |
 | Source normalization | Filesystem-path validation and conversion to a `Path` | Uses normal filesystem path semantics; accepts no open stream or URL as an archive source. |
 | Format detection | Bounded content inspection and recognized-suffix claims, returned as one format candidate | Borrows a normalized path, owns only its short-lived inspection handle and performs no full extraction or line analysis. |
@@ -54,6 +55,10 @@ The facade validates scan options before source I/O, opens a content stream and 
 ### Stream 7z content
 
 The adapter validates the selected member and starts one outer extraction thread. Its writer forwards callback bytes in bounded blocks, waiting for capacity with cancellation checks. The reader drains those blocks and observes producer completion or failure. On close, cancellation unblocks bridge-controlled waits, the worker unwinds and releases its archive resources, and the closing operation joins it. No detached worker or filesystem extraction is used. Dependency-internal work remains subject to the cooperative-cancellation limitation in ARCHITECTURE.
+
+### Index a CLI target
+
+Console execution and `python -m archive_line_index` invoke the same `main(argv)` adapter available to Python callers. The adapter parses without indexing on import, resolves one target and its output choice, checks destination protection and source/destination aliasing, calls `build_line_index` once and passes the same completed array to the SQLite writer and then the raw writer. It emits a success summary only after both writes succeed and returns an integer status. If a later write fails, already published output is retained and identified in the failure diagnostic. It does not catch library errors inside core operations or terminate a process from the imported callable.
 
 ### Persist an index
 

@@ -4,7 +4,7 @@
 
 SQLite and raw persistence independently store the completed offset model in [DECOMPOSITION](../DECOMPOSITION.md). Public functions are declared in [public API design](../decomposition/public-api.md); [internal API design](../decomposition/internal-api.md) defines the publication/temporary-path boundary. This document owns both storage formats and their publication outcomes.
 
-Writers validate the full array and non-I/O arguments before creating a temporary file or changing a destination. Readers validate the complete stored representation before returning a new array. Both preserve the EOF sentinel and the exact ordered values. Paths are explicit; there is no automatic naming, source metadata, archive association, append operation or two-output transaction.
+Writers validate the full array and non-I/O arguments before creating a temporary file or changing a destination. Readers validate the complete stored representation before returning a new array. Both preserve the EOF sentinel and the exact ordered values. Library persistence paths are explicit; persistence functions perform no automatic naming. The CLI supplies its derived output paths to these same writers. There is no source metadata, archive association, append operation or two-output transaction.
 
 ## Publication and cleanup
 

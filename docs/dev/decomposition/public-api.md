@@ -2,7 +2,7 @@
 
 ## Ownership and consumers
 
-This document owns the public surface defined by [DECOMPOSITION](../DECOMPOSITION.md). External Python callers import it from `archive_line_index`. Backend classes, internal messages, format detection and filesystem helpers are not public exports. The declarations below are design signatures, not implementation code; postponed annotations support Python 3.11.
+This document owns the public surface defined by [DECOMPOSITION](../DECOMPOSITION.md). External Python callers import library operations from `archive_line_index` and the CLI callable from `archive_line_index.cli`. Backend classes, internal messages, format detection and filesystem helpers are not public exports. The declarations below are design signatures, not implementation code; postponed annotations support Python 3.11.
 
 ## Input types and defaults
 
@@ -103,6 +103,19 @@ def read_raw_index(source: Source) -> array[int]: ...
 
 Each persistence operation is independent. Writers borrow a canonical array for the call; readers return a newly owned canonical array. All persistence handles and temporary files are package-owned. Destinations are explicit arguments, and `overwrite` selects protected creation versus authorized replacement. SPEC defines the dedicated SQLite schema, exact raw encoding and publication/cleanup error behavior.
 
+## CLI entry points
+
+```python
+from collections.abc import Sequence
+
+
+def main(argv: Sequence[str] | None = None) -> int: ...
+```
+
+`archive_line_index.cli.main` is a public submodule entry point. `None` selects command arguments from `sys.argv[1:]`; an explicit sequence supports in-process callers. The adapter returns a status for normal success, help, command errors and expected operational failures instead of raising `SystemExit`. It performs no parsing, I/O or process exit at import time. SPEC owns invocation syntax, destination selection, messages and status codes.
+
+The installed console entry is `archive-line-index = "archive_line_index.cli:main"`. Module execution through `python -m archive_line_index` invokes that same callable and converts its return value into process exit status. Importing `archive_line_index.__main__` also has no execution side effect; the executable wrapper is guarded. No root-level `main` re-export or general CLI framework is part of the surface.
+
 ## Public errors and exports
 
 ```python
@@ -119,4 +132,4 @@ class PersistenceError(ArchiveLineIndexError): ...
 
 The error component owns these classes. Their categories respectively cover unsupported formats, malformed recognized archives, invalid member structure, size-limit violations, extraction/delivery failures, invalid offset representations and persistence-engine failures. Specific ordinary Python exceptions remain available where appropriate; SPEC owns the complete classification and precedence.
 
-The public export set is exactly `Source`, `ReadableBinary`, `DEFAULT_BUFFER_SIZE`, `ContentStream`, `open_content_stream`, `scan_line_offsets`, `build_line_index`, the four persistence functions and the listed exception classes. Consumers are not given public backend registration, worker controls, format enums, temporary-file helpers or a combined multi-output writer.
+The package-root export set is exactly `Source`, `ReadableBinary`, `DEFAULT_BUFFER_SIZE`, `ContentStream`, `open_content_stream`, `scan_line_offsets`, `build_line_index`, the four persistence functions and the listed exception classes. Consumers are not given public backend registration, worker controls, format enums, temporary-file helpers or a combined multi-output writer.

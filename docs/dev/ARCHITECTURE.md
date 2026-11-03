@@ -10,9 +10,12 @@ Arrows below mean that the originating block depends on the destination block. A
 
 ```mermaid
 flowchart TD
-    API["Public API composition"] --> Stream["Content stream"]
+    Entry["CLI entry points"] --> CLI["Single-target CLI adapter"]
+    CLI --> API["Public API composition"]
+    CLI --> Store["Index persistence"]
+    API --> Stream["Content stream"]
     API --> Scanner["Line scanner"]
-    API --> Store["Index persistence"]
+    API --> Store
     API --> Selection["Source and format selection"]
     Selection --> Backends["Archive and plain-file adapters"]
     Stream --> Reader["Backend reader contract"]
@@ -25,6 +28,7 @@ flowchart TD
 
 | Block | Responsibility and boundary |
 | --- | --- |
+| Single-target CLI adapter | Parse one target and minimal output options, select the destination, invoke index construction and both persistence writers, and present status/errors. Console and module execution share an importable callable; importing the adapter has no side effects. Core components do not depend on CLI parsing or process state. |
 | Public API composition | Expose the supported entry points and coordinate source-based index construction. It connects content opening to scanning without becoming a dependency of internal blocks. Standalone stream, scanner and persistence operations remain usable independently. |
 | Source and format selection | Normalize filesystem paths, identify a format candidate from bounded inspection and suffix claims, and select a supported adapter. Complete archive validity remains the adapter's responsibility. |
 | Content stream | Present the common read-only sequential interface; buffer bounded reads, count decompressed bytes, enforce the configured size limit and own adapter cleanup. It has no line or persistence semantics. |
@@ -34,6 +38,8 @@ flowchart TD
 | Index persistence | Validate complete arrays and independently encode/decode SQLite or raw little-endian files. A shared filesystem publication mechanism owns temporary sibling files, destination protection and replacement. Persistence does not open payload sources. |
 
 A small shared error vocabulary supports consistent failures across these blocks. It depends on no higher-level operation. Public package initialization re-exports the supported surface; internal modules never import through that initialization layer. Backend-specific dependency objects do not escape through public interfaces.
+
+The CLI depends downward on the index-building facade and SQLite/raw writers. Its two outputs are independent publications of one completed array; it does not add a cross-file transaction. It owns argument parsing, default destination naming and presentation; library operations retain explicit paths and Python exception semantics. Only executable entry-point wrappers terminate a process from the callable result.
 
 ## Content access and backend adaptation
 

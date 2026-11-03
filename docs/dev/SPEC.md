@@ -4,7 +4,7 @@
 
 Archive Line Index is a synchronous Python library for sequential payload access, LF byte-line indexing and independent index persistence. [PROJECT](PROJECT.md) owns intent and exclusions; [ARCHITECTURE](ARCHITECTURE.md) and [DECOMPOSITION](DECOMPOSITION.md) own structure. The system accepts filesystem paths to plain files or supported single-member archives and exposes original payload bytes without extracting member paths.
 
-The complete scope includes Python 3.11 or later on Windows, Linux and macOS; unencrypted ZIP, TAR, gzip/bzip2/xz-compressed TAR and 7z; caller-provided readable binary scanner inputs; canonical offset arrays; dedicated SQLite and raw little-endian persistence; and an installable distribution. Unsupported scope includes text/record parsing, random compressed seeking, encrypted content, remote sources, multiple selected payloads, source/index identity, stale-index detection, mmap/lazy indexes, automatic output naming, public asynchronous interfaces, CLI/GUI and cross-file transactions.
+The complete scope includes Python 3.11 or later on Windows, Linux and macOS; unencrypted ZIP, TAR, gzip/bzip2/xz-compressed TAR and 7z; caller-provided readable binary scanner inputs; canonical offset arrays; dedicated SQLite and raw little-endian persistence; an installable distribution; and an importable minimal single-target CLI. Unsupported scope includes text/record parsing, random compressed seeking, encrypted content, remote sources, multiple selected payloads, source/index identity, stale-index detection, mmap/lazy indexes, automatic naming inside library persistence APIs, public asynchronous interfaces, batch/recursive CLI processing, stdin payloads, GUI and cross-file transactions.
 
 ## Terminology and system guarantees
 
@@ -22,6 +22,7 @@ Each child is normative for its assigned behavior. API/type declarations remain 
 
 | Contract | Behavioral owner | Participating design components |
 | --- | --- | --- |
+| [Single-target CLI](spec/cli.md) | Invocation, importable execution, destination selection, output and exit statuses | CLI adapter, entry-point wrappers, index-building facade, SQLite/raw writers |
 | [Public operations and errors](spec/public-api.md) | Input validation, composed operations, exports, errors and distribution behavior | Public facade, source normalization, shared errors |
 | [Content stream](spec/content-stream.md) | Read operations, limits, state, completion and cleanup | Common stream, backend reader, producer bridge |
 | [Archive handling](spec/archive-handling.md) | Detection, supported formats, member validation and backend obligations | Detector, selection, concrete adapters |
@@ -54,5 +55,6 @@ Native target execution is verified where facilities are available. Unavailable 
 | SYS-10 | Public arguments fail before avoidable acquisition/mutation; public names, supported types and failure categories match the accepted API design and contract children. |
 | SYS-11 | A wheel and source distribution build with valid consistent metadata. The installed wheel exposes exactly the supported API and completes stream/index/persistence workflows outside the repository without source-path injection or undeclared runtime dependencies. |
 | SYS-12 | All contract acceptance groups below have inspectable evidence, with actual host/platform limitations and dependency versions identified. Passing a focused check does not certify unexercised formats, lifecycles or native platforms. |
+| SYS-13 | Installed console execution, module execution and imported CLI invocation index the same single target once into corresponding SQLite and raw destinations, with equivalent statuses, protected overwrite behavior, accurate partial-publication diagnostics and no import-time execution. |
 
 The companion [SPEC review](SPEC-REVIEW-REPORT.md) records design conformance and document readiness. It is not implementation acceptance evidence.

@@ -4,6 +4,10 @@
 
 This document owns cross-component internal interfaces under [DECOMPOSITION](../DECOMPOSITION.md). [Public API design](public-api.md) owns `Source`, `ReadableBinary`, `ContentStream`, public defaults and public exceptions; those definitions are referenced rather than redeclared here. Signatures identify logical providers and consumers, not physical import paths. Private helpers may vary without changing these collaboration boundaries.
 
+## CLI collaboration
+
+The CLI adapter calls the existing `build_line_index` facade and `write_sqlite_index`/`write_raw_index` providers directly from their owning modules. It owns argument parsing and result presentation and receives no private scanner/backend handle. Entry-point wrappers call the public CLI `main` signature; there is no additional cross-component execution API. Destination naming is confined to the adapter. CLI preflight uses path metadata to reject source/output aliases and protected existing destinations, while the persistence provider remains responsible for publication-time protection.
+
 ## Source selection
 
 ```python

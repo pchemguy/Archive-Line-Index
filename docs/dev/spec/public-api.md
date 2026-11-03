@@ -51,11 +51,11 @@ If cleanup fails while another exception is propagating, the original remains pr
 
 The distribution is named `archive-line-index`, requires Python 3.11 or later and packages `archive_line_index`. It uses Hatchling and declares the required `py7zr` runtime dependency; ZIP, TAR and SQLite use the standard library. No separate archive executable or development dependency is required for installed-library use. The source distribution contains the files needed to build the wheel.
 
-Version metadata must be present and consistent across distribution metadata and the built artifacts. Public imports work outside the checkout. Package initialization exports exactly the names in the public API design and does not import optional development tools. The implementation chooses and records a dependency constraint supported by its actual integration evidence; dependency updates require rerunning affected format/lifecycle checks. This contract does not authorize PyPI or other external package publication.
+Version metadata must be present and consistent across distribution metadata and the built artifacts. Public imports work outside the checkout. Package initialization exports exactly the package-root names in the public API design and does not import optional development tools. The implementation chooses and records a dependency constraint supported by its actual integration evidence; dependency updates require rerunning affected format/lifecycle checks. The distribution also installs the console entry point and module runner defined by the public API design; both share the importable CLI callable and obey the [CLI contract](cli.md). This contract does not authorize PyPI or other external package publication.
 
 ## Acceptance
 
-- API-01: Every documented public name imports from the installed package, and internal readers, enums, worker controls and publication helpers are absent from the explicit export set.
+- API-01: Every documented package-root public name and the separate CLI callable import from the installed package, and internal readers, enums, worker controls and publication helpers are absent from the explicit export set.
 - API-02: Invalid non-I/O arguments are rejected without opening a source, creating an output or starting a worker; normal source/path errors retain their ordinary classes.
 - API-03: Composed building and direct scanning yield identical results for equivalent bytes while preserving their distinct ownership behavior, including exception paths.
 - API-04: Each failure category is exercised at its owning boundary with original causes preserved for translated dependency failures; cleanup does not replace a primary exception.
