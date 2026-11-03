@@ -233,3 +233,20 @@ def test_corrupt_compressed_member_cannot_complete(
         assert not reader.completed
     finally:
         reader.close()
+
+
+def test_delivery_position_io_failure_is_not_a_codec_error(tmp_path: Path) -> None:
+    from archive_line_index.backends.zip import open_zip_backend
+
+    p = make_zip(tmp_path / "a.zip", [("data", b"x" * 10000, stat.S_IFREG)])
+    handle = p.open("rb")
+    with patch.object(Path, "open", return_value=handle):
+        reader = open_zip_backend(p)
+    failure = OSError("source position")
+    try:
+        with patch.object(handle, "tell", side_effect=failure):
+            with pytest.raises(OSError) as error:
+                reader.read(1)
+        assert error.value is failure
+    finally:
+        reader.close()

@@ -206,7 +206,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 ## Phase 3 — ZIP and TAR workflows
 
 - [ ] Phase 3 — ZIP and TAR workflows
-    - [ ] Milestone 3.1 — ZIP source integration
+    - [x] Milestone 3.1 — ZIP source integration
         - [x] T-029 — Implement ZIP metadata and member validation
             - Scope: backends/zip.py opening/selection and archive-factory/unit checks.
             - Depends on: T-028.
@@ -231,11 +231,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Exercise actual ZIP through console/module/imported workflows, load identical SQLite/raw results and retain the previously working plain/persistence surface under installed artifacts.
             - Contracts: CLI-01–06 for ZIP; SYS-01, SYS-07–13.
             - Verified result: ZIP console/module/imported paired indexing and corruption rejection pass on both native and independently source-rebuilt installed wheels outside the checkout. Six complete README examples execute, including nested compressed ZIP indexing; the exact scanner excerpt remains unchanged. README now distinguishes delivered ZIP from planned TAR/7z. All 22 selected installed/documentation/plain CLI checks, strict mypy and Ruff pass; no new runtime behavior or test-first claim is introduced by this documentation/integration task.
-        - [ ] T-033 — Review test and report milestone 3.1
+        - [x] T-033 — Review test and report milestone 3.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-029, T-030, T-031, T-032.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Whole ZIP milestone code review found and repaired source tell() misclassification with an observed failing regression. Full verification passes 444 tests, 96% production coverage, Ruff lint/format and strict mypy; actual native/source-rebuilt installs run all commands and six README examples. Report records acceptance, T-029 forward recovery and T-031 readback reconciliation; HANDOFF preserves complete Phase 3 authority and the stop before Phase 4.
             - Report: `docs/dev/reports/phases/3/3.1.md`; include HANDOFF at this boundary.
     - [ ] Milestone 3.2 — Sequential TAR integration
         - [ ] T-034 — Implement sequential plain-TAR payload delivery

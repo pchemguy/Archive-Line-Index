@@ -78,7 +78,11 @@ class _Source:
             raise
 
     def tell(self) -> int:
-        return self.handle.tell()
+        try:
+            return self.handle.tell()
+        except OSError as error:
+            self.failure = error
+            raise
 
     def seekable(self) -> bool:
         return self.handle.seekable()
