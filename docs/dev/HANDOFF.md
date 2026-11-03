@@ -1,19 +1,23 @@
 # Project handoff
 
-Checkpoint: Phase 2 integration `d4acf064974c7867c713dc01dba94c0180fb4a61` is verified and published on main. All 13 task issues and four milestones are closed. This containing direct main commit finalizes release 0.2.0; its publication, exact-source packages, tag and hosted release require actual readback.
+Checkpoint: Phase 2 is complete, integrated on main and published as [v0.2.0](https://github.com/pchemguy/Archive-Line-Index/releases/tag/v0.2.0). This containing commit records the final verified outcome; confirm its own publication separately from the already verified release. Stop before Phase 3/T-029.
 
-## Authorization and result
+## Scope and authority
 
-The human selected complete Phase 2 (T-016–T-028), main integration and the 0.2.0 release with source/wheel/checksums/download verification. Stop before Phase 3; T-029 and later remain unselected. Markdown prose/list items remain unwrapped. Accepted design/contracts/PLAN/layout and TASKS retain their ownership; root AGENTS/pyproject own operational configuration.
+The human selected complete Phase 2 (T-016–T-028), main integration and a stable 0.2.0 release with source, wheel, checksums and downloaded-byte verification. All selected work is complete; no new approval is pending within that range. Phase 3 is unselected. Preserve the accepted [TASKS](TASKS.md), design/contracts/PLAN/layout and GitHub tracking policy. Markdown prose and list items must remain unwrapped.
 
-Phase 2 delivers independent canonical SQLite/raw storage, importable single-target CLI, console/module wiring, default/explicit stems, both-path/source-alias protection and partial-publication/interruption diagnostics. All five README examples and the three invocation forms pass on native/source-rebuilt clean installed artifacts. The phase review corrected a reproduced committed-WAL visibility defect by using ordinary read-only SQLite mode. See [Phase 2 report](reports/phases/2/PHASE-REPORT.md) and its milestone links.
+## Delivered and verified
 
-The sandbox interruption preserved the three uncommitted T-028 files; its recovery patch was also saved in issue #37. Access returned and the source/remote/checks were reconciled without rollback or partial completion commits. Fresh verification: 399 tests, 96% coverage, Ruff lint/format, strict mypy (including helper) pass. Linux/CPython 3.12.14 is the actual host; --no-native-parser avoids the container's mypy discovery issue without weakening strict checking. Native Windows/macOS/Python 3.11/big-endian execution and archive adapters remain unverified/later scope.
+Independent canonical SQLite/raw persistence and the single-target CLI are available through console, module and importable callable. Default/explicit stems, both-output protection, source aliases and partial-publication/interruption diagnostics are covered. [Phase 2 report](reports/phases/2/PHASE-REPORT.md) owns acceptance, review, recovery, integration and release evidence.
 
-## Git and tracking
+Verification passes 399 tests with 96% production coverage, Ruff lint/format, strict mypy and artifact checks. Exact release source and wheel, plus an independent wheel rebuilt from the source archive, pass clean installed library/CLI workflows and five README examples outside the checkout. Actual runtime: Linux/CPython 3.12.14; mypy uses --no-native-parser for the container discovery issue. Native Windows/macOS/Python 3.11/big-endian execution remains unverified. Archive adapters remain later scope.
 
-Creation/integration parent main: `eaa2dcfdfd756d367c15b9ec4eb763dda2e49c97`. Published source before T-028: `08f251e75cfd44bc3bd82aad4679b234e4c41e57`. Preserve previous phase/design/manual branches and v0.1.0 at `2d0435cc731d608843ad71cfa9c7688d1d8b5d09`. Native Phase 2 milestones #6–9 and issues #25–37 are associated with the phase label. T-016–T-027 are individually published/read back with their issues closed; milestones #6–8 are verified closed. All 12 initial closing commits pass the parent-diff composition audit.
+## Git and hosted state
 
-## Next effects
+Phase branch `phase/2-persistence-cli` was created from main `eaa2dcfdfd756d367c15b9ec4eb763dda2e49c97`; its final tip is `15cf302066fa0932e072cb00cdfe406fbdd6a909`. Explicit two-parent merge `d4acf064974c7867c713dc01dba94c0180fb4a61` is verified and published on main. All 13 task closing commits pass the parent-diff composition audit. Issues #25–37 and native milestones #6–9 are closed; no hosted transitions remain pending.
 
-All Phase 2 issues #25–37 and milestones #6–9 are closed. Integration pins receiving main `eaa2dcfdfd756d367c15b9ec4eb763dda2e49c97` and incoming `15cf302066fa0932e072cb00cdfe406fbdd6a909`. No conflicts occurred. The explicit merge `d4acf064974c7867c713dc01dba94c0180fb4a61` passed 399 merged-state tests and is published/read back. This direct default-branch release commit uses root RELEASE-NOTES.md as its exact body. Publish/read back it, pin its SHA and build/check/install from that exact source before publishing v0.2.0 there. Use one protected API publisher for source/wheel/SHA256SUMS, complete draft verification before publication, then verify body/latest/tag and downloaded bytes. Preserve root notes and only remove the owned ignored highlights draft after consumption. Record the final result/report, push/read back main and stop before Phase 3.
+Release commit/tag v0.2.0 is `0227494d2e2874f8b09e71cfc49f2c42fc7a3ef8`, directly on main with the integration merge as its parent. Its body, root RELEASE-NOTES.md and actual published release body match exactly. Release ID 432949524 is stable/latest; source, wheel and SHA256SUMS uploads and downloads match the hashes in the phase report. The ignored highlights checkpoint was consumed after body readback. Preserve retained notes, prior branches/design/manual records and v0.1.0 at `2d0435cc731d608843ad71cfa9c7688d1d8b5d09`.
+
+## Stop and next decision
+
+Publish/read back this documentation outcome commit, then report Phase 2 complete and stop. There are no unfinished implementation or release effects. T-029/Phase 3 remains unchecked and requires a new human selection. The temporary legacy reference remains until full reimplementation closure under T-049.
