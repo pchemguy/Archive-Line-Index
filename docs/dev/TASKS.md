@@ -10,90 +10,105 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 ## Phase 1 — Plain-file library
 
-- [ ] Phase 1 — Plain-file library
-    - [ ] Milestone 1.1 — Plain content access
-        - [ ] T-001 — Establish the typed package and executable check foundation
+- [x] Phase 1 — Plain-file library
+    - [x] Milestone 1.1 — Plain content access
+        - [x] T-001 — Establish the typed package and executable check foundation
             - Scope: pyproject.toml, package __init__/errors owners, test/shared-fixture setup and generated-file exclusions; establish initial 0.1.0 metadata without CLI wiring.
             - Depends on: accepted preparation/phase activation; no earlier product task.
             - Acceptance/evidence: Observe focused failing package/error checks before implementation; make pytest, configured Ruff/mypy and minimal package imports runnable in a scoped environment. Document actual tool/runtime limits; export no unimplemented APIs.
             - Contracts: API-01–02, API-04–05; layout root/source/test owners.
-        - [ ] T-002 — Implement path normalization and bounded format candidates
+            - Verified result: RED: package/error import failed before implementation. GREEN: 1 pytest test; Ruff lint/format; strict mypy with --no-native-parser (container PID discovery workaround); wheel and sdist build --no-isolation. Static version 0.1.0 and py.typed delivered; Phase 1 tracking read back before work.
+        - [x] T-002 — Implement path normalization and bounded format candidates
             - Scope: sources.py and formats.py with their focused unit checks.
             - Depends on: T-001.
             - Acceptance/evidence: Validate Source kinds, inspect at most 512 bytes and preserve candidate evidence/precedence without plain fallback for recognized claims. Full archive validity/rejection remains with selection/adapters in their delivery phases.
             - Contracts: API-02, ARC-01–02; internal source-selection interfaces.
-        - [ ] T-003 — Implement the backend reader contract and plain selection
+            - Verified result: RED: source/detector modules absent. GREEN: 26 tests pass, including text-only paths, 512-byte inspection, all suffixes/magic families, signature precedence and TAR checksum/zero-prefix discrimination; Ruff lint/format and strict mypy pass.
+        - [x] T-003 — Implement the backend reader contract and plain selection
             - Scope: backends/base.py, plain.py and registry.py with adapter/selection checks.
             - Depends on: T-001, T-002.
             - Acceptance/evidence: Read original bytes through owned handles, report validated EOF, close idempotently and reject recognized undelivered adapters explicitly. Preserve the protocol used by future adapters.
             - Contracts: STR-01–02, STR-04–05; internal BackendReader.
-        - [ ] T-004 — Implement bounded stream reads state and cleanup
+            - Verified result: RED: adapter package absent. GREEN: 36 tests pass; byte fidelity, positive bounded reads, terminal EOF, metadata-failure cleanup, idempotent close and explicit rejection of ZIP/TAR/7z selection; Ruff and strict mypy pass.
+        - [x] T-004 — Implement bounded stream reads state and cleanup
             - Scope: stream.py and controlled-reader unit checks.
             - Depends on: T-003.
             - Acceptance/evidence: Cover bounded/zero reads, capability/rejection surfaces, terminal EOF, retained delivery failures, closed-state precedence and cleanup without converting failures to EOF.
             - Contracts: STR-01–02, STR-04–05; public ContentStream and internal construction ownership.
-        - [ ] T-005 — Complete readinto unbounded reads and inclusive size limits
+            - Verified result: RED: common stream absent. GREEN: 51 tests pass covering bounded/zero reads, invalid backend results, terminal validation, retained failure, closed/argument priority, unsupported operations, cleanup notes and retry. Ruff and strict mypy pass; unbounded/readinto/limits remain T-005.
+        - [x] T-005 — Complete readinto unbounded reads and inclusive size limits
             - Scope: stream.py extensions and focused buffer/limit/ownership checks.
             - Depends on: T-004.
             - Acceptance/evidence: Verify byte-capacity buffers, unchanged tails, unbounded-read late failure, declared/actual inclusive limits and failed-construction cleanup. No excessive byte is returned or copied.
             - Contracts: STR-01–04; API-02, API-04.
-        - [ ] T-006 — Review test and report milestone 1.1
+            - Verified result: RED: 16 buffer/unbounded/limit checks failed against T-004. GREEN: 68 tests pass with byte-capacity/tail checks, inclusive declared/actual limits, exact-limit finalization, retained late failures and reader-consuming construction cleanup. Ruff and strict mypy pass.
+        - [x] T-006 — Review test and report milestone 1.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-001, T-002, T-003, T-004, T-005.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Whole-milestone code review completed independently of test execution; no blockers. Real-file mixed read demonstration and cleanup regressions pass: 76 tests, 99% coverage; Ruff lint/format and strict mypy pass. Report and HANDOFF included; issues #10–14 verified completed before boundary.
             - Report: `docs/dev/reports/phases/1/1.1.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 1.2 — Canonical line indexing
-        - [ ] T-007 — Implement canonical offset validation and checked construction
+    - [x] Milestone 1.2 — Canonical line indexing
+        - [x] T-007 — Implement canonical offset validation and checked construction
             - Scope: offsets.py and focused unit checks.
             - Depends on: T-001, T-006.
             - Acceptance/evidence: Validate concrete Q/eight-byte arrays, first offsets/singletons, strict ordering, sentinel interpretation and signed-range bounds; keep incomplete construction distinct from completed-array validation.
             - Contracts: IDX-01, IDX-05–06; canonical offset model.
-        - [ ] T-008 — Implement bounded LF scanning over borrowed readers
+            - Verified result: RED: offset provider absent. GREEN: 92 tests pass; concrete Q/eight-byte representation, valid 0/3 singletons, EOF structure, strict ordering and signed maximum tested; append construction remains separate from completed validation. Ruff and strict mypy pass; milestone #2 closure verified first.
+        - [x] T-008 — Implement bounded LF scanning over borrowed readers
             - Scope: scanner.py, ReadableBinary/default/options and scanner unit checks.
             - Depends on: T-007.
             - Acceptance/evidence: Use native block search, produce exact LF/CRLF/lone-CR/unterminated offsets, accept legal short reads and reject invalid read results without closing or restoring the caller stream.
             - Contracts: IDX-01–02, IDX-04–05; API-02–03.
-        - [ ] T-009 — Complete BOM and scanner failure boundary behavior
+            - Verified result: RED: scanner provider absent. GREEN: bounded LF scanning and borrowing checks pass with all regressions; exact LF/CRLF/lone-CR/unterminated cases, tiny buffers, short reads, invalid options/results and unchanged caller error/ownership covered. Ruff and strict mypy pass. Initial BOM refinements remain T-009.
+        - [x] T-009 — Complete BOM and scanner failure boundary behavior
             - Scope: scanner.py refinements and shared short-read corpora.
             - Depends on: T-007, T-008.
             - Acceptance/evidence: Verify all initial/later/incomplete BOM cases and tiny-buffer splits, offset overflow/allocation/read failures and long-line bounded storage. Return no partial array.
             - Contracts: IDX-01–06; SYS-03, SYS-06.
+            - Verified result: RED: 21 initial-BOM checks failed before refinement. GREEN: 198 tests, 99% coverage (scanner 100%), Ruff and strict mypy pass. Whole milestone review found no blockers; 32 MiB generated line stays below 128 KiB peak with <=8 KiB reads; overflow/allocation/borrowed ownership verified. Folded review report and HANDOFF included.
             - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
             - Report: `docs/dev/reports/phases/1/1.2.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 1.3 — Installed source-based indexing
-        - [ ] T-010 — Compose public plain-file stream and index APIs
+    - [x] Milestone 1.3 — Installed source-based indexing
+        - [x] T-010 — Compose public plain-file stream and index APIs
             - Scope: api.py and package-root re-exports with public integration checks.
             - Depends on: T-006, T-009.
             - Acceptance/evidence: Validate all options before source acquisition; verify stream ownership transfer, build cleanup and direct/source index equivalence. Delivered exports import without future adapter modules.
             - Contracts: API-01–04; SYS-02–06, SYS-10.
-        - [ ] T-011 — Verify built plain-library distributions outside the checkout
+            - Verified result: RED: facade absent. GREEN: public source/direct equivalence, early validation, exact phase exports, source acquisition errors, scan-failure cleanup and close-failure propagation pass with all regressions; Ruff and strict mypy pass. Milestone #3 closure verified before execution; no later archive adapter imports.
+        - [x] T-011 — Verify built plain-library distributions outside the checkout
             - Scope: Packaging metadata/build selection and installed-package/distribution integration owners.
             - Depends on: T-010.
             - Acceptance/evidence: Build wheel/sdist at 0.1.0, install actual wheel bytes outside repository paths, exercise delivered public APIs and rebuild the wheel from source distribution without undeclared runtime tools.
             - Contracts: API-05; SYS-11–12; layout packaging boundary.
-        - [ ] T-012 — Implement native release artifact inventory validation
+            - Verified result: RED: source artifact included vendored .agents files. GREEN: explicit sdist selection; 3 native build/install integration tests pass against wheel and independently source-rebuilt wheel outside checkout. Clean runtimes use actual artifacts/declared py7zr dependencies with no dev tools or path injection; metadata/version/exports/plain workflows pass. Ruff and strict mypy pass; prior 215 behavior tests retained.
+        - [x] T-012 — Implement native release artifact inventory validation
             - Scope: scripts/check_release_artifacts.py, its unit tests and relevant build exclusions.
             - Depends on: T-011.
             - Acceptance/evidence: Reject mismatched native filenames/version/tag metadata, missing source/wheel or unsafe distribution entries; verify SHA256SUMS against real candidate bytes. Synthetic failure cases must fail before corrected inventory passes.
             - Contracts: PLAN phase release gate; native wheel/sdist naming and inventory owners.
-        - [ ] T-013 — Complete documented installed plain-index workflows
+            - Verified result: RED: inventory checker absent; synthetic invalid inventories checked before real candidates. GREEN: 247 full-suite tests pass, including 28 synthetic artifact checks and real native inventory/CLI/SHA256SUMS readback. Native filenames/tag/embedded metadata, safe entries, source-wheel byte parity, required files and exact checksums enforced. Ruff and strict mypy (including helper) pass; pytest import isolation fixes duplicate test basenames.
+        - [x] T-013 — Complete documented installed plain-index workflows
             - Scope: Root README, public module documentation and executable documentation examples.
             - Depends on: T-010, T-011, T-012.
             - Acceptance/evidence: Run complete stream-only/direct-scan/source-based examples against the installed artifact, document phase-scoped capabilities and resource/memory limits, and retain reproducible package/check instructions.
             - Contracts: API-03–05; SYS-02–03, SYS-10–12.
-        - [ ] T-014 — Review test and report milestone 1.3
+            - Verified result: RED: README lacked the three complete workflows (both installed-artifact example checks failed). GREEN: 5 installed example/runtime/inventory tests pass using native and source-rebuilt wheels; README relative links verified. Phase-scoped capabilities, resource/memory/error behavior, native build/install/check instructions and public API docstrings updated; Markdown prose unwrapped. Ruff and strict mypy pass.
+        - [x] T-014 — Review test and report milestone 1.3
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-010, T-011, T-012, T-013.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Whole milestone code review completed; incompatible buffer-provider error translation repaired after RED regression. GREEN: 253 tests, 99% coverage, Ruff lint/format, strict mypy including helper, isolated wheel/sdist build, source rebuild, both clean installed runtimes/examples and native SHA256SUMS checks pass. Report and HANDOFF included. Stop before T-015; no phase completion/integration/tag/release.
             - Report: `docs/dev/reports/phases/1/1.3.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 1.4 — Phase review
-        - [ ] T-015 — Review test and report phase 1
+    - [x] Milestone 1.4 — Phase review
+        - [x] T-015 — Review test and report phase 1
             - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence.
             - Depends on: T-006, T-009, T-014. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
             - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.1.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
             - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Verified result: Phase-wide source review and all applicable exits pass: 253 tests, 99% coverage, Ruff/strict mypy, isolated native build, source rebuild and six refreshed installed/artifact/example checks. Earlier task composition and delivery milestone closures verified. Release notes/report/HANDOFF included. Integration, tag and hosted release remain pending actual readback; Phase 2 is unselected.
             - Report: `docs/dev/reports/phases/1/PHASE-REPORT.md`; include HANDOFF with this boundary.
 
 ## Phase 2 — Paired persistence and CLI

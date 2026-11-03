@@ -1,32 +1,21 @@
 # Project handoff
 
-Checkpoint: verified documentation integration on main; target publication and documentation-milestone closure require actual readback after this merge commit. This snapshot is identified by its containing commit; recover subsequent effects from Git and provider state before continuing.
+Checkpoint: prospective explicit Phase 1 integration into main. T-015 `0fa719b0b08de33cee1124627cf59077230a21a3` is published/read back; issue #24 and review milestone #5 are closed. The containing two-parent merge must be verified/published before release finalization. Recover subsequent effects from Git/provider state before replay.
 
-Outcome: the complete design/contract/PLAN/layout/TASKS suite is accepted and whole-package document QC passes after editorial-state corrections. It describes intended functionality and a 52-task implementation route; no product implementation or runtime verification is claimed.
+## Authorization and boundary
 
-## Workflow and sources
+The human now requested “Finalize Phase 1”, superseding the earlier stop before T-015. Complete its publication, tracking closure, default-branch integration and 0.1.0 GitHub release with explicit wheel/source/SHA256SUMS assets, then stop. Phase 2 is not selected and must not be activated or executed. Markdown prose/list items remain unwrapped.
 
-- Workflow/stage/owner: main preparation, interactive/onepass; sdd-manage owns final integration/closure and the implementation handoff.
-- Governing entry points: [PROJECT](PROJECT.md), [ARCHITECTURE](ARCHITECTURE.md), [DECOMPOSITION](DECOMPOSITION.md), [SPEC](SPEC.md), [PLAN](PLAN.md), [layout](layout.md) and [TASKS](TASKS.md), including their linked children.
-- Evidence and current control: [DOCS_TASKS](DOCS_TASKS.md), [DOCS_PREPARATION](DOCS_PREPARATION.md), [DOCS-QC-REPORT](DOCS-QC-REPORT.md) and the SPEC/PLAN/TASKS review reports.
-- Available workflow guidance: installed and repository-vendored SDD Manager 0.16.1, root AGENTS and current pyproject tooling. No product source/test/build environment has been established.
+## Verified result
 
-## Scope and human decisions
+T-001–T-015 provide plain-file ContentStream access, generic borrowed-reader LF/BOM scanning, canonical offsets, source-based building, typed exports and installed-library examples. See [Phase 1 report](reports/phases/1/PHASE-REPORT.md) and its milestone links. Cross-module code review found no remaining blockers; 253 tests, 99% coverage, Ruff lint/format and strict mypy pass. Isolated native build and six refreshed installed/artifact/example checks pass. Root RELEASE-NOTES.md contains the curated 0.1.0 message and is included in the source distribution. Runtime code is unchanged by T-015.
 
-- Authorized scope: complete documentation preparation and verified default-branch integration. Human acceptance covers all roots and selected design/contract/layout children; TASKS was accepted on 2026-11-03.
-- Standing delivery policy: four phases, with a version tag/GitHub release after each verified/integrated phase, release notes and explicit source-distribution/wheel assets plus checksums/readback. CLI indexes one target once into both SQLite/raw outputs under the accepted input-directory/stem defaults.
-- Exact stop: after verified preparation integration and documentation milestone closure, ask the human for an implementation range. No product phase/task is active and no implementation checkpoint is preapproved.
-- Reporting/format: concise operational updates, substantive checkpoints and unwrapped Markdown unless explicitly requested. The temporary legacy reference in AGENTS remains until reimplementation closure.
+Actual host: Linux/bash, CPython 3.12.14. Mypy needs `--no-native-parser` for the container process-discovery issue; strict checks remain enabled. Native Windows/macOS/Python 3.11 execution and archive dependency behavior are unverified. CLI/persistence and archive delivery remain later-phase capabilities. Root AGENTS/pyproject and accepted design/contracts/PLAN/layout/TASKS remain governing sources.
 
-## Branches and return
+## Git, tracking and next effects
 
-- Current receiving branch: main. Preparation branch: design-docs/main; creation parent and integration target: main.
-- Original branch-off commit: c6398d8e51c60cabddc21997188e0a9cc040272d.
-- Pinned integration parents: main `c6398d8e51c60cabddc21997188e0a9cc040272d` and preparation `33c582df1ed181b5ae38fcbc0663af57362fc35d`. The latter is the published passing DOCS-009 checkpoint; its issue #9 closure is independently verified.
-- Suspended parent workflow: none. Preserve the separate manual provenance branch and records; they are not continuation work.
+Creation parent/default main is `9c90eebc8aaca66f8f086cb69f93f0dbb7c571ee`; published source before T-015 was `15c36f54b49801ee7fe5f2889290ee7f8d4e9593`, including the requested README purpose/input/output/interface overview. The actual containing task commit identifies the next phase tip. All 14 earlier task commits passed a parent-diff composition audit; their issues #10–23 and delivery milestones #2–4 are closed. Preserve phase/design/manual provenance branches.
 
-## Pending effects and next action
+All 15 task issues #10–24 and milestones #2–5 are closed/completed. Merge purpose is Phase 1 completion into creation parent/default main. Pinned receiving parent: `9c90eebc8aaca66f8f086cb69f93f0dbb7c571ee`; incoming published tip: `0fa719b0b08de33cee1124627cf59077230a21a3`. No conflicts occurred; reconcile this checkpoint to main and verify/publish the containing two-parent merge.
 
-- All nine DOCS issues are closed with verified evidence. The prospective merged tree passed package/hash/link/structure checks; no product requirements, tasks or implementation changed during integration.
-- Finish/verify the containing explicit two-parent integration commit, publish/read back main, then close/read back sdd-docs-main. These external effects occur after this checkpoint and must be reconciled from actual state.
-- If these transitions have already completed, reuse their observed identities rather than replay them. Return on the default branch and pause for the selected implementation range; eligible-phase activation and execution belong to that later handoff.
+Then create a direct default-branch release commit whose exact body matches RELEASE-NOTES.md; publish it before tagging. Build/check/install artifacts from that exact commit, publish/read back v0.1.0 and use one protected API publisher because the connector lacks release/asset mutations. Verify complete draft assets before publishing, then body/latest/tag and downloaded-byte hashes. Retain release notes; consume only the owned ignored highlights draft after body verification. Record release identity and hashes in the phase report, publish the final outcome and stop without Phase 2.
