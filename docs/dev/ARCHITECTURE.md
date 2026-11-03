@@ -84,4 +84,4 @@ The main verification seams are the internal backend reader, arbitrary short-rea
 
 ## Further design ownership
 
-DECOMPOSITION will define concrete component collaboration, public/internal API surfaces, state ownership and selected model definitions. SPEC will own exact behavior, error contracts and acceptance, including format variants and dependency limits. PLAN and layout will own delivery order and physical paths. These responsibilities do not require architecture child documents for the present scope.
+DECOMPOSITION defines concrete component collaboration, public/internal API surfaces, state ownership and selected model definitions. SPEC owns exact behavior, error contracts and acceptance, including format variants and dependency limits. PLAN and layout own delivery order and physical paths. These responsibilities do not require architecture child documents for the present scope.

@@ -24,9 +24,9 @@ The current governing set includes the human-authorized CLI scope amendment. The
 
 | Governing artifact | SHA-256 |
 | --- | --- |
-| [PROJECT.md](PROJECT.md) | `84c2fbe4bb54d38bcc3426dc6460bcd4bb0a045e812502a13a210a5acc5d056c` |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | `adf0fab5199e8676cd585ce8ed6652b821f6fcd4590f3a9125a2c5672e85a1db` |
-| [DECOMPOSITION.md](DECOMPOSITION.md) | `a9df24ec01f2dc470f020f29ae45e89a6a5b36602aa9cb01ee470be624135af6` |
+| [PROJECT.md](PROJECT.md) | `5f41066d8e0508a5bf265b8b89536fa8b9f156693b87a5ee8873d2b9ec5ca76b` |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | `7c607427ed1d1700a9d45800b697f48e4dd846c35bb2fe2fba40aa714d2f5718` |
+| [DECOMPOSITION.md](DECOMPOSITION.md) | `f65f45fd3bacef4be060a5fff7afb4d0d28f496a51b2d666c04f27315d6ecc62` |
 | [decomposition/public-api.md](decomposition/public-api.md) | `fac8ed1680f4adb2e6e7d251f2aee5e4fa316e2d78a8e6b6bd078da796b4bd44` |
 | [decomposition/internal-api.md](decomposition/internal-api.md) | `ef90a5d76bc0456e3f926e439a8983d987c05d65e88df31cb70d3bc7223b16c6` |
 
@@ -92,3 +92,9 @@ The proposal writes both SQLite (`.sqlite3`) and raw little-endian (`.u64`) outp
 Recheck covered every changed scope/exclusion statement, separate package-root versus CLI-submodule exports, downward dependencies, ownership of the completed array, default/explicit stems, both outputs and input aliases, existing destinations, second-writer failure, late writer cleanup errors and installed entry-point behavior. The library still receives explicit destination paths; CLI naming does not alter persistence semantics. SQLite is written first, followed by raw; a later failure retains and identifies any already published output. Both paths are preflighted before scanning, and only both successful writes yield the success summary. One integrated acceptance condition and six CLI conditions extend the set from 42 to 49 uniquely identified conditions. No unresolved confirmed finding remains in this amended scope.
 
 The current reviewed identities cover SPEC and six children. Governing hashes match the revised design, local links resolve, Markdown prose/list items remain unwrapped and the unchanged core contract/model surfaces are retained. No production CLI implementation, entry-point metadata change or runtime test was performed; implementation and packaging remain future work. Acceptance of the exact amended upstream/SPEC set is recorded in DOCS_PREPARATION; no contract bytes changed in recording that decision.
+
+## Revision 3 — Resolved design-state wording
+
+Whole-package QC found that PROJECT still described APIs, formats, versioning and release policy as unsettled, while ARCHITECTURE/DECOMPOSITION used future/proposal wording for definitions already owned by the completed suite. The design owners replaced these stale statements with present-tense ownership links and retained the existing product constraints. No public declaration, line/stream/archive/persistence/CLI contract or acceptance condition changed.
+
+Recheck against the existing SPEC contracts confirms unchanged behavior and responsibility boundaries. The current governing identity table reflects the editorial updates; their original accepted scope remains recoverable from the prior proposal/acceptance commits. Document conformance remains Ready. No new human scope decision is inferred and no implementation evidence is claimed.

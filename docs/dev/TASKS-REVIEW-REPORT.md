@@ -2,21 +2,21 @@
 
 ## Current gate
 
-State: **Ready for TASKS acceptance**. The complete list conforms to the accepted PLAN/layout and design/SPEC. Human TASKS acceptance remains pending; no product task is checked, projected to GitHub or selected for implementation. Whole-document-package QC and verified preparation integration remain later gates.
+State: **Ready for TASKS acceptance**. The complete list conforms to the accepted PLAN/layout and design/SPEC. The human accepted the exact task-unit set on 2026-11-03; acceptance checkpoint `9d3bdde8cff48427e0a624b50292e7a81d7c34ef` is published and DOCS-008 issue #8 is closed with evidence/readback. No product task is checked, projected to GitHub or selected for implementation. Whole-package QC and preparation integration remain governed by their own evidence.
 
 Review date: 2026-11-03. The authoring agent performed hierarchy, contract/owner and dependency review plus document checks. This is not independent code review or evidence that a proposed task has executed.
 
 ## Exact reviewed and governing identities
 
-Corrected `TASKS.md` SHA-256: `19ed2de108f58207145cdfe4fb1dbf54bc359d1d65b0eae3cf14a6546b6dc82a`. The initial draft SHA-256 before the bounded correction was `30c9795b0cdcd94c1112c1d850382eb3edc214e36daf534e26a24f7ba50f3e09`.
+Corrected `TASKS.md` SHA-256: `df54f248a12c1e9f2e49a3fa4ca53c69326f205df41e51747adfa54d34e7a842`. The initial draft SHA-256 before the bounded correction was `30c9795b0cdcd94c1112c1d850382eb3edc214e36daf534e26a24f7ba50f3e09`.
 
 Accepted scope is recoverable from the published design/SPEC, PLAN/release and layout checkpoints through `63a5669f2cce55b86f168360c9c8e4acffc6f2db`. The current PLAN review metadata records verified layout acceptance/issue closure without changing any governing contract or layout byte. Exact inputs are:
 
 | Governing source | SHA-256 |
 | --- | --- |
-| [PROJECT.md](PROJECT.md) | `84c2fbe4bb54d38bcc3426dc6460bcd4bb0a045e812502a13a210a5acc5d056c` |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | `adf0fab5199e8676cd585ce8ed6652b821f6fcd4590f3a9125a2c5672e85a1db` |
-| [DECOMPOSITION.md](DECOMPOSITION.md) | `a9df24ec01f2dc470f020f29ae45e89a6a5b36602aa9cb01ee470be624135af6` |
+| [PROJECT.md](PROJECT.md) | `5f41066d8e0508a5bf265b8b89536fa8b9f156693b87a5ee8873d2b9ec5ca76b` |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | `7c607427ed1d1700a9d45800b697f48e4dd846c35bb2fe2fba40aa714d2f5718` |
+| [DECOMPOSITION.md](DECOMPOSITION.md) | `f65f45fd3bacef4be060a5fff7afb4d0d28f496a51b2d666c04f27315d6ecc62` |
 | [decomposition/public-api.md](decomposition/public-api.md) | `fac8ed1680f4adb2e6e7d251f2aee5e4fa316e2d78a8e6b6bd078da796b4bd44` |
 | [decomposition/internal-api.md](decomposition/internal-api.md) | `ef90a5d76bc0456e3f926e439a8983d987c05d65e88df31cb70d3bc7223b16c6` |
 | [SPEC.md](SPEC.md) | `70a815a5d4bce2a03e22c31caab6b5853ab441ffc323b9a49c0ed18a5c82dd68` |
@@ -26,13 +26,13 @@ Accepted scope is recoverable from the published design/SPEC, PLAN/release and l
 | [spec/line-index.md](spec/line-index.md) | `444c48b11d9645b2a1f4527cb6853c79a1542939f25830112d8c392480ec3735` |
 | [spec/persistence.md](spec/persistence.md) | `bb89f91105d4f1593c1ba2462559cf2004cb85a46f28a75d9a2fd8bddfe588bb` |
 | [spec/public-api.md](spec/public-api.md) | `611e302b15dc7206ab2367e6bd0054874977fb03f408f8f28a5623a45f3b1303` |
-| [PLAN.md](PLAN.md) | `e7e5ed9ebcaa9ed6b30e4644451916203a19cdc99a0f161c3c71babe6db74698` |
+| [PLAN.md](PLAN.md) | `9326bd22add1d75eba1fd48b463e695f2ee8c2b5c10e064255138d42d77d88dc` |
 | [layout.md](layout.md) | `da78d756af01b8f94ac5b76ea22e8224c55890e6bb6fbff1f1ce59a7db8aa516` |
 | [layout/src.md](layout/src.md) | `20ae7203f448683c6d28b9d604963bc601ced5099b494800aae1a17ac208102d` |
 | [layout/tests.md](layout/tests.md) | `899b8e26dd9ee98326111519c259c4df620cd33659903fb5612d919d8e34b67b` |
 | [layout/docs.md](layout/docs.md) | `43dd9d2618f2784a1c4f539a99ba23bc574e7b28563001f031754291d32b5630` |
-| [SPEC-REVIEW-REPORT.md](SPEC-REVIEW-REPORT.md) | `958da59cfe5c94e57714c9e8bf45ecaf8b6bb97956d0ddbe8a25357e96ff2456` |
-| [PLAN-REVIEW-REPORT.md](PLAN-REVIEW-REPORT.md) | `c35cab0ddb92533b4182003e88782370adacd01ecd04b8171a048eff9a1c7d60` |
+| [SPEC-REVIEW-REPORT.md](SPEC-REVIEW-REPORT.md) | `107b21a77526435ed144ed16402a6ea21c4e22284524ff5780869789ad0b44b6` |
+| [PLAN-REVIEW-REPORT.md](PLAN-REVIEW-REPORT.md) | `dd4f59623f1ed689ae663af5c289c3baf90c10d5f44ba708eed66026e119c9ee` |
 
 ## Initial review
 
@@ -84,3 +84,9 @@ Recheck found no remaining confirmed conformance issue. IDs are unique and monot
 ## Limits and next gate
 
 No product code, tests, build artifacts, GitHub product-task projection, dependency installation or release has been created. Numeric count/hierarchy checks and document review establish derivation quality, not runtime correctness. TASKS human acceptance precedes whole-package preparation QC; accepted preparation must then be integrated/published and the implementation range selected before eligible-phase activation or execution.
+
+## Revision 2 — Accepted state and editorial currency
+
+Whole-package QC removed the stale word proposed from the accepted task list introduction and refreshed present-tense source-owner references in upstream roots. Every task ID, title, scope, dependency, contract, evidence field, parent and checkbox is unchanged. The accepted task units remain those in `909a3053edc93b56794ad9d650970a4c0e4f0a3b`; current whole-file identity differs only in that introductory status sentence.
+
+Recheck of parsed task units confirms exact equivalence, 41 delivery plus seven milestone-review plus four phase-review tasks, the same acyclic dependency order and review thresholds. The current source table records refreshed editorial/QC identities. Conformance remains Ready, human task acceptance is recorded separately from implementation, and no product issue or code is created.

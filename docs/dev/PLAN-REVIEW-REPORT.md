@@ -8,15 +8,15 @@ Review date: 2026-11-03. The authoring agent performed the strategy/contract rev
 
 ## Reviewed and governing identities
 
-Reviewed `PLAN.md` SHA-256: `e7e5ed9ebcaa9ed6b30e4644451916203a19cdc99a0f161c3c71babe6db74698`. Initial strategy proposal at `1db10245cb090a38e744ac3374464e1735510778` had SHA-256 `6140880a9ce9a53eacc7563a86e326d4996d3a44a474362f65b9c77abc4fea01`.
+Reviewed `PLAN.md` SHA-256: `9326bd22add1d75eba1fd48b463e695f2ee8c2b5c10e064255138d42d77d88dc`. Initial strategy proposal at `1db10245cb090a38e744ac3374464e1735510778` had SHA-256 `6140880a9ce9a53eacc7563a86e326d4996d3a44a474362f65b9c77abc4fea01`.
 
 The amended design/SPEC set was accepted from `e75a91b338590113eea94074ce0a377ceaffb6a5`; the decision is published in `4a7da7178131da01d974ff84319d402a35e0bcb5` and DOCS-005 is closed. SPEC review metadata records that decision; its contract/governing hashes remain unchanged. The exact current inputs are:
 
 | Governing source | SHA-256 |
 | --- | --- |
-| [PROJECT.md](PROJECT.md) | `84c2fbe4bb54d38bcc3426dc6460bcd4bb0a045e812502a13a210a5acc5d056c` |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | `adf0fab5199e8676cd585ce8ed6652b821f6fcd4590f3a9125a2c5672e85a1db` |
-| [DECOMPOSITION.md](DECOMPOSITION.md) | `a9df24ec01f2dc470f020f29ae45e89a6a5b36602aa9cb01ee470be624135af6` |
+| [PROJECT.md](PROJECT.md) | `5f41066d8e0508a5bf265b8b89536fa8b9f156693b87a5ee8873d2b9ec5ca76b` |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | `7c607427ed1d1700a9d45800b697f48e4dd846c35bb2fe2fba40aa714d2f5718` |
+| [DECOMPOSITION.md](DECOMPOSITION.md) | `f65f45fd3bacef4be060a5fff7afb4d0d28f496a51b2d666c04f27315d6ecc62` |
 | [decomposition/public-api.md](decomposition/public-api.md) | `fac8ed1680f4adb2e6e7d251f2aee5e4fa316e2d78a8e6b6bd078da796b4bd44` |
 | [decomposition/internal-api.md](decomposition/internal-api.md) | `ef90a5d76bc0456e3f926e439a8983d987c05d65e88df31cb70d3bc7223b16c6` |
 | [SPEC.md](SPEC.md) | `70a815a5d4bce2a03e22c31caab6b5853ab441ffc323b9a49c0ed18a5c82dd68` |
@@ -26,7 +26,7 @@ The amended design/SPEC set was accepted from `e75a91b338590113eea94074ce0a377ce
 | [spec/line-index.md](spec/line-index.md) | `444c48b11d9645b2a1f4527cb6853c79a1542939f25830112d8c392480ec3735` |
 | [spec/persistence.md](spec/persistence.md) | `bb89f91105d4f1593c1ba2462559cf2004cb85a46f28a75d9a2fd8bddfe588bb` |
 | [spec/public-api.md](spec/public-api.md) | `611e302b15dc7206ab2367e6bd0054874977fb03f408f8f28a5623a45f3b1303` |
-| [SPEC-REVIEW-REPORT.md](SPEC-REVIEW-REPORT.md) | `958da59cfe5c94e57714c9e8bf45ecaf8b6bb97956d0ddbe8a25357e96ff2456` |
+| [SPEC-REVIEW-REPORT.md](SPEC-REVIEW-REPORT.md) | `107b21a77526435ed144ed16402a6ea21c4e22284524ff5780869789ad0b44b6` |
 
 ## Initial review — Functional boundaries and counts
 
@@ -89,3 +89,17 @@ The governing PLAN remains the accepted release-amended state recorded above and
 Recheck methods: component-to-path and path-to-owner inspection, public/internal declaration placement, import-direction comparison, source/test separation, contract-to-check routing, package/release-input coverage, local link checks and unwrapped Markdown validation. Root/child responsibilities do not duplicate behavioral contracts, delivery order or executable checklists. Paths are intended placement, not a claim of created implementation. No confirmed placement/design/strategy issue remains unresolved; combined technical readiness is Ready for the layout checkpoint.
 
 No TASKS file, product source/test file, artifact, script implementation, dependency installation or hosted release was created. Task-size/count review remains for TASKS. Layout acceptance is required before dependent task derivation.
+
+## Revision 3 — Whole-package editorial currency
+
+The current PLAN replaces a document-preparation handoff paragraph with present-tense references to layout and TASKS ownership. PROJECT/ARCHITECTURE/DECOMPOSITION likewise reference their resolved owners rather than claiming those decisions remain open. Phase outcomes, versions/releases, milestones, ordering, review rules and layout allocation remain unchanged; the original accepted release-policy PLAN state remains recorded in Revision 1 and DOCS_PREPARATION.
+
+| Editorially updated product owner | Prior SHA-256 | Current SHA-256 |
+| --- | --- | --- |
+| PROJECT.md | `84c2fbe4bb54d38bcc3426dc6460bcd4bb0a045e812502a13a210a5acc5d056c` | `5f41066d8e0508a5bf265b8b89536fa8b9f156693b87a5ee8873d2b9ec5ca76b` |
+| ARCHITECTURE.md | `adf0fab5199e8676cd585ce8ed6652b821f6fcd4590f3a9125a2c5672e85a1db` | `7c607427ed1d1700a9d45800b697f48e4dd846c35bb2fe2fba40aa714d2f5718` |
+| DECOMPOSITION.md | `a9df24ec01f2dc470f020f29ae45e89a6a5b36602aa9cb01ee470be624135af6` | `f65f45fd3bacef4be060a5fff7afb4d0d28f496a51b2d666c04f27315d6ecc62` |
+| PLAN.md | `e7e5ed9ebcaa9ed6b30e4644451916203a19cdc99a0f161c3c71babe6db74698` | `9326bd22add1d75eba1fd48b463e695f2ee8c2b5c10e064255138d42d77d88dc` |
+| TASKS.md | `19ed2de108f58207145cdfe4fb1dbf54bc359d1d65b0eae3cf14a6546b6dc82a` | `df54f248a12c1e9f2e49a3fa4ca53c69326f205df41e51747adfa54d34e7a842` |
+
+Recheck confirms the same strategy and placement coverage. Updated governing hashes include refreshed SPEC review evidence; no material contract/design change invalidates the prior coverage. Combined PLAN/layout readiness remains Ready, with actual layout acceptance/closure already recorded. TASKS implementation units retain their original boundaries despite removal of a stale proposed-state sentence in their introduction.

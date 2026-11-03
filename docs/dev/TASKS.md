@@ -2,7 +2,7 @@
 
 ## Execution boundaries
 
-[PLAN](PLAN.md) owns phase/milestone outcomes and exits; [layout](layout.md) owns physical placement; [SPEC](SPEC.md) and the [component/API design](DECOMPOSITION.md) own contracts and interfaces. All tasks below are proposed and unchecked. Each task includes its own focused tests and professional documentation within the stated scope; no task is complete solely because its source file exists.
+[PLAN](PLAN.md) owns phase/milestone outcomes and exits; [layout](layout.md) owns physical placement; [SPEC](SPEC.md) and the [component/API design](DECOMPOSITION.md) own contracts and interfaces. Checkboxes record verified implementation; listing a task does not imply execution. Each task includes its own focused tests and professional documentation within the stated scope; no task is complete solely because its source file exists.
 
 The first selected implementation range requires accepted preparation integrated into the default branch and verified eligible-phase tracking. A phase’s first task additionally requires its predecessor’s verified integration and published source/wheel GitHub release. Task dependencies below do not waive those gates or authorize a range. Phase review tasks prepare notes/artifacts and evidence; post-task integration, exact-source release finalization, tag publication and hosted-byte verification are completed under PLAN’s standing phase release policy before a successor starts. A partial range pauses without a phase release.
 

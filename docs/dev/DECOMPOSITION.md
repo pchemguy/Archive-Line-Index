@@ -2,9 +2,9 @@
 
 ## Scope and document ownership
 
-[ARCHITECTURE](ARCHITECTURE.md) defines the system arrangement. This document defines logical components, dependencies, data ownership and collaboration. [Public API design](decomposition/public-api.md) owns public types, signatures and exports. [Internal API design](decomposition/internal-api.md) owns cross-component interfaces, internal messages and lifecycle state. These three documents form one design proposal.
+[ARCHITECTURE](ARCHITECTURE.md) defines the system arrangement. This document defines logical components, dependencies, data ownership and collaboration. [Public API design](decomposition/public-api.md) owns public types, signatures and exports. [Internal API design](decomposition/internal-api.md) owns cross-component interfaces, internal messages and lifecycle state. These three documents define the component and API design.
 
-SPEC will define exact behavior, errors and acceptance against these interfaces. Physical module paths and delivery order belong to layout and PLAN. The component names below identify responsibilities, not a prescribed file tree.
+SPEC defines exact behavior, errors and acceptance against these interfaces. Physical module paths and delivery order belong to layout and PLAN. The component names below identify responsibilities, not a prescribed file tree.
 
 ## Component ownership
 
@@ -70,4 +70,4 @@ The public API child defines all supported consumer entry points. The internal c
 
 Reader doubles exercise common-stream completion and size enforcement without concrete archive dependencies. Short-read inputs exercise scanner boundaries and borrowing. A controlled producer exercises 7z backpressure, terminal outcomes and cancellation. Real archives exercise dependency integration and format-specific validation. Publication primitives can be fault-injected separately from SQLite/raw construction, while actual filesystem tests verify destination protection and replacement. Public export and installed-package checks exercise the facade rather than internal import paths.
 
-No material structural question remains open in this proposal. SPEC must settle exact argument/error behavior, supported format variants, read-after-failure details, numeric buffering policy, dependency suitability, filesystem support and post-publication cleanup outcomes before implementation tasks rely on them.
+[SPEC](SPEC.md) owns exact argument/error behavior, supported format variants, read-after-failure details, numeric buffering policy, dependency suitability, filesystem support and post-publication cleanup outcomes. Implementations and their verification consume those contracts.

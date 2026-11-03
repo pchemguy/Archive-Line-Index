@@ -90,6 +90,6 @@ The final phase review prepares verified package candidates and release notes fo
 
 Native Python distribution filenames retain their required ecosystem structure, including project/version and wheel compatibility tags. Use the actual valid `.whl` and source `.tar.gz` names as release assets; a version-free wheel rename would invalidate the requested format. Artifact inventory validation must check version/tag/metadata agreement and checksum/hosted-byte identity for these native assets. PyPI publication is not part of the phase release policy.
 
-## Preparation handoff
+## Implementation ownership
 
-[PLAN strategy review](PLAN-REVIEW-REPORT.md) assesses the current strategy against the accepted SPEC/design set. After PLAN acceptance, layout assigns physical ownership and combined PLAN/layout QC assesses placement before TASKS derivation. TASKS then defines executable units and task-level dependencies within these phase/milestone boundaries. No source/test file allocation, implementation checklist or execution status is owned by this plan.
+[Layout](layout.md) assigns physical ownership, and [TASKS](TASKS.md) defines executable units and task-level dependencies within these phase/milestone boundaries. [PLAN review](PLAN-REVIEW-REPORT.md) records strategy and placement conformance. Source/test allocation, the executable checklist and its status retain their respective owners.

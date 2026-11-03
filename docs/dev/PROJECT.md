@@ -61,8 +61,8 @@ A user can index one filesystem target with a single positional command-line arg
 - Automatic output naming within library persistence APIs, cross-file transactions or interprocess writer locks.
 - Batch/recursive CLI processing, stdin payloads, GUI, service or public asynchronous API.
 
-## Design decisions still to establish
+## Design and delivery ownership
 
-The public API, component boundaries, backend adaptation and cancellation mechanism, detailed persistence publication rules, dependency-version policy and performance acceptance measures remain to be designed and specified. Support for particular compressed-TAR variants must account for the selected Python and backend versions.
+[ARCHITECTURE](ARCHITECTURE.md) defines major blocks and dependency direction; [DECOMPOSITION](DECOMPOSITION.md) defines component/API ownership; [SPEC](SPEC.md) defines precise behavior, resource limits, supported formats and acceptance. [PLAN](PLAN.md) defines delivery increments, package versions and per-phase GitHub releases with source/wheel artifacts.
 
-Package versioning must be defined before distribution builds. The current packaging configuration contains neither a project version nor a dynamic-version declaration. Numeric performance targets and a release/publication policy have not been established.
+Distribution metadata must contain a valid version consistent with its artifacts. Dependency constraints require actual integration evidence. Resource guarantees are defined by the contracts; no additional numeric throughput target is prescribed.
