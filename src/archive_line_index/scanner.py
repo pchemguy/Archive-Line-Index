@@ -74,9 +74,23 @@ def scan_line_offsets(
     offsets = array("Q", [0])
     if offsets.itemsize != 8:
         raise InvalidIndexError("Native unsigned Q offsets require eight-byte items")
-    position = 0
-    while block := _read_block(stream, buffer_size):
-        position = _scan_block(offsets, block, position)
+    prefix = b""
+    exhausted = False
+    while len(prefix) < 3:
+        block = _read_block(stream, min(buffer_size, 3 - len(prefix)))
+        if not block:
+            exhausted = True
+            break
+        prefix += block
+    if skip_utf8_bom and prefix == b"\xef\xbb\xbf":
+        offsets[0] = 3
+        position = 3
+        check_position(position)
+    else:
+        position = _scan_block(offsets, prefix, 0)
+    if not exhausted:
+        while block := _read_block(stream, buffer_size):
+            position = _scan_block(offsets, block, position)
     if offsets[-1] != position:
         append_offset(offsets, position)
     validate_offsets(offsets)

@@ -99,3 +99,107 @@ def test_read_failure_propagates_without_closing_borrowed_source() -> None:
     with pytest.raises(OSError) as caught:
         scan_line_offsets(source)
     assert caught.value is error and not source.closed
+
+
+@pytest.mark.parametrize(
+    "payload,skipped",
+    [
+        (b"\xef\xbb\xbf", [3]),
+        (b"\xef\xbb\xbfabc\n", [3, 7]),
+        (b"\xef\xbb\xbf\n", [3, 4]),
+        (b"\xef\xbb\xbf\xef\xbb\xbf", [3, 6]),
+        (b"\xef", [0, 1]),
+        (b"\xef\xbb", [0, 2]),
+        (b"\xef\xbbX\n", [0, 4]),
+        (b"x\xef\xbb\xbf", [0, 4]),
+    ],
+)
+@pytest.mark.parametrize("buffer_size", [1, 2, 3, 4, 9])
+def test_bom_policy_at_every_probe_boundary(
+    payload: bytes, skipped: list[int], buffer_size: int
+) -> None:
+    assert (
+        scan_line_offsets(io.BytesIO(payload), buffer_size=buffer_size).tolist()
+        == skipped
+    )
+    expected = [0] + [i + 1 for i, b in enumerate(payload) if b == 10]
+    if expected[-1] != len(payload):
+        expected.append(len(payload))
+    assert (
+        scan_line_offsets(
+            io.BytesIO(payload), skip_utf8_bom=False, buffer_size=buffer_size
+        ).tolist()
+        == expected
+    )
+
+
+def test_random_legal_short_reads_preserve_exact_coordinates() -> None:
+    import random
+
+    rng = random.Random(4732)
+    for _ in range(100):
+        payload = b"\xef\xbb\xbf" + bytes(
+            rng.choice([0, 10, 13, 65, 239, 255]) for _ in range(rng.randrange(200))
+        )
+
+        class Short(io.BytesIO):
+            def read(self, size: int = -1, /) -> bytes:
+                assert 0 < size <= 11
+                return super().read(rng.randint(1, size))
+
+        expected = [3] + [i + 1 for i in range(3, len(payload)) if payload[i] == 10]
+        if expected[-1] != len(payload):
+            expected.append(len(payload))
+        assert scan_line_offsets(Short(payload), buffer_size=11).tolist() == expected
+
+
+def test_overflow_rejected_without_closing_borrowed_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from archive_line_index import offsets
+    from archive_line_index.errors import InvalidIndexError
+
+    monkeypatch.setattr(offsets, "MAX_OFFSET", 5)
+    source = io.BytesIO(b"abcdef")
+    with pytest.raises(InvalidIndexError):
+        scan_line_offsets(source, buffer_size=2)
+    assert not source.closed
+
+
+def test_allocation_and_native_width_fail_before_reading(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from array import array
+
+    from archive_line_index import scanner
+    from archive_line_index.errors import InvalidIndexError
+
+    source = io.BytesIO(b"data")
+
+    def fail(*args: object) -> object:
+        raise MemoryError("index allocation")
+
+    monkeypatch.setattr(scanner, "array", fail)
+    with pytest.raises(MemoryError, match="index allocation"):
+        scan_line_offsets(source)
+    assert source.tell() == 0 and not source.closed
+    monkeypatch.setattr(scanner, "array", lambda *args: array("I", [0]))
+    with pytest.raises(InvalidIndexError):
+        scan_line_offsets(source)
+    assert source.tell() == 0 and not source.closed
+
+
+def test_append_allocation_failure_returns_no_partial_index(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from archive_line_index import scanner
+
+    source = io.BytesIO(b"line\nnext")
+
+    def fail(*args: object) -> None:
+        raise MemoryError("append allocation")
+
+    monkeypatch.setattr(scanner, "append_offset", fail)
+    with pytest.raises(MemoryError, match="append allocation"):
+        scan_line_offsets(source, buffer_size=2)
+    assert not source.closed

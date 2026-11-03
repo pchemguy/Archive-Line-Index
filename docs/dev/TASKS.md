@@ -49,7 +49,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
             - Verified result: Whole-milestone code review completed independently of test execution; no blockers. Real-file mixed read demonstration and cleanup regressions pass: 76 tests, 99% coverage; Ruff lint/format and strict mypy pass. Report and HANDOFF included; issues #10–14 verified completed before boundary.
             - Report: `docs/dev/reports/phases/1/1.1.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 1.2 — Canonical line indexing
+    - [x] Milestone 1.2 — Canonical line indexing
         - [x] T-007 — Implement canonical offset validation and checked construction
             - Scope: offsets.py and focused unit checks.
             - Depends on: T-001, T-006.
@@ -62,11 +62,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Use native block search, produce exact LF/CRLF/lone-CR/unterminated offsets, accept legal short reads and reject invalid read results without closing or restoring the caller stream.
             - Contracts: IDX-01–02, IDX-04–05; API-02–03.
             - Verified result: RED: scanner provider absent. GREEN: bounded LF scanning and borrowing checks pass with all regressions; exact LF/CRLF/lone-CR/unterminated cases, tiny buffers, short reads, invalid options/results and unchanged caller error/ownership covered. Ruff and strict mypy pass. Initial BOM refinements remain T-009.
-        - [ ] T-009 — Complete BOM and scanner failure boundary behavior
+        - [x] T-009 — Complete BOM and scanner failure boundary behavior
             - Scope: scanner.py refinements and shared short-read corpora.
             - Depends on: T-007, T-008.
             - Acceptance/evidence: Verify all initial/later/incomplete BOM cases and tiny-buffer splits, offset overflow/allocation/read failures and long-line bounded storage. Return no partial array.
             - Contracts: IDX-01–06; SYS-03, SYS-06.
+            - Verified result: RED: 21 initial-BOM checks failed before refinement. GREEN: 198 tests, 99% coverage (scanner 100%), Ruff and strict mypy pass. Whole milestone review found no blockers; 32 MiB generated line stays below 128 KiB peak with <=8 KiB reads; overflow/allocation/borrowed ownership verified. Folded review report and HANDOFF included.
             - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
             - Report: `docs/dev/reports/phases/1/1.2.md`; include HANDOFF at this boundary.
     - [ ] Milestone 1.3 — Installed source-based indexing
