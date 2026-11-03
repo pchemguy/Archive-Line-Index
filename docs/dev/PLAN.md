@@ -9,11 +9,11 @@ This sequence makes the scanner, ownership rules and installed-library path usab
 | Phase | Integrated outcome | Planned package version | Prerequisite |
 | --- | --- | --- | --- |
 | 1 — Plain-file library | Standalone plain payload streaming and exact LF/BOM line offsets through installed public APIs | 0.1.0 | Accepted preparation integrated and published; implementation range selected |
-| 2 — Paired persistence and CLI | Persist/reload either index format and index one plain target through console, module or imported CLI, producing both outputs | 0.2.0 | Phase 1 reviewed, integrated and published |
-| 3 — ZIP and TAR workflows | The same public APIs and CLI work with ZIP, TAR and required compressed-TAR variants | 0.3.0 | Phase 2 reviewed, integrated and published |
-| 4 — 7z and complete-system delivery | Bounded 7z streaming/indexing and paired CLI outputs, with complete accepted-scope evidence | 0.4.0 | Phase 3 reviewed, integrated and published |
+| 2 — Paired persistence and CLI | Persist/reload either index format and index one plain target through console, module or imported CLI, producing both outputs | 0.2.0 | Phase 1 reviewed, integrated and its GitHub release published |
+| 3 — ZIP and TAR workflows | The same public APIs and CLI work with ZIP, TAR and required compressed-TAR variants | 0.3.0 | Phase 2 reviewed, integrated and its GitHub release published |
+| 4 — 7z and complete-system delivery | Bounded 7z streaming/indexing and paired CLI outputs, with complete accepted-scope evidence | 0.4.0 | Phase 3 reviewed, integrated and its GitHub release published |
 
-Each completed phase produces a verified wheel and source-distribution candidate with matching version metadata. Package versions identify cumulative delivered capability; phase completion and candidate artifacts do not by themselves constitute external package or release publication.
+After each implementation phase is complete, verified and integrated into the default branch, create and publish a GitHub release for its package version, tagged `v0.1.0` through `v0.4.0` respectively. Each release includes release notes and explicitly attached source-distribution and wheel artifacts built from the exact tagged source, with matching metadata and SHA-256 checksums. Automatic GitHub source links do not substitute for the attached source distribution.
 
 ## Phase 1 — Plain-file library
 
@@ -83,6 +83,12 @@ Two delivery milestones keep the adapter's bounded streaming/ownership risk dist
 - **Phase exits:** Each phase has exactly one final dedicated review milestone containing one review/testing/report task. It starts after delivery milestones and enabled tracking closures complete. A phase integrates only after its review, applicable artifacts and exits pass; verify/publish the merged result before an authorized successor starts. Partial ranges push and pause without integrating an incomplete phase.
 - **Tracking:** Project policy enables GitHub tracking. Activate only the eligible phase's label, milestones and task issues before its execution, with association/readback and evidence-based closure. Local PLAN/TASKS contain the full intended hierarchy; preparation does not create future-phase hosted objects.
 - **Packaging and feedback:** Each phase's version/artifacts and documented capabilities agree. Demonstration feedback informs the human's decisions but adds no approval pause inside an already authorized range unless a material decision/blocker requires it. Implementation remains bounded by the human's selected range.
+
+## Phase release gate
+
+The final phase review prepares verified package candidates and release notes for that phase’s delivered scope, including installation/use instructions, checks performed and material evidence limits. After verified integration, finalize and verify the release commit on the actual default branch, rebuild/verify the source distribution and wheel from that exact source, publish/read back the corresponding version tag, and publish the GitHub release with both explicit assets and `SHA256SUMS`. Verify the hosted notes, tag target, asset names and downloaded bytes against the local inventory before declaring release completion or starting an authorized successor phase. A partial implementation range does not trigger a phase release.
+
+Native Python distribution filenames retain their required ecosystem structure, including project/version and wheel compatibility tags. Use the actual valid `.whl` and source `.tar.gz` names as release assets; a version-free wheel rename would invalidate the requested format. Artifact inventory validation must check version/tag/metadata agreement and checksum/hosted-byte identity for these native assets. PyPI publication is not part of the phase release policy.
 
 ## Preparation handoff
 

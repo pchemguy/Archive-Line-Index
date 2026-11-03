@@ -2,13 +2,13 @@
 
 ## Current gate
 
-State: **Ready for PLAN strategy acceptance only**. The plan conforms to the accepted design/SPEC and preserves the complete intended scope through bounded useful increments. Human PLAN acceptance is pending. Physical allocation is not reviewed because layout has not been authored; TASKS readiness remains blocked until accepted layout and combined PLAN/layout QC.
+State: **Ready for PLAN strategy acceptance only**. The plan conforms to the accepted design/SPEC and preserves the complete intended scope through bounded useful increments. The human accepted PLAN on 2026-11-03 and explicitly added per-phase GitHub releases with source/wheel artifacts; that directed release amendment is included in the reviewed identity below. Physical allocation is not reviewed because layout has not been authored; TASKS readiness remains blocked until accepted layout and combined PLAN/layout QC.
 
 Review date: 2026-11-03. The authoring agent performed the strategy/contract review; no independent implementation audit or product execution is claimed. No confirmed strategy finding remains unresolved.
 
 ## Reviewed and governing identities
 
-Reviewed `PLAN.md` SHA-256: `6140880a9ce9a53eacc7563a86e326d4996d3a44a474362f65b9c77abc4fea01`.
+Reviewed `PLAN.md` SHA-256: `e7e5ed9ebcaa9ed6b30e4644451916203a19cdc99a0f161c3c71babe6db74698`. Initial strategy proposal at `1db10245cb090a38e744ac3374464e1735510778` had SHA-256 `6140880a9ce9a53eacc7563a86e326d4996d3a44a474362f65b9c77abc4fea01`.
 
 The amended design/SPEC set was accepted from `e75a91b338590113eea94074ce0a377ceaffb6a5`; the decision is published in `4a7da7178131da01d974ff84319d402a35e0bcb5` and DOCS-005 is closed. SPEC review metadata records that decision; its contract/governing hashes remain unchanged. The exact current inputs are:
 
@@ -59,3 +59,9 @@ The reviewed design maps to the strategy without adding a public API, changing a
 Performed: comparison with accepted PROJECT/design/SPEC and API/model owners; semantic review of every phase and milestone; explicit assessment of the two small delivery groups; all acceptance-group delivery routes; phase/milestone review ordering, package/version consistency, tracking activation and integration rules; local links, unique phase/milestone identities, Markdown structure/no-hard-wrap policy and exact content identities. Confirmed strategy findings: none. No correction/recheck revision is fabricated.
 
 Unreviewed placement: layout is absent. After PLAN acceptance, author layout and update this report with a combined placement assessment and exact new identity, preserving this strategy review. TASKS cannot be generated from this scoped Ready result alone. No implementation task IDs, task-count assessment, dependency installation, product testing, native execution or artifact build has been performed.
+
+## Revision 1 — Phase release policy
+
+The human accepted PLAN and directed a GitHub release after every completed, verified and integrated phase, with the corresponding version tag, release notes, source and wheel. PLAN now requires versions/tags 0.1.0/v0.1.0 through 0.4.0/v0.4.0, explicit sdist/wheel assets, checksums and tag/hosted-byte readback after integration. The source artifact is a buildable Python source distribution rather than only GitHub-generated source links. Native wheel/sdist filenames retain valid ecosystem-required version structure to honor the requested artifact formats; this is a scoped project requirement, not a general release naming change.
+
+Recheck: phase/milestone identities, scope and counts are unchanged; release finalization is a post-integration gate, with candidates/notes prepared by the review boundary. Successor phases require the predecessor release to be published and verified. Exact source/version/package identities and hosted download checks are required; no release or tag is created during preparation. The current PLAN hash above identifies the reviewed directed amendment. Strategy is Ready; combined layout readiness remains pending.
