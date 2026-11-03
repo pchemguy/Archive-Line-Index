@@ -239,11 +239,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Verified result: Whole ZIP milestone code review found and repaired source tell() misclassification with an observed failing regression. Full verification passes 444 tests, 96% production coverage, Ruff lint/format and strict mypy; actual native/source-rebuilt installs run all commands and six README examples. Report records acceptance, T-029 forward recovery and T-031 readback reconciliation; HANDOFF preserves complete Phase 3 authority and the stop before Phase 4.
             - Report: `docs/dev/reports/phases/3/3.1.md`; include HANDOFF at this boundary.
     - [ ] Milestone 3.2 — Sequential TAR integration
-        - [ ] T-034 — Implement sequential plain-TAR payload delivery
+        - [x] T-034 — Implement sequential plain-TAR payload delivery
             - Scope: backends/tar.py and TAR reader/fixture checks.
             - Depends on: T-033.
             - Acceptance/evidence: Expose a sole regular payload through sequential iteration with exact bytes, empty/nested-member support, correct handle ownership and early close.
             - Contracts: ARC-01, ARC-03; STR-01, STR-05.
+            - Verified result: Sequential plain-TAR payload access uses stream mode and owns source/archive/member handles without filesystem extraction. Real USTAR/PAX/GNU fixtures cover empty/nested payloads, consumed extension headers, special entries before payload, bounded reads, early close and failed-opening cleanup. New-module checks first failed because the adapter was absent; 40 TAR/ZIP tests, strict mypy and full Ruff pass. Trailing validation remains explicitly assigned to T-035 before public TAR selection.
         - [ ] T-035 — Implement TAR trailing-entry and structure validation
             - Scope: backends/tar.py finalization and late-invalid-member tests.
             - Depends on: T-034.
