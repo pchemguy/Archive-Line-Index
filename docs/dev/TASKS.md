@@ -207,11 +207,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 - [ ] Phase 3 — ZIP and TAR workflows
     - [ ] Milestone 3.1 — ZIP source integration
-        - [ ] T-029 — Implement ZIP metadata and member validation
+        - [x] T-029 — Implement ZIP metadata and member validation
             - Scope: backends/zip.py opening/selection and archive-factory/unit checks.
             - Depends on: T-028.
             - Acceptance/evidence: Accept sole empty/nested regular members, account for directories/metadata files and reject count/special/encrypted cases through the required public categories with cleanup on opening failure.
             - Contracts: ARC-01, ARC-03–04; API-04.
+            - Verified result: ZIP opening validates sole empty/nested regular payloads, directory metadata, extra metadata files, special Unix types and encryption without extraction. Opening failures release the owned source and preserve parsing causes. New-adapter test initially failed because the module was absent; 13 real-fixture tests, Ruff and strict mypy pass. Phase 3 source parent is e19750c6e79b3c0eb0b135bb9db042a51b6fed70; issues #38–49 and milestones #10–12 are activated and read back.
         - [ ] T-030 — Implement ZIP reader completion and resource cleanup
             - Scope: backends/zip.py bounded delivery/finalization and corruption/limit checks.
             - Depends on: T-029.
