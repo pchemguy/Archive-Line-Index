@@ -76,6 +76,19 @@ assert not source.closed
 
 Set `skip_utf8_bom=False` to include the initial BOM in first-line content. Later or incomplete BOMs remain ordinary bytes. Empty input yields `[0]`, skipped BOM-only input yields `[3]`, and a trailing LF adds no extra empty line. Line i spans `[offsets[i], offsets[i + 1])`.
 
+## Line-boundary scanning
+
+`scan_line_offsets` reads bounded byte blocks (1 MiB by default) and searches each block with repeated `bytes.find` calls. The core loop in [`scanner.py`](src/archive_line_index/scanner.py), shown below as an implementation excerpt, records the byte immediately after each LF; `position` is the block’s starting offset:
+
+```py
+start = 0
+while (newline := block.find(b"\n", start)) >= 0:
+    append_offset(offsets, position + newline + 1)
+    start = newline + 1
+```
+
+This keeps byte searching in the runtime’s native `bytes` implementation, with Python work per match rather than per byte, and never assembles a complete line. A one-byte LF needs no overlap between blocks; BOM handling and the final EOF sentinel are managed outside this loop. Python byte-by-byte iteration adds interpreter work, `readline()`/`split()` materialize lines or fragments, and `mmap` requires a suitable file rather than the generic binary-reader interface. Blockwise `bytes.find` fits the bounded-memory streaming contract without an extra scanning dependency.
+
 ## Build from a filesystem source
 
 `build_line_index` opens and owns the content stream, scans through validated EOF and closes it on success or failure. It returns only the completed array; it creates no output files.
