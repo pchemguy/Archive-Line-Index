@@ -2,7 +2,7 @@
 
 ## Current gate
 
-State: **Ready for PLAN strategy acceptance only**. The plan conforms to the accepted design/SPEC and preserves the complete intended scope through bounded useful increments. The human accepted PLAN on 2026-11-03 and explicitly added per-phase GitHub releases with source/wheel artifacts; that directed release amendment is included in the reviewed identity below. Physical allocation is not reviewed because layout has not been authored; TASKS readiness remains blocked until accepted layout and combined PLAN/layout QC.
+State: **Ready for layout acceptance with combined PLAN/layout QC**. The plan conforms to the accepted design/SPEC and preserves the complete intended scope through bounded useful increments. The human accepted PLAN on 2026-11-03 and explicitly added per-phase GitHub releases with source/wheel artifacts; that directed release amendment is included in the reviewed identity below. Physical allocation is reviewed in Revision 2 against the accepted PLAN/design/SPEC. Layout human acceptance remains pending, so TASKS derivation remains blocked until that checkpoint and DOCS-007 publication/closure.
 
 Review date: 2026-11-03. The authoring agent performed the strategy/contract review; no independent implementation audit or product execution is claimed. No confirmed strategy finding remains unresolved.
 
@@ -65,3 +65,27 @@ Unreviewed placement: layout is absent. After PLAN acceptance, author layout and
 The human accepted PLAN and directed a GitHub release after every completed, verified and integrated phase, with the corresponding version tag, release notes, source and wheel. PLAN now requires versions/tags 0.1.0/v0.1.0 through 0.4.0/v0.4.0, explicit sdist/wheel assets, checksums and tag/hosted-byte readback after integration. The source artifact is a buildable Python source distribution rather than only GitHub-generated source links. Native wheel/sdist filenames retain valid ecosystem-required version structure to honor the requested artifact formats; this is a scoped project requirement, not a general release naming change.
 
 Recheck: phase/milestone identities, scope and counts are unchanged; release finalization is a post-integration gate, with candidates/notes prepared by the review boundary. Successor phases require the predecessor release to be published and verified. Exact source/version/package identities and hosted download checks are required; no release or tag is created during preparation. The current PLAN hash above identifies the reviewed directed amendment. Strategy is Ready; combined layout readiness remains pending.
+
+## Revision 2 — Combined PLAN/layout review
+
+The layout proposal consists of the root ownership map and separate source, test and document children. Exact reviewed states are:
+
+| Layout artifact | SHA-256 |
+| --- | --- |
+| [layout.md](layout.md) | `da78d756af01b8f94ac5b76ea22e8224c55890e6bb6fbff1f1ce59a7db8aa516` |
+| [layout/src.md](layout/src.md) | `20ae7203f448683c6d28b9d604963bc601ced5099b494800aae1a17ac208102d` |
+| [layout/tests.md](layout/tests.md) | `899b8e26dd9ee98326111519c259c4df620cd33659903fb5612d919d8e34b67b` |
+| [layout/docs.md](layout/docs.md) | `43dd9d2618f2784a1c4f539a99ba23bc574e7b28563001f031754291d32b5630` |
+
+The governing PLAN remains the accepted release-amended state recorded above and published in `c3b8f271e9484995fc21baf38f4b3aed3f01a710`; its phase boundaries, ten delivery milestones and four dedicated reviews are unchanged. Design/SPEC source identities remain those in the governing table. DOCS-006 closure is independently verified.
+
+| Delivery concern | Physical allocation and combined assessment |
+| --- | --- |
+| Plain library/scanner and installed package | Source map assigns facade, normalization, detection, errors, reader contract, stream, scanner and offset owners under the existing src package. Unit/component checks and installed-artifact integration have distinct test homes; pyproject remains the build/version/tool owner. Phase 1 can deliver a genuine installed API without implementing later adapters. |
+| Persistence and paired CLI | Separate SQLite/raw modules share only offset/path/publication owners. CLI main and guarded module wrapper have explicit homes, with console metadata in pyproject. Unit CLI checks isolate one-scan/writer-order/status behavior; integrated checks cover all invocation paths, actual outputs and filesystem failures. Phase 2 placement supports both independent library APIs and the installed paired command. |
+| Standard-library and 7z adapters | Dedicated adapter modules implement the base reader contract. The bounded producer is physically separate from py7zr-specific callbacks; controlled producer tests require no archive dependency. Actual archive/integrity/cancellation and progressive delivery checks live in integration ownership. No scanner/persistence import of an adapter is introduced. |
+| Documentation, package/release evidence and artifact validation | Product documents, public examples/docstrings and workflow reports have separate owners. Generated dist/checksum outputs are excluded from committed/package inputs; the inventory script/tests own native names, version/tag agreement and archive exclusions. Root release notes and phase evidence support the approved post-integration source/wheel release policy. |
+
+Recheck methods: component-to-path and path-to-owner inspection, public/internal declaration placement, import-direction comparison, source/test separation, contract-to-check routing, package/release-input coverage, local link checks and unwrapped Markdown validation. Root/child responsibilities do not duplicate behavioral contracts, delivery order or executable checklists. Paths are intended placement, not a claim of created implementation. No confirmed placement/design/strategy issue remains unresolved; combined technical readiness is Ready for the layout checkpoint.
+
+No TASKS file, product source/test file, artifact, script implementation, dependency installation or hosted release was created. Task-size/count review remains for TASKS. Layout acceptance is required before dependent task derivation.
