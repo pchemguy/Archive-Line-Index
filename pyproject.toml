@@ -51,6 +51,10 @@ exclude = [
     "/.venv",
     "/dist",
     "/**/__pycache__",
+    "/**/*.tkn",
+    "/**/.env",
+    "/**/.agents",
+    "/**/ai-logs",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -70,7 +74,7 @@ only-include = [
 packages = ["src/archive_line_index"]
 
 [tool.pytest]
-addopts = ["-ra", "-q", "--strict-config", "--strict-markers"]
+addopts = ["-ra", "-q", "--strict-config", "--strict-markers", "--import-mode=importlib"]
 pythonpath = ["src"]
 testpaths = ["tests"]
 asyncio_mode = "strict"

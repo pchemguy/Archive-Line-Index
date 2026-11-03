@@ -83,11 +83,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Build wheel/sdist at 0.1.0, install actual wheel bytes outside repository paths, exercise delivered public APIs and rebuild the wheel from source distribution without undeclared runtime tools.
             - Contracts: API-05; SYS-11–12; layout packaging boundary.
             - Verified result: RED: source artifact included vendored .agents files. GREEN: explicit sdist selection; 3 native build/install integration tests pass against wheel and independently source-rebuilt wheel outside checkout. Clean runtimes use actual artifacts/declared py7zr dependencies with no dev tools or path injection; metadata/version/exports/plain workflows pass. Ruff and strict mypy pass; prior 215 behavior tests retained.
-        - [ ] T-012 — Implement native release artifact inventory validation
+        - [x] T-012 — Implement native release artifact inventory validation
             - Scope: scripts/check_release_artifacts.py, its unit tests and relevant build exclusions.
             - Depends on: T-011.
             - Acceptance/evidence: Reject mismatched native filenames/version/tag metadata, missing source/wheel or unsafe distribution entries; verify SHA256SUMS against real candidate bytes. Synthetic failure cases must fail before corrected inventory passes.
             - Contracts: PLAN phase release gate; native wheel/sdist naming and inventory owners.
+            - Verified result: RED: inventory checker absent; synthetic invalid inventories checked before real candidates. GREEN: 247 full-suite tests pass, including 28 synthetic artifact checks and real native inventory/CLI/SHA256SUMS readback. Native filenames/tag/embedded metadata, safe entries, source-wheel byte parity, required files and exact checksums enforced. Ruff and strict mypy (including helper) pass; pytest import isolation fixes duplicate test basenames.
         - [ ] T-013 — Complete documented installed plain-index workflows
             - Scope: Root README, public module documentation and executable documentation examples.
             - Depends on: T-010, T-011, T-012.
