@@ -7,6 +7,7 @@ from unittest.mock import patch
 import pytest
 
 from archive_line_index.cli import main
+from archive_line_index.errors import ExtractionError
 
 
 @pytest.mark.parametrize(
@@ -184,3 +185,75 @@ def test_explicit_overwrite_allows_distinct_outputs(tmp_path: Path) -> None:
             == 0
         )
     assert sqlite.call_args.kwargs == raw.call_args.kwargs == {"overwrite": True}
+
+
+@pytest.mark.parametrize("stage", ["build", "sqlite", "raw"])
+@pytest.mark.parametrize("error_kind", [OSError, MemoryError, ExtractionError])
+def test_operational_failure_status_and_known_publications(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    stage: str,
+    error_kind: type[Exception],
+) -> None:
+    error = error_kind("operational fault")
+    values = array("Q", [0, 3])
+    with (
+        patch(
+            "archive_line_index.cli.build_line_index",
+            side_effect=error if stage == "build" else None,
+            return_value=values,
+        ),
+        patch(
+            "archive_line_index.cli.write_sqlite_index",
+            side_effect=error if stage == "sqlite" else None,
+        ) as sqlite,
+        patch(
+            "archive_line_index.cli.write_raw_index",
+            side_effect=error if stage == "raw" else None,
+        ) as raw,
+    ):
+        assert main([str(tmp_path / "payload.txt")]) == 1
+    out, err = capsys.readouterr()
+    assert not out and str(error) in err and "Traceback" not in err
+    if stage == "build":
+        sqlite.assert_not_called()
+    if stage != "raw":
+        raw.assert_not_called()
+    else:
+        assert "Already published" in err and str(tmp_path / "payload.sqlite3") in err
+
+
+def test_interruption_preserves_known_sqlite_publication(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    with (
+        patch("archive_line_index.cli.build_line_index", return_value=array("Q", [0])),
+        patch("archive_line_index.cli.write_sqlite_index"),
+        patch("archive_line_index.cli.write_raw_index", side_effect=KeyboardInterrupt),
+    ):
+        assert main([str(tmp_path / "payload.txt")]) == 130
+    out, err = capsys.readouterr()
+    assert not out and "Interrupted" in err and str(tmp_path / "payload.sqlite3") in err
+
+
+def test_unexpected_programming_error_propagates(tmp_path: Path) -> None:
+    with (
+        patch(
+            "archive_line_index.cli.build_line_index",
+            side_effect=RuntimeError("programming defect"),
+        ),
+        pytest.raises(RuntimeError, match="programming defect"),
+    ):
+        main([str(tmp_path / "payload.txt")])
+
+
+@pytest.mark.parametrize(
+    "error,status", [(MemoryError("parser allocation"), 1), (KeyboardInterrupt(), 130)]
+)
+def test_parser_resource_failure_returns_operational_status(
+    error: BaseException, status: int, capsys: pytest.CaptureFixture[str]
+) -> None:
+    with patch("archive_line_index.cli._parser", side_effect=error):
+        assert main(["payload.txt"]) == status
+    out, err = capsys.readouterr()
+    assert not out and err and "Traceback" not in err

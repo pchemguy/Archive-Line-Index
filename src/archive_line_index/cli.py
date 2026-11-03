@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import NoReturn
 
 from .api import build_line_index
+from .errors import ArchiveLineIndexError
 from .persistence.raw import write_raw_index
 from .persistence.sqlite import write_sqlite_index
 
@@ -63,6 +64,14 @@ def _preflight(target: Path, outputs: tuple[Path, Path], *, overwrite: bool) -> 
             raise FileExistsError(f"Protected destination exists: {output}")
 
 
+def _diagnostic(title: str, error: BaseException, published: list[Path]) -> None:
+    print(f"{title}: {error}" if str(error) else title, file=sys.stderr)
+    for note in getattr(error, "__notes__", ()):
+        print(note, file=sys.stderr)
+    for path in published:
+        print(f"Already published: {path}", file=sys.stderr)
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     """Index one filesystem target once and write SQLite then raw from one array.
 
@@ -70,7 +79,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         argv: Explicit argument sequence, or None for sys.argv[1:]. A command-line
             string, bytes, nonsequence or nonstring element raises TypeError.
 
-    Help and usage errors return integer statuses without exiting the caller.
+    Returns 0 for success/help, 2 for usage, 1 for expected operational failure
+    or 130 for interruption. Completed publications and exception notes are
+    reported on stderr on failure; they are never rolled back. Unexpected
+    programming errors propagate. Help/usage never exit the caller.
     Importing this module performs no parsing, path inspection or CLI execution.
     """
     if argv is not None and (
@@ -79,28 +91,38 @@ def main(argv: Sequence[str] | None = None) -> int:
         or any(not isinstance(value, str) for value in argv)
     ):
         raise TypeError("argv must be a sequence of strings or None")
-    values = list(sys.argv[1:] if argv is None else argv)
     try:
+        values = list(sys.argv[1:] if argv is None else argv)
         options = _parser().parse_args(values)
     except _ParserExit as outcome:
         if outcome.message:
             print(outcome.message, file=sys.stderr, end="")
         return outcome.status
-    target = Path(options.target)
-    stem = (
-        Path(options.output)
-        if options.output is not None
-        else target.parent / target.stem
-    )
-    sqlite = Path(str(stem) + ".sqlite3")
-    raw = Path(str(stem) + ".u64")
+    except (MemoryError, KeyboardInterrupt) as error:
+        interrupted = isinstance(error, KeyboardInterrupt)
+        _diagnostic("Interrupted" if interrupted else "Indexing failed", error, [])
+        return 130 if interrupted else 1
+    published: list[Path] = []
     try:
+        target = Path(options.target)
+        stem = (
+            Path(options.output)
+            if options.output is not None
+            else target.parent / target.stem
+        )
+        sqlite = Path(str(stem) + ".sqlite3")
+        raw = Path(str(stem) + ".u64")
         _preflight(target, (sqlite, raw), overwrite=options.overwrite)
-    except (OSError, ValueError) as error:
-        print(f"Indexing failed: {error}", file=sys.stderr)
+        offsets = build_line_index(target)
+        write_sqlite_index(offsets, sqlite, overwrite=options.overwrite)
+        published.append(sqlite)
+        write_raw_index(offsets, raw, overwrite=options.overwrite)
+        published.append(raw)
+        print(f"Indexed {len(offsets) - 1} lines: {sqlite}; {raw}")
+        return 0
+    except KeyboardInterrupt as error:
+        _diagnostic("Interrupted", error, published)
+        return 130
+    except (ArchiveLineIndexError, OSError, MemoryError, ValueError) as error:
+        _diagnostic("Indexing failed", error, published)
         return 1
-    offsets = build_line_index(target)
-    write_sqlite_index(offsets, sqlite, overwrite=options.overwrite)
-    write_raw_index(offsets, raw, overwrite=options.overwrite)
-    print(f"Indexed {len(offsets) - 1} lines: {sqlite}; {raw}")
-    return 0

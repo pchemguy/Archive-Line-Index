@@ -152,7 +152,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
             - Verified result: Whole-milestone code review completed; reproduced SQL LIKE-prefix bug repaired with exact internal-prefix matching. GREEN: 333 tests, 95% coverage, Ruff/strict mypy and both installed persistence workflows pass. Race/flush/cleanup/read-failure checks preserve file/array/error ownership. Milestone report/HANDOFF included; no blockers.
             - Report: `docs/dev/reports/phases/2/2.1.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 2.2 — Importable paired-output command
+    - [x] Milestone 2.2 — Importable paired-output command
         - [x] T-022 — Implement importable single-target paired indexing
             - Scope: cli.py main/parser and focused successful invocation/help checks.
             - Depends on: T-021.
@@ -165,11 +165,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Cover default input directory/final-suffix stem, explicit output stem, both extensions, spaces/hyphen-prefixed targets, protected outputs, dangling paths and source aliases before scanning.
             - Contracts: CLI-02, CLI-04; explicit overwrite/naming contract.
             - Verified result: RED: seven preflight cases scanned protected/alias sources. GREEN: final-suffix/default/explicit stems, appended extensions, spaces, hyphen targets with --, both protected paths, dangling links and lexical/hard/symlink source aliases are checked before scanning; distinct overwrite remains explicit. Full regressions, Ruff/strict mypy pass.
-        - [ ] T-024 — Complete CLI errors interruption and partial-publication reporting
+        - [x] T-024 — Complete CLI errors interruption and partial-publication reporting
             - Scope: cli.py error/status flow and real in-process integration checks.
             - Depends on: T-022, T-023.
             - Acceptance/evidence: Verify help/usage/operational/interruption statuses and streams, no success summary on failure, no raw write after SQLite failure, and accurate already-published paths/cleanup notes. Preserve library exception behavior.
             - Contracts: CLI-01–05; API-04; PER-05.
+            - Verified result: RED: operational/interruption/partial-publication cases escaped, and parser resource failures reproduced during review. GREEN: 383 tests, 96% coverage (CLI 100%), Ruff/strict mypy pass. Real imported workflows and raw interruption cleanup preserve/report complete outputs; expected status/streams/notes and unexpected-error propagation verified. Folded review report/HANDOFF included.
             - Milestone exit: whole-capability code review, applicable regressions and blocker repairs; commit the milestone report and HANDOFF with this task’s verified result and initial checkbox.
             - Report: `docs/dev/reports/phases/2/2.2.md`; include HANDOFF at this boundary.
     - [ ] Milestone 2.3 — Installed command workflow
