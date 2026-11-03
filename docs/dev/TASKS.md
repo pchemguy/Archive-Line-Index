@@ -153,11 +153,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Verified result: Whole-milestone code review completed; reproduced SQL LIKE-prefix bug repaired with exact internal-prefix matching. GREEN: 333 tests, 95% coverage, Ruff/strict mypy and both installed persistence workflows pass. Race/flush/cleanup/read-failure checks preserve file/array/error ownership. Milestone report/HANDOFF included; no blockers.
             - Report: `docs/dev/reports/phases/2/2.1.md`; include HANDOFF at this boundary.
     - [ ] Milestone 2.2 — Importable paired-output command
-        - [ ] T-022 — Implement importable single-target paired indexing
+        - [x] T-022 — Implement importable single-target paired indexing
             - Scope: cli.py main/parser and focused successful invocation/help checks.
             - Depends on: T-021.
             - Acceptance/evidence: Use the existing builder once and pass the same array to SQLite then raw; return integer results, avoid import-time work/SystemExit for normal outcomes, and print success only after both writes.
             - Contracts: CLI-01, CLI-03; public CLI signature; SYS-13.
+            - Verified result: RED: CLI module absent. GREEN: one builder call and identical array passed to SQLite then raw, zero/BOM-only line counts, success-after-both-writes, help/usage statuses without path I/O/SystemExit, argv validation and sys.argv defaults pass with regressions. Ruff/strict mypy pass; milestone #6 closure verified first.
         - [ ] T-023 — Implement shared output stems and both-path preflight
             - Scope: cli.py path/options handling and focused naming/alias checks.
             - Depends on: T-022.
