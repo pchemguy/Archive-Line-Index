@@ -1,6 +1,6 @@
 # Project handoff
 
-Checkpoint: prospective explicit Phase 2 integration into main. T-028 `15cf302066fa0932e072cb00cdfe406fbdd6a909` is published/read back; issue #37 and milestone #9 are closed. Verify/publish the containing two-parent merge before release finalization. Recover subsequent effects before replay.
+Checkpoint: Phase 2 integration `d4acf064974c7867c713dc01dba94c0180fb4a61` is verified and published on main. All 13 task issues and four milestones are closed. This containing direct main commit finalizes release 0.2.0; its publication, exact-source packages, tag and hosted release require actual readback.
 
 ## Authorization and result
 
@@ -16,4 +16,4 @@ Creation/integration parent main: `eaa2dcfdfd756d367c15b9ec4eb763dda2e49c97`. Pu
 
 ## Next effects
 
-All Phase 2 issues #25–37 and milestones #6–9 are closed. Integration pins receiving main `eaa2dcfdfd756d367c15b9ec4eb763dda2e49c97` and incoming `15cf302066fa0932e072cb00cdfe406fbdd6a909`. No conflicts occurred. Verify and publish the containing explicit two-parent merge. Finalize a direct default-branch release commit using the exact root RELEASE-NOTES.md body; publish it, build/check/install from that exact source and tag v0.2.0 there. Use one protected API publisher for source/wheel/SHA256SUMS, complete draft verification before publication, then verify body/latest/tag and downloaded bytes. Preserve root notes and only remove the owned ignored highlights draft after consumption. Record the final result/report, push/read back main and stop before Phase 3.
+All Phase 2 issues #25–37 and milestones #6–9 are closed. Integration pins receiving main `eaa2dcfdfd756d367c15b9ec4eb763dda2e49c97` and incoming `15cf302066fa0932e072cb00cdfe406fbdd6a909`. No conflicts occurred. The explicit merge `d4acf064974c7867c713dc01dba94c0180fb4a61` passed 399 merged-state tests and is published/read back. This direct default-branch release commit uses root RELEASE-NOTES.md as its exact body. Publish/read back it, pin its SHA and build/check/install from that exact source before publishing v0.2.0 there. Use one protected API publisher for source/wheel/SHA256SUMS, complete draft verification before publication, then verify body/latest/tag and downloaded bytes. Preserve root notes and only remove the owned ignored highlights draft after consumption. Record the final result/report, push/read back main and stop before Phase 3.
