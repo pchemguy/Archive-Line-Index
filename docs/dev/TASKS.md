@@ -11,7 +11,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 ## Phase 1 — Plain-file library
 
 - [ ] Phase 1 — Plain-file library
-    - [ ] Milestone 1.1 — Plain content access
+    - [x] Milestone 1.1 — Plain content access
         - [x] T-001 — Establish the typed package and executable check foundation
             - Scope: pyproject.toml, package __init__/errors owners, test/shared-fixture setup and generated-file exclusions; establish initial 0.1.0 metadata without CLI wiring.
             - Depends on: accepted preparation/phase activation; no earlier product task.
@@ -42,11 +42,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Verify byte-capacity buffers, unchanged tails, unbounded-read late failure, declared/actual inclusive limits and failed-construction cleanup. No excessive byte is returned or copied.
             - Contracts: STR-01–04; API-02, API-04.
             - Verified result: RED: 16 buffer/unbounded/limit checks failed against T-004. GREEN: 68 tests pass with byte-capacity/tail checks, inclusive declared/actual limits, exact-limit finalization, retained late failures and reader-consuming construction cleanup. Ruff and strict mypy pass.
-        - [ ] T-006 — Review test and report milestone 1.1
+        - [x] T-006 — Review test and report milestone 1.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-001, T-002, T-003, T-004, T-005.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Whole-milestone code review completed independently of test execution; no blockers. Real-file mixed read demonstration and cleanup regressions pass: 76 tests, 99% coverage; Ruff lint/format and strict mypy pass. Report and HANDOFF included; issues #10–14 verified completed before boundary.
             - Report: `docs/dev/reports/phases/1/1.1.md`; include HANDOFF at this boundary.
     - [ ] Milestone 1.2 — Canonical line indexing
         - [ ] T-007 — Implement canonical offset validation and checked construction

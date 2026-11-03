@@ -239,3 +239,31 @@ def test_exact_limit_still_requires_terminal_validation() -> None:
         assert s.read(0) == b""
         with pytest.raises(ExtractionError, match="footer"):
             s.read(1)
+
+
+def test_context_cleanup_failure_without_body_is_raised() -> None:
+    s = make_content_stream(Reader(close_failures=1), max_uncompressed_size=None)
+    with pytest.raises(OSError, match="close fault"), s:
+        pass
+    assert not s.closed
+    s.close()
+
+
+def test_construction_error_preserves_cleanup_failure_note() -> None:
+    from archive_line_index.errors import SizeLimitExceededError
+
+    r = Reader(declared_size=3, close_failures=1)
+    with pytest.raises(SizeLimitExceededError) as caught:
+        make_content_stream(r, max_uncompressed_size=0)
+    assert "close fault" in caught.value.__notes__[0]
+    r.close()
+
+
+def test_released_buffer_is_type_error_without_backend_work() -> None:
+    view = memoryview(bytearray(2))
+    view.release()
+    r = Reader(b"x")
+    with make_content_stream(r, max_uncompressed_size=None) as s:
+        with pytest.raises(TypeError):
+            s.readinto(view)
+        assert not r.requests
