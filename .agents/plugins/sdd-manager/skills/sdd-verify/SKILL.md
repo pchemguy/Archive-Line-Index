@@ -15,6 +15,7 @@ Establish the requested task, change, milestone, phase, or project scope. Load t
 | --- | --- |
 | Review milestone/phase implementation code and findings | [boundary review](references/boundary-review.md) |
 | Derive checks from requirements, changes, and dependencies | [check selection](references/check-selection.md) |
+| Execute a complete-inventory artifact-name check; select the project check or Python helper | [executed naming gate](scripts/release-assets.md) |
 | Assess Git highlights, package contents, release workflows, CI outputs and hosted download evidence | [package and release checks](references/release-checks.md) |
 | Execute checks and assess acceptance evidence | [execution and evidence](references/execution-and-evidence.md) |
 | Classify failures and return unresolved work | [failure assessment](references/failure-assessment.md) |
@@ -32,5 +33,7 @@ For an explicit boundary review task, load boundary review and assess implementa
 5. Classify observed failures where evidence permits and return remaining work to its owner. Do not silently omit an unrelated or pre-existing failure from the results.
 
 **sdd-tdd** owns testing strategy and test design or changes; this skill assesses coverage and executes the verification campaign. **sdd-docs** owns documentation maintenance. The active workflow owns repair coordination, completion, persistence and hosted closure: **sdd-manage** for main preparation, **sdd-implement** or **sdd-steer** for implementation. Leave source, tests, governing documents, and task status unchanged during verification; report necessary changes rather than repairing them here. Account for command-generated artifacts and preserve unrelated pending work.
+
+**Version numbers in the name of any release artifact are absolutely prohibited, regardless of type.** For package/release checks, validate every actual name without type/extension filtering through the [independent naming gate](../sdd-forge/references/github-packaging.md#artifact-name-gate-and-repair). Matching manifests/checksums cannot waive it.
 
 Return the boundary and implementation state, conditions assessed, check selection and rationale, commands and environment, observed outcomes and evidence locations, failure classifications, omitted or blocked checks, and remaining gaps. **sdd-report** owns presentation of these facts. Existing task evidence or a project-designated record may hold durable results; no separate verification journal is required. State when the selected conditions are verified without equating that finding with task completion or whole-project correctness.

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "sdd-manager",
-  "version": "0.16.1",
+  "version": "0.16.4",
   "description": "Git-based specification-driven development with central workflow coordination, design, specification, planning, task lists, documentation, TDD, verification, bounded implementation, human-directed steering, feature integration, reporting, and optional GitHub tracking, release packaging and release publication.",
   "author": {
     "name": "PChemGuy",

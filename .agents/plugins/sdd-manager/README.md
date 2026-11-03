@@ -4,7 +4,7 @@
 
 SDD Manager is a learning-by-doing experiment in specification-driven development with coding agents, packaged as an Agent Plugin for Git repositories. It composes focused skills into workflows for exploration, design, specification, planning, implementation, verification and releases. Practical project runs inform its refinement; local source checks and live agent/client acceptance have distinct evidence boundaries.
 
-Navigate: [Quick Start](#quick-start) · [Workflows](#core-development-workflows) · [Modes and checkpoints](#doc-design-modes) · [Continuation](#continue-with-another-agent) · [Workflow diagrams](#workflow-guide) · [Releases](#release-operations) · [Package assets](#plugin-package).
+Navigate: [Prerequisites](#execution-prerequisites) · [Quick Start](#quick-start) · [Workflows](#core-development-workflows) · [Modes and checkpoints](#doc-design-modes) · [Continuation](#continue-with-another-agent) · [Workflow diagrams](#workflow-guide) · [Releases](#release-operations) · [Package assets](#plugin-package).
 
 In the source repository, the complete plugin package is at `.agents/plugins/sdd-manager/`, available for agents to load when working on SDD Manager itself. A separate agent installation remains an option. This checkout layout does not configure automatic loading; installed or extracted packages begin at their own plugin root.
 
@@ -12,7 +12,15 @@ The plugin defines a non-standard [PLUGIN.md](PLUGIN.md) entry, analogous to a s
 
 Development uses [SDD Manager](assets/SDD-MANAGER.md). See the [AI-assisted development disclosure](assets/AI_DISCLOSURE.md).
 
+## Execution prerequisites
+
+When a workflow uses the bundled supervised HTTPS Git publication utility, the execution environment needs native Git on PATH, Node.js 22+ and Python 3.11+. Its supported hosts are Windows 10+ with Job Object process ownership, or Linux with child-subreaper and procfs facilities. See the [publication runtime guide](skills/sdd-manage/scripts/git-auth-recover.md#runtime-and-interface) for the utility's complete requirements.
+
+Target projects and other selected operations retain their own toolchain requirements.
+
 ## Quick Start
+
+Before project work, review the [execution prerequisites](#execution-prerequisites).
 
 Choose the minimal Hello World app, the Tetris game, the calculator, or a template for your own project.
 
@@ -392,7 +400,7 @@ A release request checks local source coverage and the stated version; a matchin
 
 ### Packaging and publication
 
-Preparing a package/workflow does not publish a release. Publication uses verified local packages or an existing workflow, complete assets and provider readback; it does not require task tracking. Asset names are version-free, such as project.zip, while tags/metadata identify the version. Stable downloads use https://github.com/{OWNER}/{REPO}/releases/latest/download/{ASSET_NAME} and require the complete advertised latest-stable asset set.
+Preparing a package/workflow does not publish a release. Publication uses verified local packages or an existing workflow, complete assets and provider readback; it does not require task tracking. **Version numbers in the name of any release artifact are absolutely prohibited, regardless of type.** Every actual artifact must pass an executed naming check before tagging, publishing dispatch, upload or publication; no format/extension exemption is permitted. Previous releases and explicit project naming policies/templates/examples do not exempt new releases; the agent must correct all conflicting active definitions and producers. Stable downloads use https://github.com/{OWNER}/{REPO}/releases/latest/download/{ASSET_NAME} and require the complete advertised latest-stable asset set.
 
 A mandatory [artifact-name gate](skills/sdd-forge/references/github-packaging.md#artifact-name-gate-and-repair) checks actual files against the naming requirements, independently of the generated upload list. This includes raw HTML files: use `tetris.html`, not a release-version filename. If names fail, the agent repairs build/release scripts and related code, tests and docs, publishes the corrected source, rebuilds and rechecks before continuing an authorized release. Direct and CI publishers need the project-local check; hosted/latest readback verifies the final names. Explicit narrower requests and existing-tag/immutable-release limits still apply.
 

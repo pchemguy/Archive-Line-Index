@@ -50,7 +50,7 @@ export function validateToken(raw) {
 export function childEnv(base = process.env) {
   const env = {};
   for (const [key, value] of Object.entries(base)) {
-    if (/^(GIT_DIR|GIT_WORK_TREE|GIT_COMMON_DIR|GIT_INDEX_FILE|GIT_CONFIG_PARAMETERS|GIT_CONFIG_COUNT|GIT_CONFIG_KEY_\d+|GIT_CONFIG_VALUE_\d+)$/i.test(key)) fail('relocated_git_environment');
+    if (/^(GIT_DIR|GIT_WORK_TREE|GIT_COMMON_DIR|GIT_INDEX_FILE|GIT_CONFIG|GIT_CONFIG_PARAMETERS|GIT_CONFIG_COUNT|GIT_CONFIG_KEY_\d+|GIT_CONFIG_VALUE_\d+)$/i.test(key)) fail('relocated_git_environment');
     if (/^(GIT_ASKPASS|SSH_ASKPASS|GIT_TRACE.*|GIT_CURL_VERBOSE|GIT_TRACE_CURL.*|GIT_TERMINAL_PROMPT|GCM_INTERACTIVE)$/i.test(key)) continue;
     env[key] = value;
   }

@@ -4,7 +4,9 @@ Load after the [package contract](github-packaging.md) is sufficient, or when in
 
 ## Author or extend
 
-Inspect existing `.github/workflows/` and project build procedures. Reuse a suitable workflow and publishing stage rather than introduce competing release creators. Establish trigger, exact source/tag inputs, build-only versus publication behavior, supported variants, expected asset set and notes/latest/prerelease policy. Keep a simple source ZIP proportionate: an explicit inventory, relevant checks, archive inspection, checksum and one publishing stage may be enough.
+**Version numbers in the name of any release artifact are absolutely prohibited, regardless of type.** Establish independent stable names before writing the workflow. Generate a real failing-before-passing naming check in the existing stack, cover every staged artifact without filtering by type, and require it before uploads/publication. Provide a build-only route for pre-tag candidate verification.
+
+Inspect existing `.github/workflows/` and project build procedures directly, including tracked hidden directories; do not infer absence from a visible-file listing. Record actual CI paths and executed versus source-only checks accurately. Reuse a suitable workflow and publishing stage rather than introduce competing release creators. Establish trigger, exact source/tag inputs, build-only versus publication behavior, supported variants, expected asset set and notes/latest/prerelease policy. Keep a simple source ZIP proportionate: an explicit inventory, relevant checks, archive inspection, checksum and one publishing stage may be enough.
 
 Before a publishing tag push or dispatch, complete the [artifact-name gate and repair](github-packaging.md#artifact-name-gate-and-repair), including publication/readback of repaired source and checks against the rebuilt pinned candidate. Generated and reused workflows must:
 
@@ -31,6 +33,8 @@ Inspect the existing publisher’s declared mechanism. For manual dispatch, a de
 If the existing workflow has no supported notes transfer, extend and verify it before triggering publication or return the prepared handoff as pending. Generated notes alone do not satisfy requested curated highlights. Reuse one publisher, preserve human notes, avoid duplicate highlights and retain the internal highlights checkpoint until published-body readback confirms consumption. Build-only or failed runs retain it. The complete-message file remains after all outcomes, including verified publication; refresh/replace it on the next preparation. Transfer its exact UTF-8 bytes with source association and body hash through the established publisher; an ignored local file is not available by CI pathname alone.
 
 ## Dispatch and monitor
+
+**Version numbers in the name of any release artifact are absolutely prohibited, regardless of type.** Before a publishing dispatch, require current executed naming evidence for every actual candidate artifact through the [naming gate](github-packaging.md#artifact-name-gate-and-repair). Missing or failing evidence requires repair/rebuild; build-only dispatch remains nonpublishing.
 
 For a run that will publish a release, apply the shared [advisory prerelease review reminder](../../sdd-manage/references/prerelease-review.md#advisory-release-reminder), reusing any disposition from the release handoff. Build-only runs retain their preparation boundary. Apply the same handoff before an authorized publishing tag trigger through the release lifecycle.
 

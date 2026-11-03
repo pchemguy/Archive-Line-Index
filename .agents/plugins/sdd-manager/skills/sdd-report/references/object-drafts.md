@@ -4,7 +4,9 @@ Keep the same task identity across all outputs. Use the ID from its owning TASKS
 
 ## Task issue
 
-Return `title` and `body` separately. Format the title as `[<task-id>] <task title>`, using the owning task list. Draft the body from the task outcome, reason and project context, expected scope and dependencies, objective acceptance and prescribed checks, and source document links. Add relevant kind-specific details. For example:
+Return `title` and `body` separately. For product T tasks and main DOCS tasks, format the title as `[<task-id>] <task title>`, using the owning task list. For feature preparation, use `[<campaign>/FDOCS-xxx] <stage title>` under forge's [feature issue identity contract](../../sdd-forge/references/github-feature-preparation.md#resolve-feature-preparation-issues). Establish the selected campaign from FEATURE_PREPARATION/FEATURE_DOCS_TASKS or the explicit scoped request; missing campaign context must be resolved before drafting the title, not inferred by recency. Keep the bare FDOCS stage in the task body marker and the exact campaign in its separate feature-scope marker. This hosted qualification does not change the bare stage ID in [task commit subjects](#task-commit-subjects).
+
+Draft the body from the task outcome, reason and project context, expected scope and dependencies, objective acceptance and prescribed checks, and source document links. Add relevant kind-specific details. For example:
 
 - **Performance:** Describe the problem with the current implementation, explain how the proposed approach may improve it, and identify the measurement plan and any established baseline. Do not present an expected speedup as an achieved result.
 - **Security:** State the affected guarantee and risk without exposing exploit instructions or credentials.
