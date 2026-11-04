@@ -38,7 +38,7 @@ def test_version_and_console_metadata() -> None:
     project = tomllib.loads(
         (Path(__file__).resolve().parents[2] / "pyproject.toml").read_text()
     )["project"]
-    assert project["version"] == "0.2.0"
+    assert project["version"] == "0.3.0"
     assert project["scripts"] == {"archive-line-index": "archive_line_index.cli:main"}
 
 

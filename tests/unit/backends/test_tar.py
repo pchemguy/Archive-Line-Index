@@ -308,3 +308,34 @@ def test_gzip_footer_is_validated_after_payload_delivery(tmp_path: Path) -> None
         assert not reader.completed
     finally:
         reader.close()
+
+
+def test_negative_declared_tar_size_is_invalid_at_open(tmp_path: Path) -> None:
+    from archive_line_index.backends.tar import open_tar_backend
+
+    info = tarfile.TarInfo("data")
+    info.size = -1
+    p = tmp_path / "bad.tar"
+    p.write_bytes(info.tobuf(format=tarfile.GNU_FORMAT) + b"\0" * 1024)
+    with pytest.raises(InvalidArchiveError):
+        reader = open_tar_backend(p)
+        reader.close()
+
+
+def test_tar_close_attempts_all_handles_and_retries(tmp_path: Path) -> None:
+    from archive_line_index.backends.tar import open_tar_backend
+
+    p = make_tar(
+        tmp_path / "data", [("data", b"payload", tarfile.REGTYPE)], mode="w:gz"
+    )
+    source = p.open("rb")
+    with patch.object(Path, "open", return_value=source):
+        reader = open_tar_backend(p)
+    with patch.object(
+        tarfile.ExFileObject, "close", side_effect=OSError("member cleanup")
+    ):
+        with pytest.raises(OSError, match="member cleanup"):
+            reader.close()
+    assert source.closed
+    reader.close()
+    reader.close()

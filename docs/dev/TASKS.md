@@ -238,7 +238,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
             - Verified result: Whole ZIP milestone code review found and repaired source tell() misclassification with an observed failing regression. Full verification passes 444 tests, 96% production coverage, Ruff lint/format and strict mypy; actual native/source-rebuilt installs run all commands and six README examples. Report records acceptance, T-029 forward recovery and T-031 readback reconciliation; HANDOFF preserves complete Phase 3 authority and the stop before Phase 4.
             - Report: `docs/dev/reports/phases/3/3.1.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 3.2 — Sequential TAR integration
+    - [x] Milestone 3.2 — Sequential TAR integration
         - [x] T-034 — Implement sequential plain-TAR payload delivery
             - Scope: backends/tar.py and TAR reader/fixture checks.
             - Depends on: T-033.
@@ -269,11 +269,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Build/install/rebuild native candidates, verify inventory/checksums and demonstrate supported ZIP/TAR variants plus corruption/ownership regressions without exposing 7z as delivered.
             - Contracts: API-05; SYS-11–12; ARC-01–05; phase release gate.
             - Verified result: Version 0.3.0 supports installed ZIP/plain-gzip-bzip2-xz TAR through all three CLI forms and seven executable README examples. Stable wheel/source ZIP bundles preserve valid native package filenames internally; PLAN/layout/guidance/checks now match the reloaded naming rule. The actual gate rejects old versioned assets with matching faulty expectations and passes shared notation vectors. All 77 selected installed/metadata/bundle/example checks, isolated native source-wheel builds, independent bundle/checksum verification, strict mypy for src/scripts, Ruff and local-link checks pass. 7z remains undelivered.
-        - [ ] T-039 — Review test and report milestone 3.2
+        - [x] T-039 — Review test and report milestone 3.2
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-034, T-035, T-036, T-037, T-038.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Separate TAR milestone code review and focused invalid-size/cleanup-retry checks found no unresolved runtime blocker. Corrected a stale unit version assertion; full regression passes 574 tests at 96% production coverage, strict src/scripts mypy and Ruff. Native/source-rebuilt installed ZIP/TAR commands, seven README examples, isolated builds and stable bundle/name/content/checksum checks pass. Report/HANDOFF retain acceptance, recovery, platform limits and exact release/Phase 4 boundaries.
             - Report: `docs/dev/reports/phases/3/3.2.md`; include HANDOFF at this boundary.
     - [ ] Milestone 3.3 — Phase review
         - [ ] T-040 — Review test and report phase 3
