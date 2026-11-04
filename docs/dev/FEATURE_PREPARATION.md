@@ -55,3 +55,7 @@ Manual provenance setup is reused without recording or altering conversations. I
 ## Pending transitions
 
 Publish/read back this accepted FEATURE/mode checkpoint and close/read back #64, then continue FDOCS-003–009 under preapproval. No additional human pause is needed at the autodoc pass stop, package QC or full implementation checkpoint. Preserve five-second chunk-boundary cadence, light operation and caller logging ownership; resolve only material scope changes outside the accepted brief with the human.
+
+## Final preparation correction
+
+After FDOCS-009 publication/hosted closure, focused configuration QC found F-001: parent levels do not filter an explicitly configured child. The CLI context will control archive_line_index.scanner directly, restore its previous level and preserve package/root configuration. Actual standard-library probe confirmed the problem; design, SPEC, task acceptance and their conformance/package rechecks are corrected before integration. This is within accepted logging-isolation scope, changes no task/phase IDs or cadence, and retains first-completion checkoffs. Publish/read back this correction, then integrate preparation; milestone #16 stays open until the default-branch merge is verified/published.

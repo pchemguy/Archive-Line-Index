@@ -13,7 +13,7 @@
             - Scope: cli.py --log-level parser and scoped logging context; unit CLI logging tests and affected CLI regression assertions/docstrings.
             - Depends on: T-053.
             - Contracts: LOG-05–06; retained CLI status/output/alias/publication guarantees.
-            - Acceptance/evidence: First observe tests fail for default INFO, WARNING suppression, case-insensitive valid/invalid levels, no configuration on help/usage, existing handler/root-state preservation, repeated calls and failure/interruption restoration. Implement scoped package level/owned handler, rerun green and CLI/source/persistence regressions; ensure scan-complete is never a publication-success claim.
+            - Acceptance/evidence: First observe tests fail for default INFO, WARNING suppression, case-insensitive valid/invalid levels, no configuration on help/usage, existing handler/root-state preservation including an explicitly INFO scanner child, repeated calls and failure/interruption restoration. Implement scoped scanner-logger level/owned handler, rerun green and CLI/source/persistence regressions; ensure scan-complete is never a publication-success claim.
         - [ ] T-055 — Verify and document installed progress workflows
             - Scope: actual cross-format/direct-scanner and installed wheel/source-rebuilt command checks; README configuration/suppression guidance; version/install examples 0.5.0. Adapt quiet-stderr assertions to the intentional contract change without weakening status/result checks.
             - Depends on: T-054.
