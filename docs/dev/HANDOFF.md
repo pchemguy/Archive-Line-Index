@@ -1,19 +1,21 @@
 # Project handoff
 
-Checkpoint: Campaign `001_7c8c72b` is completing on receiving actual default `main`. Published incoming verification tip `ac4bdb13c972ab52a140669bce2d02d784d29d4d` is explicitly merging into original creation parent `7c8c72b0791be95f3b28bbf193bbc29f8432d0c2` with no conflicts. All selected repairs and source/merged-state verification pass. Commit and publish/read back this two-parent main merge, then stop at the completed campaign boundary.
+Checkpoint: Testing revision campaign `003_7c4dcef` is open on `revision/003_7c4dcef-testing`. Scope and initial report are prepared; no assessment, test execution or repair has started. Publish/read back this containing opening commit, then stop.
 
-## Completed scope and provenance
+## Identity, source and authority
 
-Original campaign opening `7eedb5efdb5e8ce1a6b8ef333a25c9f36c3fb70c`; reviewed baseline/branch-off `7c8c72b0791be95f3b28bbf193bbc29f8432d0c2`; retained completed branch `revision/001_7c8c72b-code-review`. The human authorized revision plan preparation and execution. [Revision plan](reviews/001_7c8c72b-code-review/REVISION-PLAN.md), [revision report](reviews/001_7c8c72b-code-review/REVISION-REPORT.md) and [review/assessment](reviews/001_7c8c72b-code-review/REVIEW-REPORT.md) retain selected dispositions, original observations, regression evidence and actual action commit identities.
+Starting code and branch-off: `7c4dcef1c171572e7868d3a03c959ea1c2f87b32`, matching fetched origin/main. Creation parent, eventual integration and return target: actual current `main`. Package: `docs/dev/reviews/003_7c4dcef-testing/`; [plan](reviews/003_7c4dcef-testing/REVISION-PLAN.md), [report](reviews/003_7c4dcef-testing/REVISION-REPORT.md). Branch and directory retain the same full suffix.
 
-Repairs implement writable non-truncating SQLite synchronization, a strict 512-byte raw inspection budget with short reads, explicit plain buffering, observable ZIP size checks, short archive parameter IDs and explicit UTF-8 metadata/example reads. False configuration allegations were rejected; pyproject/dependencies/tasks were unchanged. R-003 is deferred; R-006 retains unavailable native evidence. No further product decision or accepted repair is pending.
+The human requested “open testing revision campaign.” Opening only is selected: reserve identity, record testing scope/context and publish. Focus is test coverage/contract mapping, test quality and sensitivity, fixtures, failure/resource/concurrency scenarios, portability and installed-package/example/release-helper testing. No specific repair is accepted yet. Production code and governing contracts are reference inputs; behavior changes are not authorized by this opening.
 
-## Verification and limits
+## Independent work and preserved parent state
 
-The source boundary passes 705 tests at 95% production coverage, Ruff lint/format over 73 files and strict src/scripts mypy over 26 files (--no-native-parser). Actual native/source-rebuilt installed packages, all eight README examples, all supported archive/CLI routes and complete inventory/naming/content/checksum gates pass. These are revision validation candidates, not newly published release assets. All 705 tests also pass on the prospective merged state; Ruff, strict mypy, maintained links/Markdown structure and protected-path checks pass. Product/test/script/configuration bytes match the reviewed incoming candidate.
+Origin has reserved sequence 002 with separate remote branch `revision/002_7c4dcef-code-review-5856224455108738895` at opening `49c033a8ec123cf899c18dae9188d019109f227c`. Preserve it unchanged. This new testing campaign is rooted separately in current main; no nesting/resumption of 002 was selected. No other workflow is suspended or incorporated by this opening.
 
-Actual runtime is Linux/CPython 3.12.14, py7zr 1.1.4 and pytest 9.2.0. Controlled writable-fsync, 128 KiB buffering and cp1252 simulations do not certify native Windows or Python 3.14. Other unavailable native Windows/macOS/Python 3.11/Python 3.14/big-endian execution remains unverified. ZIP counting cannot inspect a decompressed tail hidden by the dependency. Existing v0.4.0/tag remains at `7ee4afc200c7fded93880397128b0a9e217f3c52`; all original task/hosted closures and frozen phase/manual records remain intact.
+Campaign 001 completed through published main merge `7c4dcef1c171572e7868d3a03c959ea1c2f87b32`; its records remain frozen. Its 705-test/95% and installed-package evidence is historical baseline evidence, not fresh verification in campaign 003. Preserve original tasks/hosted closures and existing v0.4.0 tag/release at `7ee4afc200c7fded93880397128b0a9e217f3c52`. Do not read or amend closed campaign/phase records without a specific need.
 
-## Completion and stop
+Actual execution host is Linux/bash with existing Python 3.12/py7zr tooling; Windows-only shell instructions apply on Windows hosts. Native target limitations remain unverified rather than inferred from simulations. Markdown prose/list items remain unwrapped; publish/read back every owned commit before advancing.
 
-Prospective merged verification is complete. Commit the explicit two-parent campaign summary and publish/read back actual main before reporting closure. The resulting Git merge records its own exact identity without retrospective edits to closed campaign records. Retain the revision branch. After publication/readback, the selected campaign is closed; stop on clean main. No version bump, release, new feature or additional review is selected. Markdown prose/list items remain unwrapped.
+## Next human boundary
+
+Stop once the opening is published and verified. A later request establishes the testing assessment or concrete revision range; derive evidence-backed actions and verification before editing tests or tooling. No production repair, campaign merge/closure, version bump, release or new runtime provisioning is selected now.
