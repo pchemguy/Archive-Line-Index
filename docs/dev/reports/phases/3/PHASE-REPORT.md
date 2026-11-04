@@ -2,7 +2,7 @@
 
 ## Result and selected boundary
 
-T-029–T-040 deliver version 0.3.0 with single-payload ZIP and sequential plain/gzip/bzip2/xz TAR through the existing library/index/persistence/CLI interfaces. The reviewed source is `61c760ac9d4844c317083a693b08e59b333993fa` plus this task's release notes, phase report and HANDOFF. Creation/integration parent is main `e19750c6e79b3c0eb0b135bb9db042a51b6fed70`. This review establishes phase exits; actual merge/tag/release effects remain pending until observed below. Stop before Phase 4/T-041.
+T-029–T-040 deliver version 0.3.0 with single-payload ZIP and sequential plain/gzip/bzip2/xz TAR through the existing library/index/persistence/CLI interfaces. The reviewed source is `61c760ac9d4844c317083a693b08e59b333993fa` plus this task's release notes, phase report and HANDOFF. Creation/integration parent is main `e19750c6e79b3c0eb0b135bb9db042a51b6fed70`. All Phase 3 exits, main integration and the published v0.3.0 release are verified in the final outcome below. Stop before Phase 4/T-041.
 
 ## Separate phase code review
 
@@ -47,3 +47,29 @@ T-040 `04b665b4121847e91b8911673cdd50e0768b043a` is published/read back. All 12 
 Prospective merged-state verification passes all 574 tests, including actual installed native/source-rebuilt artifacts, all supported archive workflows and release-bundle checks. Product source matches the reviewed phase tip. The explicit merge commit and its publication require subsequent observation.
 
 Integration `bc8d64edcb9494ed3ac9da711a69ae3963ab6e1a` is published and exact remote main readback matches. Its two pinned parents and all 574 merged-state tests are verified. The next direct main release commit finalizes the already prepared notes/body; its exact source/bundle/tag/hosted outcomes remain pending. All 12 Phase 3 issues and three milestones are closed.
+
+## Final integration and release outcome
+
+The complete phase is integrated and published on main as `bc8d64edcb9494ed3ac9da711a69ae3963ab6e1a`, with receiving parent `e19750c6e79b3c0eb0b135bb9db042a51b6fed70` and incoming T-040 tip `04b665b4121847e91b8911673cdd50e0768b043a`. All 574 merged-state tests pass; exact remote main containment/readback is verified. All 12 issues #38–49 and milestones #10–12 are closed. No Phase 4 task or tracking projection was started.
+
+Direct main release commit `2490b645891be7ae0ab7763d1aa7fe195b730b83` has the integration merge as its parent. Its raw body is byte-identical to retained root RELEASE-NOTES.md. Lightweight tag v0.3.0 resolves to that exact source locally and remotely, separately published/read back before the single protected release publisher ran.
+
+[Archive Line Index 0.3.0](https://github.com/pchemguy/Archive-Line-Index/releases/tag/v0.3.0), release ID 433481126, is published stable and confirmed as the repository's latest release. The publisher validated the local full inventory before each stage, created/reused one draft, uploaded only missing matching assets, verified all three draft assets before publication and read back actual notes/tag/state/latest/names/digests. The actual naming gate ran against complete draft and hosted inventories. No CI publisher/run is claimed.
+
+## Exact-source artifacts and downloads
+
+Isolated native source/wheel builds use exact release source `2490b645891be7ae0ab7763d1aa7fe195b730b83`. The full complete-inventory name/content/checksum gate passes before tagging/publication. Both stable bundles contain exactly their safe native package with matching metadata. All 107 packaged tracked source/configuration/test/script/document bytes were compared against that Git source. An independent wheel rebuild from the actual bundled source distribution passes; native and source-rebuilt wheels have the same observed SHA-256, `6e8d022623cbca5269539213eaf2c4ffcf208bd54ce0a12dbd99ee72f592eb3b`.
+
+Both actual bundle-derived variants install into clean runtimes outside the checkout and pass public library/persistence workflows, seven executable README examples, six plain CLI cases and 31 ZIP/TAR cases per variant. These include console/module/imported forms, every required TAR suffix, empty and late-invalid payloads, corruption, partial publication and real SIGINT cleanup. Installed runtimes contain no development tools or source-path injection. Runtime dependency py7zr is 1.1.4; no 7z adapter suitability/delivery is inferred from its presence.
+
+| Asset | Bytes | SHA-256 |
+| --- | ---: | --- |
+| [archive-line-index-source.zip](https://github.com/pchemguy/Archive-Line-Index/releases/download/v0.3.0/archive-line-index-source.zip) | 154864 | `0f1c8723eab93dd2b3302f9e9742c565c3b49d20ed03a1ba0b7374709849e52e` |
+| [archive-line-index-wheel.zip](https://github.com/pchemguy/Archive-Line-Index/releases/download/v0.3.0/archive-line-index-wheel.zip) | 32350 | `a420070c537fae2ea3a9bfca40e87a86d2477e245c2a89584860fec70182b1c6` |
+| [SHA256SUMS](https://github.com/pchemguy/Archive-Line-Index/releases/download/v0.3.0/SHA256SUMS) | 191 | `55e646d2d74c37cf6690efc03d034bfb3352bdb91a994c524d58adf078d8945a` |
+
+All three tag-specific assets were downloaded and their complete bytes matched the local manifest. Downloaded SHA256SUMS exactly matches the local file and covers both bundles. Every advertised latest/download URL was also fetched and its bytes matched the same hashes. Stable filenames, source association, body, latest selection and hosted integrity are verified independently of a successful upload response.
+
+The full release history coverage is pinned to prior v0.2.0 through the exact release source. The published body exactly matches finalized notes with no checkpoint front matter. Root RELEASE-NOTES.md is retained. Only the owned ignored highlights checkpoint was removed after confirmed published-body consumption. Runtime verification remains Linux/CPython 3.12.14; other native platforms remain unverified.
+
+Phase 3 is complete. This containing documentation outcome commit requires its own main publication/readback before the final user report. The release tag stays pinned to the exact release source above; T-041 and all Phase 4 tasks remain unchecked and unselected.
