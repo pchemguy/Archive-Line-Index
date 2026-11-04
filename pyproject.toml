@@ -77,8 +77,9 @@ only-include = [
 packages = ["src/archive_line_index"]
 
 [tool.pytest]
+required_plugins = ["pytest-asyncio", "pytest-timeout"]
 addopts = ["-ra", "-q", "--strict-config", "--strict-markers", "--import-mode=importlib"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 testpaths = ["tests"]
 asyncio_mode = "strict"
 asyncio_default_fixture_loop_scope = "function"

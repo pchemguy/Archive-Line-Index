@@ -2,6 +2,8 @@
 
 import os
 import signal
+import subprocess
+import sys
 import tarfile
 import threading
 import zipfile
@@ -120,7 +122,60 @@ def test_consumer_exception_preserves_primary_and_closes(
 
 
 @pytest.mark.timeout(30)
-def test_actual_sigint_during_7z_wait_releases_worker(tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    "emulate_windows_kill", [False, True], ids=["native-signal", "windows-kill-guard"]
+)
+def test_actual_sigint_during_7z_wait_releases_worker(
+    tmp_path: Path, emulate_windows_kill: bool
+) -> None:
+    root = Path(__file__).resolve().parents[2]
+    code = """
+import os
+import sys
+from contextlib import nullcontext
+from pathlib import Path
+from unittest.mock import patch
+
+sys.path[:0] = [str(Path(sys.argv[1]) / "src"), sys.argv[1]]
+from tests.integration.test_full_format_lifecycle import _exercise_sigint_cleanup
+
+def windows_kill(pid, sig):
+    sys.stderr.write("emulated Windows TerminateProcess\\n")
+    sys.stderr.flush()
+    os._exit(int(sig))
+
+with patch.object(os, "kill", windows_kill) if sys.argv[3] == "1" else nullcontext():
+    _exercise_sigint_cleanup(Path(sys.argv[2]))
+print("signal-cleanup-complete")
+"""
+    env = {
+        key: value
+        for key, value in os.environ.items()
+        if key not in {"PYTHONPATH", "PYTHONHOME"}
+    }
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-P",
+            "-c",
+            code,
+            str(root),
+            str(tmp_path),
+            str(int(emulate_windows_kill)),
+        ],
+        cwd=tmp_path,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=20,
+    )
+    assert result.returncode == 0, (
+        f"Signal scenario exited {result.returncode}:\n{result.stdout}{result.stderr}"
+    )
+    assert "signal-cleanup-complete" in result.stdout
+
+
+def _exercise_sigint_cleanup(tmp_path: Path) -> None:
     from archive_line_index.backends.sevenzip import _ForwardWriter
 
     source = make_7z(tmp_path / "signal.7z", [("data", b"a\nb" * (1024 * 1024))])
@@ -148,7 +203,7 @@ def test_actual_sigint_during_7z_wait_releases_worker(tmp_path: Path) -> None:
 
         def interrupt() -> None:
             if waiting.wait(2):
-                os.kill(os.getpid(), signal.SIGINT)
+                signal.raise_signal(signal.SIGINT)
             else:
                 release.set()
 

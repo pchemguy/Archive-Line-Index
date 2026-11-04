@@ -1,19 +1,13 @@
 # Project handoff
 
-Checkpoint: Remaining open code-review campaign `002_7c4dcef` is cancelled before any of its seven units ran. Testing campaign 003 was already cancelled and closed. This documentation-only explicit main merge owns campaign 002 closure; publish/read back it, then stop on main.
+Checkpoint: Testing campaign 004_0c22eae is complete within its selected V-001–V-003 repairs; this two-parent merge integrates it into main, subject to required target publication/readback. The user requested closure, then a new comprehensive code/docs review, important fixes, closure, a patch version bump and GitHub release.
 
-## Cancelled review campaign 002
+## Completed testing boundary
 
-Actual retained branch `revision/002_7c4dcef-code-review-5856224455108738895`; original source/branch-off `7c4dcef1c171572e7868d3a03c959ea1c2f87b32`; original opening `49c033a8ec123cf899c18dae9188d019109f227c`; published/read-back cancellation tip `277548bc435bd063b64b7644561ed6b58fb93ead`. Receiving actual main is `5f5c7dbe892b9961934a5df919077f2a6dc56f9b`. Preserve the existing branch/directory association without renaming.
+[Plan](reviews/004_0c22eae-testing/REVISION-PLAN.md) and [report](reviews/004_0c22eae-testing/REVISION-REPORT.md) retain exact observations and RED/GREEN evidence. Original branch-off 0c22eae396ed04b3d090e287f8c58af79c05f939; opening e1b3b577d476c79d12132213e91a99a619fc19c2; latest repair 095a2bd623bee106ade80428d7cee925dc205110. Working branch revision/004_0c22eae-testing; creation parent/return target main. This containing checkpoint finalizes the report before integration.
 
-[Cancelled review plan](reviews/002_7c4dcef-code-review/REVIEW-PLAN.md) and [closure report](reviews/002_7c4dcef-code-review/REVIEW-REPORT.md) record the human cancellation and actual no-review outcome. All seven units are cancelled. No review, tests, findings, revisions or product/test/configuration changes occurred. Freeze this cancelled package after verified main publication and retain its branch. The containing merge records its own exact identity in Git.
+Delivered: configured checkout-root imports for console pytest; clear required-plugin diagnostics; same-interpreter installation guidance; portable SIGINT injection isolated in a bounded child so a Windows hard exit cannot kill pytest. Exact pytest -vv passed 711 tests (233 integration and 478 unit), Ruff lint/format passed for 74 files, and strict mypy passed for 26 source/script files using --no-native-parser. Native Windows remains unverified; Windows TerminateProcess behavior was simulated in the child. Prior V-002 coverage was 95%; V-003's exact verbose run did not request coverage.
 
-## Previously closed work
+## Authorized next boundary
 
-Testing campaign `003_7c4dcef` was cancelled/closed through published main merge `5f5c7dbe892b9961934a5df919077f2a6dc56f9b`. Its [cancelled records](reviews/003_7c4dcef-testing/REVISION-REPORT.md) remain untouched. Campaign 001 completed at `7c4dcef1c171572e7868d3a03c959ea1c2f87b32`; its 705-test/95% evidence is historical baseline evidence, not testing in either cancelled campaign. Preserve all closed campaign/phase/manual records, original task/hosted closures and v0.4.0 at `7ee4afc200c7fded93880397128b0a9e217f3c52`.
-
-## Closure checks and final stop
-
-Only campaign 002 plan/report and HANDOFF differ from receiving main. Product/protected-path and existing-tag checks, maintained links/Markdown structure and diff/conflict checks pass. No product tests were run. HANDOFF reconciliation preserves receiving context rather than restarting another campaign.
-
-Publish/read back the explicit two-parent main merge, then campaign 002 is closed as cancelled. Both opened campaigns 002 and 003 are cancelled; no review/testing/repair scope remains selected. Preserve clean main, retained branches and unwrapped Markdown. Stop and await a new instruction; no version bump or release is selected.
+Publish/read back this verified main merge (source ee6ac43d48896915aa03fb496dba26b5c96c29a0; receiving parent 0c22eae396ed04b3d090e287f8c58af79c05f939), then freeze campaign 004. The merged full suite passed 711 tests. Open the next allocated comprehensive code/docs campaign on that published baseline, review current production code, tests, supported docs and release tooling, fix important confirmed issues, verify and integrate its complete boundary. Then bump 0.4.0 to 0.4.1 and publish the GitHub release with source and wheel bundles and checksums under the existing release contract. Do not hard-wrap Markdown. Preserve prior closed records and user-owned work. No native Windows result may be inferred from local Linux or simulations.
