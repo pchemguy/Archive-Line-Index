@@ -1,17 +1,19 @@
 # Project handoff
 
-Checkpoint: Testing campaign `003_7c4dcef` is cancelled at the human’s request, before assessment, test execution or implementation. This documentation-only explicit main merge owns its closure. Publish/read back the merge, then stop on main.
+Checkpoint: Remaining open code-review campaign `002_7c4dcef` is cancelled before any of its seven units ran. Testing campaign 003 was already cancelled and closed. This documentation-only explicit main merge owns campaign 002 closure; publish/read back it, then stop on main.
 
-## Cancelled campaign and persistence
+## Cancelled review campaign 002
 
-Original opening `fa0ce76ef3094796fc122c17be7b3943818e320f`; published/read-back cancellation tip `d176e153e20a3801fc8a9fb71b38e538835118c7`; creation/receiving main parent `7c4dcef1c171572e7868d3a03c959ea1c2f87b32`. Retain `revision/003_7c4dcef-testing`. [Cancelled plan](reviews/003_7c4dcef-testing/REVISION-PLAN.md) and [closure report](reviews/003_7c4dcef-testing/REVISION-REPORT.md) record the original scope, stop/cancellation and actual no-work outcome. The merge history supplies the exact closing commit without a retrospective edit to closed records.
+Actual retained branch `revision/002_7c4dcef-code-review-5856224455108738895`; original source/branch-off `7c4dcef1c171572e7868d3a03c959ea1c2f87b32`; original opening `49c033a8ec123cf899c18dae9188d019109f227c`; published/read-back cancellation tip `277548bc435bd063b64b7644561ed6b58fb93ead`. Receiving actual main is `5f5c7dbe892b9961934a5df919077f2a6dc56f9b`. Preserve the existing branch/directory association without renaming.
 
-The human said “stop”, then “Cancel/close opened review campaign”. All planned testing work in newly opened campaign 003 is cancelled. No assessment, test execution, finding, accepted repair or source/test/configuration change occurred. Only its records and HANDOFF are integrated; document links/structure and unchanged-product checks pass. The cancelled package becomes frozen after main publication/readback.
+[Cancelled review plan](reviews/002_7c4dcef-code-review/REVIEW-PLAN.md) and [closure report](reviews/002_7c4dcef-code-review/REVIEW-REPORT.md) record the human cancellation and actual no-review outcome. All seven units are cancelled. No review, tests, findings, revisions or product/test/configuration changes occurred. Freeze this cancelled package after verified main publication and retain its branch. The containing merge records its own exact identity in Git.
 
-## Preserved main and independent work
+## Previously closed work
 
-Main retains completed campaign 001 product source at `7c4dcef1c171572e7868d3a03c959ea1c2f87b32` and its historical 705-test/95% evidence. No tests were run for cancellation. Separate remote code-review campaign 002 remains unchanged and unselected; it was not cancelled, resumed or integrated. Original tasks/hosted closures, closed campaign/phase/manual records and v0.4.0 at `7ee4afc200c7fded93880397128b0a9e217f3c52` remain unchanged.
+Testing campaign `003_7c4dcef` was cancelled/closed through published main merge `5f5c7dbe892b9961934a5df919077f2a6dc56f9b`. Its [cancelled records](reviews/003_7c4dcef-testing/REVISION-REPORT.md) remain untouched. Campaign 001 completed at `7c4dcef1c171572e7868d3a03c959ea1c2f87b32`; its 705-test/95% evidence is historical baseline evidence, not testing in either cancelled campaign. Preserve all closed campaign/phase/manual records, original task/hosted closures and v0.4.0 at `7ee4afc200c7fded93880397128b0a9e217f3c52`.
 
-## Stop
+## Closure checks and final stop
 
-After actual main publication/readback, campaign 003 is closed as cancelled. Preserve the clean main state, retained branch and unwrapped Markdown. No review, test work, repair, other campaign continuation, version bump or release is selected. Await a new human instruction.
+Only campaign 002 plan/report and HANDOFF differ from receiving main. Product/protected-path and existing-tag checks, maintained links/Markdown structure and diff/conflict checks pass. No product tests were run. HANDOFF reconciliation preserves receiving context rather than restarting another campaign.
+
+Publish/read back the explicit two-parent main merge, then campaign 002 is closed as cancelled. Both opened campaigns 002 and 003 are cancelled; no review/testing/repair scope remains selected. Preserve clean main, retained branches and unwrapped Markdown. Stop and await a new instruction; no version bump or release is selected.
