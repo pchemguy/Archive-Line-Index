@@ -1,5 +1,7 @@
 # Code review plan
 
+Status: Cancelled by the human before any review unit began. Retained scope and criteria are historical preparation, not an active work queue.
+
 ## Campaign and scope
 
 - Campaign: `002_7c4dcef`; directory: `docs/dev/reviews/002_7c4dcef-code-review/`.
@@ -37,3 +39,9 @@
 ## Consolidation and stopping
 
 After all selected units, consolidate canonical findings, counts, priorities, coupled risks, deferred checks and a proposed revision queue. Stop before repairs, integration, release or campaign closure unless separately authorized.
+
+## Cancellation and closure
+
+On 2026-11-04 the human requested “Cancel/close opened review campaign”. This cancels remaining open code-review campaign `002_7c4dcef`; all seven unstarted units are cancelled. No assessment, test execution, finding or source repair occurred. Original opening `49c033a8ec123cf899c18dae9188d019109f227c` is already published on actual retained branch `revision/002_7c4dcef-code-review-5856224455108738895`; the original preparation used the shorter working-branch label above. Preserve the existing branch/directory association without renaming.
+
+Publish/read back this cancellation checkpoint, return through an explicit documentation-only merge into recorded parent main, verify unchanged product/protected records and publish/read back main. Closure follows that persistence. Preserve closed campaigns 001 and 003, existing releases/tags and original task state. Stop without review, implementation or release work.
