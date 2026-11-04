@@ -8,9 +8,12 @@ pytestmark = [pytest.mark.integration, pytest.mark.timeout(300)]
 
 def test_installed_plain_workflows_and_runtime_boundary(
     installed_package: InstalledPackage,
+    project_version: str,
 ) -> None:
     assert (
-        installed_package.run("""
+        installed_package.run(
+            f"expected_version = {project_version!r}\n"
+            + """
 import importlib.metadata as metadata
 import io
 from pathlib import Path
@@ -18,7 +21,7 @@ import sys
 import archive_line_index as ali
 
 assert Path(ali.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
-assert metadata.version("archive-line-index") == "0.4.0"
+assert metadata.version("archive-line-index") == expected_version
 assert metadata.version("py7zr")
 names = {d.metadata["Name"].lower() for d in metadata.distributions()}
 assert not names.intersection({"pytest", "mypy", "ruff", "build", "hatchling", "flowmark"})
@@ -50,6 +53,7 @@ assert ali.read_sqlite_index("standalone.sqlite3") == ali.read_raw_index("standa
 Path("standalone.sqlite3").unlink()
 Path("standalone.u64").unlink()
 print("installed workflows passed")
-""").strip()
+"""
+        ).strip()
         == "installed workflows passed"
     )

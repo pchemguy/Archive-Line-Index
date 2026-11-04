@@ -11,10 +11,15 @@ from tests.helpers.packaging import run_checked
 pytestmark = [pytest.mark.integration, pytest.mark.timeout(300)]
 
 
-def test_real_candidate_inventory_and_cli(built_distributions: Path) -> None:
+def test_real_candidate_inventory_and_cli(
+    built_distributions: Path, project_version: str
+) -> None:
     repo = Path(__file__).resolve().parents[2]
     hashes = check_release_artifacts(
-        built_distributions, repo / "pyproject.toml", "v0.4.0", write_checksums=True
+        built_distributions,
+        repo / "pyproject.toml",
+        "v" + project_version,
+        write_checksums=True,
     )
     result = run_checked(
         [
@@ -25,7 +30,7 @@ def test_real_candidate_inventory_and_cli(built_distributions: Path) -> None:
             "--pyproject",
             str(repo / "pyproject.toml"),
             "--tag",
-            "v0.4.0",
+            "v" + project_version,
         ],
         built_distributions,
     )

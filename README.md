@@ -249,7 +249,7 @@ Calling `read()` with a negative size explicitly materializes all remaining cont
 
 ## Development and artifact verification
 
-Install the configured development/test groups using the same Python interpreter that runs the suite. Pytest requires `pytest-asyncio` and `pytest-timeout` and reports a clear prerequisite error if either is missing or disabled. Then run checks from the root:
+Install the configured development/test groups using the same Python interpreter that runs the suite. These groups include the build frontend and Hatchling backend needed by integration tests that build packages without build isolation. Pytest requires `pytest-asyncio` and `pytest-timeout` and reports a clear prerequisite error if either is missing or disabled. Then run checks from the root:
 
 ```bash
 python -m pip install ".[dev,test]"
