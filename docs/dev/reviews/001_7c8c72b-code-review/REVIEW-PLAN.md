@@ -10,7 +10,7 @@
 - Included owners: `src/archive_line_index/`, `tests/`, `scripts/`, `pyproject.toml` and current public documentation. Accepted PROJECT/ARCHITECTURE/DECOMPOSITION/SPEC/PLAN/layout and focused children supply criteria; TASKS and completed release evidence supply provenance rather than proof of fresh review.
 - Exclusions: installed plugin internals, unrelated/manual-provenance branches, closed historical campaign/phase records as routine review targets, new features, external publication effects and unavailable target-native execution. Preserve existing releases and completed task/tracking state.
 - Companion report: [REVIEW-REPORT.md](REVIEW-REPORT.md).
-- State: Open; planned review units have not been executed.
+- State: Completed (`U-001` through `U-007` executed and consolidated in [REVIEW-REPORT.md](REVIEW-REPORT.md); paused at the review-only stopping boundary before revision planning or source repair).
 
 ## Review criteria
 
