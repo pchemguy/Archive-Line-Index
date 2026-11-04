@@ -2,13 +2,35 @@
 
 from __future__ import annotations
 
+import logging
 from array import array
+from time import monotonic
 from typing import Protocol
 
 from .errors import InvalidIndexError
 from .offsets import append_offset, check_position, validate_offsets
 
 DEFAULT_BUFFER_SIZE = 1024 * 1024
+_LOGGER = logging.getLogger(__name__)
+
+
+class _ScanProgress:
+    """Observe byte positions without clock or record work when INFO is disabled."""
+
+    def __init__(self) -> None:
+        self._last_report = monotonic() if _LOGGER.isEnabledFor(logging.INFO) else None
+
+    def update(self, position: int) -> None:
+        if self._last_report is None:
+            return
+        now = monotonic()
+        if now - self._last_report >= 5.0:
+            _LOGGER.info("Scanned %d uncompressed bytes", position)
+            self._last_report = now
+
+    def finish(self, position: int) -> None:
+        if self._last_report is not None:
+            _LOGGER.info("Scan complete: %d uncompressed bytes", position)
 
 
 class ReadableBinary(Protocol):
@@ -72,6 +94,8 @@ def scan_line_offsets(
     only a current block and up to three initial probe bytes, never a full line.
     A trailing LF creates no extra empty line; coordinates include skipped BOM
     bytes. The last value is EOF, and len(result) - 1 is the line count.
+    INFO logging reports byte progress at chunk boundaries at most every five
+    seconds, plus a final validated-scan total. Configure logging in the caller.
     """
     validate_scan_options(skip_utf8_bom=skip_utf8_bom, buffer_size=buffer_size)
     if not callable(getattr(stream, "read", None)):
@@ -79,6 +103,7 @@ def scan_line_offsets(
     offsets = array("Q", [0])
     if offsets.itemsize != 8:
         raise InvalidIndexError("Native unsigned Q offsets require eight-byte items")
+    progress = _ScanProgress()
     prefix = b""
     exhausted = False
     while len(prefix) < 3:
@@ -93,10 +118,14 @@ def scan_line_offsets(
         check_position(position)
     else:
         position = _scan_block(offsets, prefix, 0)
+    if prefix:
+        progress.update(position)
     if not exhausted:
         while block := _read_block(stream, buffer_size):
             position = _scan_block(offsets, block, position)
+            progress.update(position)
     if offsets[-1] != position:
         append_offset(offsets, position)
     validate_offsets(offsets)
+    progress.finish(position)
     return offsets

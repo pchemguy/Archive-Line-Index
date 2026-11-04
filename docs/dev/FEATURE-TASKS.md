@@ -4,11 +4,12 @@
 
 - [ ] Phase 5 — Lightweight progress logging
     - [ ] Milestone 5.1 — Progress logging
-        - [ ] T-053 — Report bounded scanner progress through standard logging
+        - [x] T-053 — Report bounded scanner progress through standard logging
             - Scope: scanner.py private operation-local observer and logger; tests/unit/test_progress_logging.py; scanner docstrings. Public function signatures and byte/index behavior remain unchanged.
             - Depends on: published accepted feature preparation; existing completed T-052 baseline.
             - Contracts: LOG-01–04 and retained IDX/stream ownership.
             - Acceptance/evidence: Write and observe failing exact-total/timing/disabled-cost/failure tests first, implement the smallest observer/update/finish integration, run them green plus scanner/API regressions and Ruff/mypy. Controlled clocks test 4.999/5.0/large jumps; empty/BOM/short reads, same-chunk dense LF cost, independent scans and invalid/failed reads retain their outcomes. No real-time sleeps or per-line observer calls.
+            - Verified result: Added an operation-local scanner observer and named INFO logger; chunk-boundary clock checks occur only when enabled, periodic records require five elapsed seconds, and final exact original-byte totals follow EOF/offset validation. LF search, bounds, borrowing and source ownership remain unchanged. Observed RED: seven new enabled/timing/total cases failed while five existing-behavior characterization cases passed. GREEN: all 171 selected scanner/progress/API/stream checks pass; new clock tests cover 4.999/5.0/large jumps, dense LF cost, independent scans, disabled work and late failures. Ruff/format pass over 75 files and strict mypy over 26 source/script files passes. Actual execution Linux/CPython 3.12.14; native Windows unverified.
         - [ ] T-054 — Configure scoped CLI progress and logging-level suppression
             - Scope: cli.py --log-level parser and scoped logging context; unit CLI logging tests and affected CLI regression assertions/docstrings.
             - Depends on: T-053.
