@@ -1,12 +1,14 @@
 # Feature preparation record
 
+Historical feature source/evidence. Current behavior and canonical completed task ownership are in [main SPEC](../../SPEC.md), [main PLAN](../../PLAN.md) and [main TASKS](../../TASKS.md). Retained preparation/task observations describe their recorded checkpoints; archived checklists are not executable owners.
+
 ## Identity and request
 
 Campaign 006_c33ec54; descriptive association 006_c33ec54-progress-logging. Full starting baseline and recorded creation parent main: c33ec544e06134ab71866a4bf2f46ad21c9d150d. Actual preparation branch design-docs/006_c33ec54-progress-logging; default preparation/integration target main. Intended later implementation parent main containing the verified preparation merge; intended implementation branch feature/006_c33ec54-progress-logging, not yet created. Reserve docs/dev/features/006_c33ec54-progress-logging/ for eligible future reports/archive; active feature sources belong in docs/dev, without a placeholder navigation package.
 
 The human requested opening a feature campaign for minimal lightweight progress on large sources, cumulative uncompressed or compressed bytes using whichever needs less new code, no per-line progress, proper standard Python logging. The follow-up confirms five-second increments. The later human acceptance “k. Use autodoc with preapproved QC and full implement checkpoints” accepts the presented FEATURE and authorizes the remaining preparation, package QC and full feature implementation without repeated approval pauses. Retain baseline 0.4.1 functionality, frozen campaigns 001–005, original task/hosted closures and releases.
 
-Active sources: [feature documentation tasks](FEATURE_DOCS_TASKS.md), this record and [HANDOFF](HANDOFF.md). [FEATURE](FEATURE.md) is now the published-for-review proposal; its first approval is accepted by the latest human instruction. Affected main context is PROJECT, ARCHITECTURE, DECOMPOSITION and public API design, SPEC's line-index/public-operation/CLI contracts, PLAN/layout, scanner/api/cli and their tests. These are current reference inputs, not amended by opening.
+Active sources: [feature documentation tasks](FEATURE_DOCS_TASKS.md), this record and [HANDOFF](../../HANDOFF.md). [FEATURE](FEATURE.md) is now the published-for-review proposal; its first approval is accepted by the latest human instruction. Affected main context is PROJECT, ARCHITECTURE, DECOMPOSITION and public API design, SPEC's line-index/public-operation/CLI contracts, PLAN/layout, scanner/api/cli and their tests. These are current reference inputs, not amended by opening.
 
 ## Current control
 
@@ -59,3 +61,7 @@ Publish/read back this accepted FEATURE/mode checkpoint and close/read back #64,
 ## Final preparation correction
 
 After FDOCS-009 publication/hosted closure, focused configuration QC found F-001: parent levels do not filter an explicitly configured child. The CLI context will control archive_line_index.scanner directly, restore its previous level and preserve package/root configuration. Actual standard-library probe confirmed the problem; design, SPEC, task acceptance and their conformance/package rechecks are corrected before integration. This is within accepted logging-isolation scope, changes no task/phase IDs or cadence, and retains first-completion checkoffs. Publish/read back this correction, then integrate preparation; milestone #16 stays open until the default-branch merge is verified/published.
+
+## Final disposition
+
+All nine FDOCS stages are published and hosted-closed; preparation merge 368f3b1e7afdc902f91395f0aa1106cf78d7767b is published on main and preparation milestone #16 is verified closed. The full human-preapproved Phase 5 is delivered through T-053–T-056. The accepted resulting behavior has been incorporated into main PROJECT/design/API/SPEC/progress/CLI/PLAN/layout owners; completed task records transfer to main TASKS with original closing provenance preserved. This feature package and adjacent QC are retained together as historical sources; no active feature preparation cursor remains after the containing verified integration. Phase target publication and release effects are tracked in current HANDOFF/Git, not retroactively claimed by preparation QC.

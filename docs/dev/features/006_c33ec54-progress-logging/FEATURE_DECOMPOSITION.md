@@ -1,6 +1,8 @@
 # Progress logging component design
 
-[FEATURE](FEATURE.md) extends the accepted main [architecture](ARCHITECTURE.md) and [component design](DECOMPOSITION.md) without changing public function signatures.
+Historical feature source/evidence. Current behavior and canonical completed task ownership are in [main SPEC](../../SPEC.md), [main PLAN](../../PLAN.md) and [main TASKS](../../TASKS.md). Retained preparation/task observations describe their recorded checkpoints; archived checklists are not executable owners.
+
+[FEATURE](FEATURE.md) extends the accepted main [architecture](../../ARCHITECTURE.md) and [component design](../../DECOMPOSITION.md) without changing public function signatures.
 
 ## Owners and collaboration
 

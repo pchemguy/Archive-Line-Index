@@ -12,9 +12,9 @@ All production code is allocated under `src/archive_line_index/`. The [public de
 | `formats.py` | `FormatKind`, immutable `FormatCandidate`, bounded content/suffix detection and precedence. |
 | `errors.py` | Public exception hierarchy; no imports from higher-level package components. |
 | `stream.py` | `ContentStream`, stream-limit validation and reader-consuming construction; common buffering, count/state and cleanup behavior. |
-| `scanner.py` | `ReadableBinary`, `DEFAULT_BUFFER_SIZE`, scan-option validation and `scan_line_offsets`; no archive or persistence imports. |
+| `scanner.py` | `ReadableBinary`, `DEFAULT_BUFFER_SIZE`, scan-option validation, `scan_line_offsets` and operation-local named-logger progress; no archive or persistence imports. |
 | `offsets.py` | Canonical-array validation and checked construction helpers; shared signed-range and structural rules. |
-| `cli.py` | Public submodule `main`, argument parsing, paired destination selection/preflight, provider composition and presentation/status mapping. |
+| `cli.py` | Public submodule `main`, argument parsing, paired destination selection/preflight, provider composition, scoped progress logging/level configuration and presentation/status mapping. |
 | `__main__.py` | Guarded module-execution wrapper around CLI main; import performs no execution. |
 
 ## Backend adapters

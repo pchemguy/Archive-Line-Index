@@ -115,3 +115,17 @@ The focused PLAN/layout recheck confirms unchanged SPEC conformance and task all
 | [PLAN.md](PLAN.md) | `74414e28622fd63bb0b3254a157d63abe7ef5d20597ddcc657335f728203904c` |
 | [layout.md](layout.md) | `cbe30c79abf2f4ea98da253521270e55a0d5498ef997b8d97417f004a97c3cb9` |
 | [layout/tests.md](layout/tests.md) | `7266b455d9aaf2934ba1e627b499a21a43151b93fc0792143177b123b7a14f41` |
+
+## Revision 4 — Progress feature incorporation
+
+Current SPEC and physical ownership support one additional bounded phase with one delivery milestone of three tasks and a dedicated one-task review milestone. The small milestone count is justified by one coupled observation capability; existing phases retain scope/IDs. All LOG-01–07 conditions have code/CLI/installed/review and release exits. New unit/integration paths fit existing owners without a new production module.
+
+Reviewed root and affected child content identities:
+
+- PLAN.md: df63d3ea1079d7fa751a6dfbc77d7c68bdca9e1cba5395a47e984b8371b73b1e.
+
+- layout/src.md: 2c5dee966439d5b5efb68023cf4341843c5e3523bcbf01ca2e3a8fe3171e19a2.
+
+- layout/tests.md: d9448c155051bd53c88eeaf63c82340c4b489a4b9f21f0bef2dfdb941153b3c8.
+
+Assessment: Ready for the scoped resulting main system after incorporation. No unresolved conformance finding; previous report observations retain their own identities. Runtime evidence is the separate feature milestone/phase verification, not this document assessment. Task transfer/archive and final source/package checks remain final-phase work.

@@ -85,3 +85,9 @@ The main verification seams are the internal backend reader, arbitrary short-rea
 ## Further design ownership
 
 DECOMPOSITION defines concrete component collaboration, public/internal API surfaces, state ownership and selected model definitions. SPEC owns exact behavior, error contracts and acceptance, including format variants and dependency limits. PLAN and layout own delivery order and physical paths. These responsibilities do not require architecture child documents for the present scope.
+
+## Progress observation
+
+The scanner observes its existing original-byte position outside the LF-match loop. Per-scan monotonic state limits enabled INFO observations to five-second chunk-boundary intervals, with a final exact total after EOF/offset validation. Disabled logging performs no clock or record-formatting work. Observation adds neither a new data-flow component nor a source pass, payload buffer, dependency or worker; streaming-only consumers remain independent of indexing progress.
+
+Named library loggers emit facts without configuring root/application logging. The CLI temporarily selects the emitting scanner logger's level, reuses effective application handlers or owns one temporary stderr handler, and restores its own changes. Configuration remains outside the domain algorithms and does not change error/resource/publication ownership. Library scans retain independent counters; applications serialize shared logging configuration and imported CLI invocations.

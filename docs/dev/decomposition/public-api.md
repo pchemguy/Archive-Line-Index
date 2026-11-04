@@ -133,3 +133,7 @@ class PersistenceError(ArchiveLineIndexError): ...
 The error component owns these classes. Their categories respectively cover unsupported formats, malformed recognized archives, invalid member structure, size-limit violations, extraction/delivery failures, invalid offset representations and persistence-engine failures. Specific ordinary Python exceptions remain available where appropriate; SPEC owns the complete classification and precedence.
 
 The package-root export set is exactly `Source`, `ReadableBinary`, `DEFAULT_BUFFER_SIZE`, `ContentStream`, `open_content_stream`, `scan_line_offsets`, `build_line_index`, the four persistence functions and the listed exception classes. Consumers are not given public backend registration, worker controls, format enums, temporary-file helpers or a combined multi-output writer.
+
+## Progress logging surface
+
+Index construction emits INFO through archive_line_index.scanner, with five-second chunk-boundary uncompressed-byte observations and a final validated-scan total. Library callers opt in using standard logging configuration; no callback, constructor parameter or new root export is introduced. Direct scanning still borrows its reader; build_line_index still owns source cleanup. The CLI adds case-insensitive --log-level with INFO default and WARNING-or-higher suppression, preserving stdout summaries and exception/status ownership. [Progress contract](../spec/progress-logging.md) owns counts, timing, configuration restoration and the intentional informational stderr output.

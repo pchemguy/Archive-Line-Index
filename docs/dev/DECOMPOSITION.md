@@ -71,3 +71,9 @@ The public API child defines all supported consumer entry points. The internal c
 Reader doubles exercise common-stream completion and size enforcement without concrete archive dependencies. Short-read inputs exercise scanner boundaries and borrowing. A controlled producer exercises 7z backpressure, terminal outcomes and cancellation. Real archives exercise dependency integration and format-specific validation. Publication primitives can be fault-injected separately from SQLite/raw construction, while actual filesystem tests verify destination protection and replacement. Public export and installed-package checks exercise the facade rather than internal import paths.
 
 [SPEC](SPEC.md) owns exact argument/error behavior, supported format variants, read-after-failure details, numeric buffering policy, dependency suitability, filesystem support and post-publication cleanup outcomes. Implementations and their verification consume those contracts.
+
+## Progress ownership
+
+The scanner owns archive_line_index.scanner and operation-local timing/counter observations around processed chunks; no per-LF callback or additional readable interface is needed. Its final event follows validated exhaustion and offset validation, not persistence. Disabled INFO skips clock and record work. Public indexing function signatures and root exports remain unchanged.
+
+The CLI owns --log-level and scoped invocation configuration on that emitting logger, including an application's explicitly configured child level. It restores the previous level, preserves propagation/disabled state and existing root/parent/handler configuration, and removes/closes only its own temporary stderr handler. Existing effective handlers control routing/formatting; no root configuration is performed. Shared errors, facade, adapters and persistence do not acquire progress responsibilities. Exact behavior is in the [progress contract](spec/progress-logging.md).

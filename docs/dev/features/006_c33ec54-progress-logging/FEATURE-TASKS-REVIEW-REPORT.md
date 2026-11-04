@@ -1,5 +1,7 @@
 # FEATURE-TASKS conformance review
 
+Historical feature source/evidence. Current behavior and canonical completed task ownership are in [main SPEC](../../SPEC.md), [main PLAN](../../PLAN.md) and [main TASKS](../../TASKS.md). Retained preparation/task observations describe their recorded checkpoints; archived checklists are not executable owners.
+
 Reviewed content blob 0c6c657a17c26c6a412d5f7afef1dc79bcfec970; governing inputs Ready FEATURE-SPEC, FEATURE-PLAN with scoped layout; main T-001–T-052 identity boundary. Reviewer: current agent, 2026-11-04. Source inspection and document conformance assessment, not runtime verification.
 
 Task IDs T-053–T-056 are unique, owned only by this active list and ordered by dependencies. Phase 5 has one delivery milestone with three delivery tasks (scanner, CLI, installed/docs) plus one dedicated review milestone/task. Three is cohesive and in-range; no separate milestone review is required, and T-055 explicitly owns milestone review/report/continuity. T-056 is exactly the final phase review and includes incorporation/archive/whole-boundary evidence without inventing extra administrative tasks. LOG-01–04 map T-053, LOG-05–06 map T-054, LOG-07/composition map T-055/T-056; failure/configuration/native limits and publication gates are retained. Ready for phase projection after package QC/integration.

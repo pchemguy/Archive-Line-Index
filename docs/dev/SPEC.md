@@ -4,7 +4,7 @@
 
 Archive Line Index is a synchronous Python library for sequential payload access, LF byte-line indexing and independent index persistence. [PROJECT](PROJECT.md) owns intent and exclusions; [ARCHITECTURE](ARCHITECTURE.md) and [DECOMPOSITION](DECOMPOSITION.md) own structure. The system accepts filesystem paths to plain files or supported single-member archives and exposes original payload bytes without extracting member paths.
 
-The complete scope includes Python 3.11 or later on Windows, Linux and macOS; unencrypted ZIP, TAR, gzip/bzip2/xz-compressed TAR and 7z; caller-provided readable binary scanner inputs; canonical offset arrays; dedicated SQLite and raw little-endian persistence; an installable distribution; and an importable minimal single-target CLI. Unsupported scope includes text/record parsing, random compressed seeking, encrypted content, remote sources, multiple selected payloads, source/index identity, stale-index detection, mmap/lazy indexes, automatic naming inside library persistence APIs, public asynchronous interfaces, batch/recursive CLI processing, stdin payloads, GUI and cross-file transactions.
+The complete scope includes Python 3.11 or later on Windows, Linux and macOS; unencrypted ZIP, TAR, gzip/bzip2/xz-compressed TAR and 7z; caller-provided readable binary scanner inputs; canonical offset arrays; dedicated SQLite and raw little-endian persistence; an installable distribution; an importable minimal single-target CLI and lightweight standard-logging indexing progress. Unsupported scope includes text/record parsing, random compressed seeking, encrypted content, remote sources, multiple selected payloads, source/index identity, stale-index detection, mmap/lazy indexes, automatic naming inside library persistence APIs, public asynchronous interfaces, batch/recursive CLI processing, stdin payloads, GUI and cross-file transactions.
 
 ## Terminology and system guarantees
 
@@ -27,11 +27,12 @@ Each child is normative for its assigned behavior. API/type declarations remain 
 | [Content stream](spec/content-stream.md) | Read operations, limits, state, completion and cleanup | Common stream, backend reader, producer bridge |
 | [Archive handling](spec/archive-handling.md) | Detection, supported formats, member validation and backend obligations | Detector, selection, concrete adapters |
 | [Line index](spec/line-index.md) | LF/BOM semantics, offset validation and scanner behavior | Scanner, offset model |
+| [Progress logging](spec/progress-logging.md) | Five-second byte observations, disabled cost and invocation configuration | Scanner, CLI adapter, application logging handlers |
 | [Persistence](spec/persistence.md) | Storage representations, readers/writers and filesystem publication | SQLite/raw adapters, offset model, publication helper |
 
 ## Operating assumptions and limits
 
-Sources and persisted read inputs must remain stable during an operation. A caller serializes operations on one content stream and does not mutate an offset array while a writer uses it. Different instances may be used independently. The package provides neither a source snapshot nor an external-writer locking protocol.
+Sources and persisted read inputs must remain stable during an operation. A caller serializes operations on one content stream and does not mutate an offset array while a writer uses it. Different library instances may be used independently. Applications serialize shared logging reconfiguration and imported CLI invocations; scan progress counters/timers are local to each operation. The package provides neither a source snapshot nor an external-writer locking protocol.
 
 The shared offset range is `0..2^63 - 1`. An eight-byte `array("Q")` representation is required. Payload streaming alone is not restricted by the offset range unless a size limit is requested; index construction enforces the range.
 

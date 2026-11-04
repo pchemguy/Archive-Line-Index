@@ -1,5 +1,7 @@
 # Progress feature package QC
 
+Historical feature source/evidence. Current behavior and canonical completed task ownership are in [main SPEC](../../SPEC.md), [main PLAN](../../PLAN.md) and [main TASKS](../../TASKS.md). Retained preparation/task observations describe their recorded checkpoints; archived checklists are not executable owners.
+
 Campaign 006_c33ec54; preimplementation whole-package assessment. All FDOCS-001–008 local checkoffs and corresponding published/hosted-closed checkpoints are verified by the sequential stage lifecycle. Human accepted FEATURE and explicitly preapproved remaining documents, package QC and full implementation. Actual current artifact identities:
 
 - FEATURE.md: f49370835deb61b457bbbec2c41c9a6dae5761b7.

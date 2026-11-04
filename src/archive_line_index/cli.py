@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import argparse
+import logging
 import os
 import sys
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
+from contextlib import contextmanager
 from pathlib import Path
 from typing import NoReturn
 
@@ -34,6 +36,14 @@ def _parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("target", metavar="TARGET")
     parser.add_argument(
+        "--log-level",
+        type=str.upper,
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        default="INFO",
+        metavar="LEVEL",
+        help="progress logging level (default: INFO; WARNING suppresses progress)",
+    )
+    parser.add_argument(
         "-o",
         "--output",
         metavar="OUTPUT_STEM",
@@ -45,6 +55,28 @@ def _parser() -> argparse.ArgumentParser:
         help="replace distinct existing output files",
     )
     return parser
+
+
+@contextmanager
+def _progress_logging(level: int) -> Iterator[None]:
+    """Select scan verbosity, reusing application handlers and restoring state."""
+    logger = logging.getLogger("archive_line_index.scanner")
+    previous = logger.level
+    handler: logging.Handler | None = None
+    try:
+        logger.setLevel(level)
+        if not logger.hasHandlers():
+            handler = logging.StreamHandler(sys.stderr)
+            handler.setFormatter(logging.Formatter("%(levelname)s: %(message)s"))
+            logger.addHandler(handler)
+        yield
+    finally:
+        try:
+            if handler is not None:
+                logger.removeHandler(handler)
+                handler.close()
+        finally:
+            logger.setLevel(previous)
 
 
 def _preflight(target: Path, outputs: tuple[Path, Path], *, overwrite: bool) -> None:
@@ -84,6 +116,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     reported on stderr on failure; they are never rolled back. Unexpected
     programming errors propagate. Help/usage never exit the caller.
     Importing this module performs no parsing, path inspection or CLI execution.
+    Progress defaults to INFO via the scanner logger; --log-level WARNING
+    suppresses it. Existing application handlers remain caller-owned.
     """
     if argv is not None and (
         isinstance(argv, (str, bytes))
@@ -113,7 +147,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         sqlite = Path(str(stem) + ".sqlite3")
         raw = Path(str(stem) + ".u64")
         _preflight(target, (sqlite, raw), overwrite=options.overwrite)
-        offsets = build_line_index(target)
+        with _progress_logging(getattr(logging, options.log_level)):
+            offsets = build_line_index(target)
         write_sqlite_index(offsets, sqlite, overwrite=options.overwrite)
         published.append(sqlite)
         write_raw_index(offsets, raw, overwrite=options.overwrite)

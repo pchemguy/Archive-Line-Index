@@ -4,7 +4,7 @@ import zipfile
 
 import pytest
 from tests.helpers.packaging import InstalledPackage
-from tests.integration.test_installed_cli import _invoke
+from tests.integration.test_installed_cli import _assert_progress_success, _invoke
 
 pytestmark = [pytest.mark.integration, pytest.mark.timeout(300)]
 
@@ -17,7 +17,7 @@ def test_installed_zip_pairs_and_corruption(
     with zipfile.ZipFile(target, "w", compression=zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("nested/data", b"\xef\xbb\xbfalpha\r\n\nomega")
     result = _invoke(installed_package, route, [target.name])
-    assert result.returncode == 0 and not result.stderr, result.stderr
+    _assert_progress_success(result, 16)
     stem = target.stem
     installed_package.run(f"""
 from archive_line_index import build_line_index, open_content_stream, read_raw_index, read_sqlite_index
@@ -67,7 +67,7 @@ def test_installed_tar_variants_and_pairs(
         mode=mode,
     )
     result = _invoke(installed_package, route, [target.name])
-    assert result.returncode == 0 and not result.stderr, result.stderr
+    _assert_progress_success(result, 16)
     stem = str(target.with_suffix(""))
     installed_package.run(f"""
 from archive_line_index import build_line_index, read_raw_index, read_sqlite_index
@@ -91,7 +91,7 @@ def test_installed_empty_and_late_invalid_tar(
         [("data", b"", tarfile.REGTYPE)],
         mode=mode,
     )
-    assert _invoke(installed_package, "console", [empty.name]).returncode == 0
+    _assert_progress_success(_invoke(installed_package, "console", [empty.name]), 0)
     installed_package.run(f"""
 from archive_line_index import read_raw_index, read_sqlite_index
 assert read_raw_index({str(empty.with_suffix(".u64"))!r}).tolist() == [0]
@@ -123,7 +123,7 @@ def test_installed_7z_pairs_and_corruption(
         installed_package.workdir / ("seven-" + key + ".7z"), [("nested/data", payload)]
     )
     result = _invoke(installed_package, route, [target.name])
-    assert result.returncode == 0 and not result.stderr, result.stderr
+    _assert_progress_success(result, len(payload))
     stem = target.with_suffix("")
     installed_package.run(f"""
 from archive_line_index import build_line_index, read_raw_index, read_sqlite_index

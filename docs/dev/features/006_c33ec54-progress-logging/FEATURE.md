@@ -1,5 +1,7 @@
 # Lightweight indexing progress logging
 
+Historical feature source/evidence. Current behavior and canonical completed task ownership are in [main SPEC](../../SPEC.md), [main PLAN](../../PLAN.md) and [main TASKS](../../TASKS.md). Retained preparation/task observations describe their recorded checkpoints; archived checklists are not executable owners.
+
 ## Purpose and observable outcome
 
 Make long-running line-index construction observable without materially increasing scanning cost or producing per-line output. A user indexing a large plain file or supported archive can see the cumulative amount of payload processed while work is running, using Python's standard logging facility.
@@ -26,4 +28,4 @@ No progress bars, percentages, ETA, throughput calculation, line-by-line or byte
 
 Existing public function signatures and stored index formats remain stable. The intentional observable CLI change is INFO progress on stderr, with suppression through the selected logging-level control. Document named-logger configuration for library callers, default CLI output and suppression, byte-count meaning, throttling and completion limits. Add focused checks for exact byte totals, rate limiting, disabled cost boundaries, logging isolation and preserved results/failure behavior.
 
-[Project scope](PROJECT.md), [public API design](decomposition/public-api.md), [line-index contract](spec/line-index.md) and [CLI contract](spec/cli.md) define retained behavior. Python's [library logging guidance](https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library) informs configuration ownership. Exact logger names, CLI option spelling and formatting belong to the feature design/specification.
+[Project scope](../../PROJECT.md), [public API design](../../decomposition/public-api.md), [line-index contract](../../spec/line-index.md) and [CLI contract](../../spec/cli.md) define retained behavior. Python's [library logging guidance](https://docs.python.org/3/howto/logging.html#configuring-logging-for-a-library) informs configuration ownership. Exact logger names, CLI option spelling and formatting belong to the feature design/specification.
