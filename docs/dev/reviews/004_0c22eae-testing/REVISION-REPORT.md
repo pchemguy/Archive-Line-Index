@@ -4,7 +4,7 @@
 
 Campaign `004_0c22eae`, opened on 2026-11-04. [Scope and gates](REVISION-PLAN.md). Working branch `revision/004_0c22eae-testing`; creation parent/integration/return target `main`; full starting code/branch-off `0c22eae396ed04b3d090e287f8c58af79c05f939`.
 
-State: Open. The opening itself performed no testing. The subsequent user-reported collection failure and pyproject instruction selected V-001; that bounded fix and its checks are now verified below; the subsequent plugin-warning instruction selected verified V-002. Broader testing assessment remains unselected.
+State: Open. The opening itself performed no testing. The subsequent user-reported collection failure and pyproject instruction selected V-001; that bounded fix and its checks are now verified below; the subsequent plugin-warning instruction selected verified V-002. The later Windows runner-termination report selected verified V-003 below. Broader testing assessment remains unselected.
 
 ## Opening evidence
 
@@ -14,7 +14,7 @@ Only this new plan/report and HANDOFF are owned changes. Branch/directory identi
 
 ## Current scope and stop
 
-Publish/read back the V-001 checkpoint on the active campaign branch, then stop for further instruction. No broader assessment, production repair, main merge/closure or release is selected. Preserve completed task state, closed campaign/phase/manual records and existing releases.
+Publish/read back the latest V-003 checkpoint on the active campaign branch, then stop for further instruction. No broader assessment, production repair, main merge/closure or release is selected. Preserve completed task state, closed campaign/phase/manual records and existing releases.
 
 ## V-001 — Fix pytest collection imports
 
@@ -47,3 +47,16 @@ Three new child-process regressions first failed because disabling asyncio, time
 The full provisioned pytest console run passes 710 tests in 30.92 seconds at 95% production coverage. Ruff lint/format over 74 files and strict src/scripts mypy over 26 files pass. Actual execution is Linux/CPython 3.12.14 with pytest 9.2.0 and py7zr 1.1.4; native Windows execution remains unverified. This repository change cannot install or enable plugins on the user's workstation: use python -m pip install ".[dev,test]" with the same interpreter used by pytest, and ensure the required plugins are loaded.
 
 The containing V-002 commit owns pyproject, README, behavioral regressions and current campaign evidence. Production modules, runtime dependencies/version, task state and frozen records are unchanged. Publish/read back this checkpoint on revision/004_0c22eae-testing and stop; the campaign remains open.
+
+
+## V-003 — Prevent the interruption test killing Windows pytest
+
+Revision entry: published/read-back V-002 `4864798ba10ef79819cb6b0d36c34f8a0b5f3294`. The supplied Windows/CPython 3.14.5 log stops precisely at test_actual_sigint_during_7z_wait_releases_worker. That test invoked os.kill(os.getpid(), signal.SIGINT) inside the pytest process. [Python documents](https://docs.python.org/3.14/library/os.html#os.kill) that Windows uses TerminateProcess for signals other than CTRL_C_EVENT/CTRL_BREAK_EVENT, with the signal value as the exit code. This explains termination before any unit test executes. The earlier ordering/stall diagnosis was incomplete: changing testpaths or collection order would not repair this defect.
+
+The [interruption test](../../../../tests/integration/test_full_format_lifecycle.py) now executes its real blocked-read, KeyboardInterrupt and worker-cleanup assertions in a child interpreter with a 20-second subprocess timeout. It uses signal.raise_signal(signal.SIGINT), retaining a real catchable interrupt. Isolation ensures an abrupt exit becomes an ordinary failed test rather than killing pytest. A second parameter guards against the old transport by substituting Windows hard-exit semantics for os.kill inside the child only. No collection reordering, skips or production changes were introduced.
+
+Observed RED: with the original os.kill call retained inside the new isolated scenario, native Linux passed and the Windows-semantics guard failed with child exit 2 and its TerminateProcess diagnostic; the parent runner survived. Observed GREEN: after replacing that call with signal.raise_signal, both cases passed. This regression exercises the reported failure mechanism rather than asserting configuration text.
+
+The exact pytest console command pytest -vv then completed with 711 passed in 35.60 seconds. Its actual verbose completion lines include 233 integration tests and all 478 unit tests; both interruption parameters passed at 18%, and the first unit test passed at 32%. Ruff lint/format passed over 74 files; strict src/scripts mypy passed over 26 files using --no-native-parser. These are fresh Linux/CPython 3.12.14 results, not native Windows results; the Windows hard-exit behavior was simulated in the child. The latest run did not request coverage; the prior 95% coverage result belongs to V-002.
+
+The containing checkpoint owns this test-harness repair and active campaign continuity/evidence only. Publish/read back on revision/004_0c22eae-testing and stop. Main, production modules, original task state, frozen records, version and releases remain unchanged; the testing campaign remains open.
