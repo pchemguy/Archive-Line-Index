@@ -39,8 +39,8 @@ Current selected scope is four defect findings (R-001/R-004/R-005/R-007, with na
 
 | Finding | Type | Priority | Status | Related findings |
 | --- | --- | --- | --- | --- |
-| R-001 | Defect | Medium | Accepted | R-002 |
-| R-002 | Defect | Medium | Accepted; reclassified recommendation | R-001 |
+| R-001 | Defect | Medium | Verified | R-002 |
+| R-002 | Defect | Medium | Verified overhead/portability repair | R-001 |
 | R-003 | Recommendation | Low | Deferred | R-006 |
 | R-004 | Defect | Medium | Accepted with narrowed criteria | None |
 | R-005 | Defect | Medium | Accepted | None |
