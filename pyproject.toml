@@ -78,7 +78,7 @@ packages = ["src/archive_line_index"]
 
 [tool.pytest]
 addopts = ["-ra", "-q", "--strict-config", "--strict-markers", "--import-mode=importlib"]
-pythonpath = ["src"]
+pythonpath = ["src", "."]
 testpaths = ["tests"]
 asyncio_mode = "strict"
 asyncio_default_fixture_loop_scope = "function"

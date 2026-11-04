@@ -5,9 +5,9 @@
 - Campaign: `004_0c22eae`; branch: `revision/004_0c22eae-testing`; package: `docs/dev/reviews/004_0c22eae-testing/`.
 - Full starting code and branch-off baseline: `0c22eae396ed04b3d090e287f8c58af79c05f939`, matching fetched origin/main.
 - Creation parent, eventual integration and return target: actual current `main`.
-- Request: “open testing revision campaign.” Authorized now: reserve a new campaign, record testing scope and entry HANDOFF, commit/publish/read back and stop. No testing assessment, test execution or implementation is selected by opening alone.
+- Opening request: “open testing revision campaign.” That preparation-only checkpoint was published; the later reported collection failure and pyproject instruction select bounded V-001 below.
 - Companion: [REVISION-REPORT.md](REVISION-REPORT.md).
-- State: Open, preparation only. No finding, repair action or test revision has been accepted or executed.
+- State: Open; V-001 is verified. The broader testing scope has not been assessed or accepted for execution.
 
 ## Testing scope
 
@@ -32,3 +32,13 @@ For authorized actions, preserve stable IDs, source/test ownership and observed 
 Sequences 001–003 are reserved and their published tips are contained in main: 001 completed; 002 and 003 were cancelled. Their records remain frozen; this is a new campaign, not reopening or resuming cancelled testing work. No active parent campaign or nesting context is selected.
 
 The product baseline retains prior 705-test/95% evidence, not fresh execution in campaign 004. Actual available host is Linux/bash with existing CPython 3.12/py7zr tooling. Unavailable Windows/macOS/Python 3.11/Python 3.14/big-endian execution remains unverified; simulations do not certify those platforms. Preserve original task/hosted closures and existing v0.4.0. No new runtime provisioning, version bump or release is selected.
+
+## Selected action V-001 — Make pytest imports independent of invocation
+
+The human reported four ModuleNotFoundError failures importing scripts from release tests and explicitly identified pyproject as the correction owner. This overrides the opening-only stop for this bounded testing configuration repair. Existing Linux reproduction matches all four errors under the pytest console entry point; python -m pytest collection succeeds because it contributes the current directory to sys.path. The configured pythonpath includes src only.
+
+Add the repository root alongside src in the existing pytest pythonpath, preserving importlib mode, strictness and declared dependencies. Add behavioral subprocess collection regressions without implicit current-directory/PYTHONPATH injection, then run the full suite through the pytest console executable and check module collection. Keep installed consumers isolated; no library/source behavior or governing-contract changes are selected. Record observed RED/GREEN and native limits with the fix, publish/read back on the active testing branch and stop for further instructions. This focused request does not select broader campaign assessment, main integration/closure, version bump or release.
+
+## Queued focused instruction
+
+The later plugin-warning report selects V-002 after V-001 publication: reproduce missing plugin diagnostics, require the declared pytest plugins clearly and verify both provisioned and disabled-plugin outcomes. Retain timeout enforcement rather than merely registering an inert marker.
