@@ -183,3 +183,128 @@ def test_trailing_directories_and_repeated_eof(tmp_path: Path) -> None:
         assert reader.read(1) == b""
     finally:
         reader.close()
+
+
+@pytest.mark.parametrize("mode", ["w:gz", "w:bz2", "w:xz"])
+def test_required_compressed_tar_exact_delivery(tmp_path: Path, mode: str) -> None:
+    from archive_line_index.backends.tar import open_tar_backend
+
+    payload = b"\0a\n\xff" * 4000
+    p = make_tar(
+        tmp_path / "unconventional",
+        [("nested/data", payload, tarfile.REGTYPE)],
+        mode=mode,
+    )
+    reader = open_tar_backend(p)
+    try:
+        assert reader.declared_size == len(payload)
+        blocks = []
+        while block := reader.read(11):
+            assert len(block) <= 11
+            blocks.append(block)
+        assert b"".join(blocks) == payload
+        assert reader.completed
+    finally:
+        reader.close()
+
+
+@pytest.mark.parametrize("codec", ["gzip", "bz2", "lzma"])
+def test_compressed_non_tar_and_bad_trailer_cannot_succeed(
+    tmp_path: Path, codec: str
+) -> None:
+    import importlib
+
+    from archive_line_index.backends.tar import open_tar_backend
+    from archive_line_index.errors import ExtractionError
+    from archive_line_index.scanner import scan_line_offsets
+    from archive_line_index.stream import make_content_stream
+
+    compressor = importlib.import_module(codec).compress
+    p = tmp_path / "compressed"
+    p.write_bytes(compressor(b"plain bytes, not tar"))
+    with pytest.raises(InvalidArchiveError):
+        open_tar_backend(p)
+    make_tar(p, [("data", b"payload\n", tarfile.REGTYPE)])
+    raw = compressor(p.read_bytes() + b"\0" * (128 * 1024))
+    damaged = bytearray(raw)
+    damaged[-5] ^= 0xFF
+    p.write_bytes(damaged)
+    # Codecs may detect damage while opening or while completing delivery.
+    with pytest.raises((InvalidArchiveError, ExtractionError)) as error:
+        stream = make_content_stream(open_tar_backend(p), max_uncompressed_size=None)
+        try:
+            scan_line_offsets(stream, buffer_size=3)
+        finally:
+            stream.close()
+    assert error.value.__cause__ is not None
+    p.write_bytes(raw[:-8])
+    with pytest.raises((InvalidArchiveError, ExtractionError)):
+        reader = open_tar_backend(p)
+        try:
+            while reader.read(31):
+                pass
+        finally:
+            reader.close()
+
+
+def test_missing_selected_codec_is_unsupported(tmp_path: Path) -> None:
+    import sys
+
+    from archive_line_index.backends.tar import open_tar_backend
+    from archive_line_index.errors import UnsupportedFormatError
+
+    p = make_tar(tmp_path / "a.tar.xz", [("data", b"x", tarfile.REGTYPE)], mode="w:xz")
+    handle = p.open("rb")
+    with (
+        patch.object(Path, "open", return_value=handle),
+        patch.dict(sys.modules, {"lzma": None}),
+    ):
+        with pytest.raises(UnsupportedFormatError) as error:
+            open_tar_backend(p)
+    assert isinstance(error.value.__cause__, ImportError)
+    assert handle.closed
+
+
+@pytest.mark.parametrize("mode", ["w", "w:gz", "w:bz2", "w:xz"])
+def test_tar_source_io_failure_remains_ordinary(tmp_path: Path, mode: str) -> None:
+    from archive_line_index.backends.tar import open_tar_backend
+
+    # Exercise source failures during bounded delivery or the mandatory terminal drain.
+    payload = bytes(range(256)) * 1024
+    p = make_tar(tmp_path / "source", [("data", payload, tarfile.REGTYPE)], mode=mode)
+    handle = p.open("rb")
+    with patch.object(Path, "open", return_value=handle):
+        reader = open_tar_backend(p)
+    failure = PermissionError("source read")
+    try:
+        with patch.object(handle, "read", side_effect=failure):
+            with pytest.raises(PermissionError) as error:
+                while reader.read(1024):
+                    pass
+        assert error.value is failure
+        assert not reader.completed
+    finally:
+        reader.close()
+    assert handle.closed
+
+
+def test_gzip_footer_is_validated_after_payload_delivery(tmp_path: Path) -> None:
+    import gzip
+
+    from archive_line_index.backends.tar import open_tar_backend
+    from archive_line_index.errors import ExtractionError
+
+    p = make_tar(tmp_path / "a", [("data", b"payload\n", tarfile.REGTYPE)])
+    raw = bytearray(gzip.compress(p.read_bytes() + b"\0" * (128 * 1024)))
+    raw[-8] ^= 1
+    p.write_bytes(raw)
+    reader = open_tar_backend(p)
+    try:
+        assert reader.read(8) == b"payload\n"
+        assert not reader.completed
+        with pytest.raises(ExtractionError) as error:
+            reader.read(1)
+        assert isinstance(error.value.__cause__, gzip.BadGzipFile)
+        assert not reader.completed
+    finally:
+        reader.close()

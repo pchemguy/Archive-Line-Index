@@ -251,11 +251,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Keep validation after payload delivery, reject additional files/special entries and malformed trailing structure before validated EOF, and return no completed index after late failure.
             - Contracts: ARC-03–05; STR-02, STR-04–05; SYS-04.
             - Verified result: TAR terminal completion now validates every trailing exposed entry, requires a complete end marker, rejects malformed/truncated later headers and drains only zero padding before EOF. A real late-member regression failed with false success before correction; additional files/special entries, incomplete payload/end markers and nonzero tails cannot return a completed index. Trailing directories and repeated EOF are valid. All 92 TAR/ZIP/common-stream checks, strict mypy and full Ruff pass.
-        - [ ] T-036 — Complete required compressed-TAR filters and integrity
+        - [x] T-036 — Complete required compressed-TAR filters and integrity
             - Scope: backends/tar.py gzip/bzip2/xz paths and compressed failure checks.
             - Depends on: T-035.
             - Acceptance/evidence: Support required filters/suffix forms, reject compressed non-TAR payloads, preserve unavailable-codec errors and verify available header/trailer/truncation checks and cleanup.
             - Contracts: ARC-01–05; STR-01–05.
+            - Verified result: Required gzip/bzip2/xz TAR decoding uses owned standard-library readers and drains through compression trailers before successful EOF. Real compressed TAR fixtures first failed as invalid plain TAR; 104 TAR/ZIP/common-stream checks now pass, including compressed non-TAR, corruption/truncation, missing selected codec with cause, filesystem errors and a gzip CRC failure after payload delivery. Interrupted owned edits were preserved and reconciled; strict mypy and full Ruff pass.
         - [ ] T-037 — Integrate TAR selection with source and CLI workflows
             - Scope: backends/registry.py and TAR public/paired-CLI integration checks.
             - Depends on: T-036.

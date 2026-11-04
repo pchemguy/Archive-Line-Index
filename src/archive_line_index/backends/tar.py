@@ -8,10 +8,61 @@ from __future__ import annotations
 
 import tarfile
 from pathlib import Path
-from typing import IO, Protocol, Self
+from typing import IO, BinaryIO, Protocol, Self, cast
 
-from ..errors import ArchiveStructureError, ExtractionError, InvalidArchiveError
+from ..errors import (
+    ArchiveLineIndexError,
+    ArchiveStructureError,
+    ExtractionError,
+    InvalidArchiveError,
+    UnsupportedFormatError,
+)
 from .base import BackendReader, validate_positive_size
+
+
+class _Payload(Protocol):
+    def read(self, size: int = -1, /) -> bytes: ...
+
+    def close(self) -> None: ...
+
+
+class _Source:
+    """Track source I/O errors separately from codec errors using OSError."""
+
+    def __init__(self, handle: BinaryIO) -> None:
+        self.handle = handle
+        self.failure: OSError | None = None
+
+    def read(self, size: int = -1) -> bytes:
+        try:
+            return self.handle.read(size)
+        except OSError as error:
+            self.failure = error
+            raise
+
+    def close(self) -> None:
+        self.handle.close()
+
+
+def _decoded_source(source: _Source, prefix: bytes) -> _Payload:
+    try:
+        if prefix.startswith(b"\x1f\x8b"):
+            import gzip
+
+            return gzip.GzipFile(fileobj=cast(BinaryIO, source), mode="rb")
+        if prefix.startswith(b"BZh"):
+            import bz2
+
+            return bz2.BZ2File(cast(BinaryIO, source), mode="rb")
+        if prefix.startswith(b"\xfd7zXZ\x00"):
+            import lzma
+
+            return lzma.LZMAFile(cast(BinaryIO, source), mode="rb")
+    except ImportError as error:
+        raise UnsupportedFormatError(
+            "Required TAR compression codec is unavailable"
+        ) from error
+    return source
 
 
 class _StrictTarInfo(tarfile.TarInfo):
@@ -70,9 +121,11 @@ class _TarReader:
         resources: list[_Closable],
         declared_size: int,
         archive: tarfile.TarFile,
+        source: _Source,
     ) -> None:
         self._member = member
         self._archive = archive
+        self._source = source
         self._resources = resources
         self.declared_size = declared_size
         self.completed = False
@@ -86,8 +139,15 @@ class _TarReader:
             if not data:
                 self._finish()
             return data
-        except tarfile.TarError as error:
-            raise ExtractionError("TAR payload delivery failed") from error
+        except Exception as error:
+            if (
+                isinstance(error, (ArchiveLineIndexError, MemoryError))
+                or error is self._source.failure
+            ):
+                raise
+            raise ExtractionError(
+                "TAR payload delivery or terminal validation failed"
+            ) from error
 
     def _finish(self) -> None:
         while (member := self._archive.next()) is not None:
@@ -108,21 +168,34 @@ class _TarReader:
 
 
 def open_tar_backend(path: Path) -> BackendReader:
-    """Open a regular payload in sequential plain-TAR mode, owning all handles."""
+    """Open plain/gzip/bzip2/xz TAR sequentially and own every acquired handle."""
     source = path.open("rb")
     resources: list[_Closable] = [source]
     try:
+        prefix = source.read(6)
+        source.seek(0)
+        tracked = _Source(source)
         try:
-            archive = tarfile.open(fileobj=source, mode="r|", tarinfo=_StrictTarInfo)
+            decoded = _decoded_source(tracked, prefix)
+            if decoded is not tracked:
+                resources.insert(0, decoded)
+            archive = tarfile.open(
+                fileobj=cast(IO[bytes], decoded), mode="r|", tarinfo=_StrictTarInfo
+            )
             resources.insert(0, archive)
             info = _first_payload(archive)
             member = archive.extractfile(info)
             if member is None:
                 raise ArchiveStructureError("TAR payload is not readable")
             resources.insert(0, member)
-        except tarfile.TarError as error:
+        except Exception as error:
+            if (
+                isinstance(error, (ArchiveLineIndexError, MemoryError))
+                or error is tracked.failure
+            ):
+                raise
             raise InvalidArchiveError("Cannot open TAR payload") from error
-        return _TarReader(member, resources, info.size, archive)
+        return _TarReader(member, resources, info.size, archive, tracked)
     except BaseException as error:
         try:
             _close_resources(resources)
