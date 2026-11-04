@@ -263,11 +263,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Compare exact arrays and both persisted outputs across plain/ZIP/TAR filters; ensure arbitrary chunk boundaries and late validation propagate through the generic facade.
             - Contracts: SYS-01, SYS-03–10, SYS-13; CLI-01–06; IDX-01–06.
             - Verified result: TAR selection now lazily enables plain/gzip/bzip2/xz adapters through public streams, indexing and paired CLI output. New public TAR checks failed as unsupported before integration; required suffixes, unconventional and misleading names, one-byte buffers, payload coordinates, size limits and SQLite/raw equivalence pass. Late extra members and gzip trailer errors return no completed index or outputs. All 474 selected unit/public/CLI/persistence/ZIP/TAR checks, strict mypy and full Ruff pass.
-        - [ ] T-038 — Complete installed standard-archive artifacts and examples
+        - [x] T-038 — Complete installed standard-archive artifacts and examples
             - Scope: Version 0.3.0 metadata, installed cross-format checks and user documentation.
             - Depends on: T-037.
             - Acceptance/evidence: Build/install/rebuild native candidates, verify inventory/checksums and demonstrate supported ZIP/TAR variants plus corruption/ownership regressions without exposing 7z as delivered.
             - Contracts: API-05; SYS-11–12; ARC-01–05; phase release gate.
+            - Verified result: Version 0.3.0 supports installed ZIP/plain-gzip-bzip2-xz TAR through all three CLI forms and seven executable README examples. Stable wheel/source ZIP bundles preserve valid native package filenames internally; PLAN/layout/guidance/checks now match the reloaded naming rule. The actual gate rejects old versioned assets with matching faulty expectations and passes shared notation vectors. All 77 selected installed/metadata/bundle/example checks, isolated native source-wheel builds, independent bundle/checksum verification, strict mypy for src/scripts, Ruff and local-link checks pass. 7z remains undelivered.
         - [ ] T-039 — Review test and report milestone 3.2
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-034, T-035, T-036, T-037, T-038.

@@ -19,7 +19,7 @@ Markers/configuration remain in `pyproject.toml`. Integration tests that launch 
 | `tests/unit/backends/test_sevenzip.py` | 7z metadata/callback adapter boundaries; real dependency behavior is also required in integration checks. |
 | `tests/unit/persistence/test_fs.py`, `test_sqlite.py`, `test_raw.py` | Publication commit points, temporary/sidecar ownership, exact formats, corruption, byte order and injected failures. |
 | `tests/unit/test_cli.py` | Importable argv handling, default/shared stems, both-path preflight, statuses, one scan, writer order and accurate partial-publication reporting. |
-| `tests/unit/test_release_artifacts.py` | Development-script inventory/name/version/checksum behavior using synthetic archives; no hosted release mutation. |
+| `tests/unit/test_release_artifacts.py` | Native build inventory/version/checksum behavior using synthetic archives; no hosted release mutation. |
 
 ## Integrated and installed behavior
 
@@ -35,3 +35,5 @@ Markers/configuration remain in `pyproject.toml`. Integration tests that launch 
 Installed-artifact checks use actual built package bytes and a working directory outside the repository; they cannot pass solely through `src` path injection. Source/release inventory checks inspect native artifacts, required build inputs and exclusions. GitHub upload/download identity is release evidence under the phase release workflow, not a unit test that sends hosted mutations.
 
 Milestone and phase review evidence follows the [document map](docs.md) and PLAN boundaries. This allocation does not prescribe a test per contract sentence or claim that any test file already exists or has passed.
+
+Release naming is exercised by `tests/unit/test_release_names.py` against the shared contract vectors, including matching faulty expected sets. `tests/integration/test_release_bundles.py` builds/checks actual stable bundles from native inputs and rejects inventory, content and checksum faults. `test_installed_archives.py` covers actual ZIP/TAR commands, required filters/suffixes, empty payloads and late invalid archives in clean native/source-rebuilt installations.

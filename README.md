@@ -15,21 +15,22 @@ Library functions are imported from `archive_line_index`; the importable CLI cal
 | `read_sqlite_index`, `read_raw_index` | Stored index path | A newly owned, validated offset array; no payload source is needed. |
 | `cli.main` / console / module | One target and optional shared output stem/overwrite flag | Integer status and paired SQLite/raw files from one scan. |
 
-The current implementation requires Python 3.11 or later and supports plain payload files, single-payload ZIP archives, caller-supplied binary readers, both persistence formats and all three CLI invocation forms. TAR/7z archive payload delivery remains planned and is rejected explicitly until its adapters are delivered.
+The current implementation requires Python 3.11 or later and supports plain payload files, single-payload ZIP and TAR archives, caller-supplied binary readers, both persistence formats and all three CLI invocation forms. 7z payload delivery remains planned and is rejected explicitly until its adapter is delivered.
 
 The library preserves payload bytes. LF is the only line terminator, CRLF retains both bytes, and the final offset is an EOF sentinel. An optional initial UTF-8 BOM policy changes the first line's start to 3 while retaining coordinates in the original bytes. No text decoding or line-ending normalization occurs.
 
 ## Installation
 
-From a checkout, build the native artifacts and install the wheel:
+GitHub releases provide a [wheel bundle](https://github.com/pchemguy/Archive-Line-Index/releases/latest/download/archive-line-index-wheel.zip), [source bundle](https://github.com/pchemguy/Archive-Line-Index/releases/latest/download/archive-line-index-source.zip) and [SHA256SUMS](https://github.com/pchemguy/Archive-Line-Index/releases/latest/download/SHA256SUMS). Verify the downloaded bundle against SHA256SUMS, then extract and install its native package:
 
 ```bash
-python -m pip install build
-python -m build
-python -m pip install dist/archive_line_index-0.2.0-py3-none-any.whl
+python -m zipfile -e archive-line-index-wheel.zip .
+python -m pip install archive_line_index-0.3.0-py3-none-any.whl
 ```
 
-The source distribution is `dist/archive_line_index-0.2.0.tar.gz` and can independently rebuild the wheel. The declared runtime dependency is py7zr; development tools and separate archive executables are not required to use the installed library. ZIP uses the Python standard library; TAR/7z support follows in later versions.
+Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.3.0.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag. The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
+
+From a checkout, build private native package inputs with `python -m build`. The declared runtime dependency is py7zr; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library; 7z payload delivery remains planned.
 
 ## Stream without indexing
 
@@ -108,7 +109,7 @@ with TemporaryDirectory() as directory:
     assert offsets.tolist() == [0, 7, 8, 13]
 ```
 
-Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. ZIP signatures/suffixes select the ZIP adapter. Recognized TAR/7z candidates raise `UnsupportedFormatError` until their adapters are delivered; they are never silently treated as plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
+Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. ZIP signatures/suffixes select the ZIP adapter. Recognized 7z candidates raise `UnsupportedFormatError` until its adapter is delivered; they are never silently treated as plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
 
 ## Index a ZIP payload
 
@@ -129,6 +130,30 @@ with TemporaryDirectory() as directory:
 ```
 
 The CLI accepts the same archive target and persists offsets in the uncompressed payload's byte coordinates. For `records.zip`, its default outputs are `records.sqlite3` and `records.u64` beside the archive. Signature evidence takes precedence over a conflicting suffix, and invalid suffix-claimed ZIP input cannot fall back to plain bytes.
+
+## Index a TAR payload
+
+Plain TAR and gzip/bzip2/xz-compressed TAR follow the same sole-regular-file policy as ZIP. Accepted suffixes are `.tar`, `.tar.gz`, `.tgz`, `.tar.bz2`, `.tbz`, `.tbz2`, `.tar.xz` and `.txz`; supported signatures also identify unconventional filenames. Compressed data that is not TAR is rejected. Standard TAR extension headers are interpreted by the library rather than counted as payload files.
+
+```python
+import tarfile
+from io import BytesIO
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from archive_line_index import build_line_index
+
+with TemporaryDirectory() as directory:
+    target = Path(directory) / "records.tar.gz"
+    payload = b"alpha\nbeta"
+    with tarfile.open(target, "w:gz") as archive:
+        member = tarfile.TarInfo("nested/records.txt")
+        member.size = len(payload)
+        archive.addfile(member, BytesIO(payload))
+    assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
+```
+
+TAR reads sequentially and validates entries after the selected payload before successful EOF. A later extra file or special entry invalidates the archive even after payload bytes were returned. Damaged later headers, incomplete end markers and non-padding trailing bytes fail validation. Compressed readers are drained through their available trailer/integrity checks; a corrupt footer cannot yield a completed index or CLI output pair. Early close releases resources without claiming terminal validation. For `records.tar.gz`, CLI defaults are `records.tar.sqlite3` and `records.tar.u64` beside the archive.
 
 ## Store and reload an index independently
 
@@ -212,10 +237,12 @@ python -m ruff format --check src tests scripts
 python -m mypy
 python -m pytest --cov=archive_line_index --cov-report=term-missing
 python -m build
-python scripts/check_release_artifacts.py --dist dist --tag v0.2.0 --write-checksums
-python scripts/check_release_artifacts.py --dist dist --tag v0.2.0
+python scripts/check_release_artifacts.py --dist dist --tag v0.3.0 --write-checksums
+python scripts/check_release_artifacts.py --dist dist --tag v0.3.0
+python -m scripts.prepare_release --native-dist dist --output release --tag v0.3.0
+python -m scripts.prepare_release --output release --tag v0.3.0 --check
 ```
 
-Use a clean `dist` directory for the native source/wheel pair and generated `SHA256SUMS`. The checker verifies names/tag/embedded metadata, safe contents, source/wheel package equality and checksums; it does not publish a release. Installed integration tests build both artifacts, independently rebuild from the source distribution, and exercise clean runtimes outside the checkout. If mypy's native parser fails during container process discovery, `python -m mypy --no-native-parser` retains strict checking with its supported Python parser.
+Use clean `dist` and `release` directories: `dist` contains private native build inputs, while `release` is the complete hosted inventory of wheel/source ZIP bundles and SHA256SUMS. The native checker verifies package/tag/metadata agreement, safe contents and source/wheel equality. The release checker independently rejects versions in every hosted filename, validates the bundled native pair and verifies outer checksums; neither command publishes a release. The actual naming gate is tested against the shared notation vectors, including historical and single-component versions with matching faulty expected names. Installed integration tests build both artifacts, independently rebuild from the source distribution, and exercise clean runtimes outside the checkout. If mypy's native parser fails during container process discovery, `python -m mypy --no-native-parser` retains strict checking with its supported Python parser.
 
 The [public API design](docs/dev/decomposition/public-api.md) and [contracts](docs/dev/SPEC.md) define the complete intended system. [Project brief](docs/dev/PROJECT.md), [architecture](docs/dev/ARCHITECTURE.md), [delivery plan](docs/dev/PLAN.md) and [implementation tasks](docs/dev/TASKS.md) describe scope and delivery. Development uses [SDD Manager](SDD-MANAGER.md); see the [AI-assisted development disclosure](AI_DISCLOSURE.md).

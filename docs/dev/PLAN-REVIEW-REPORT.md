@@ -103,3 +103,15 @@ The current PLAN replaces a document-preparation handoff paragraph with present-
 | TASKS.md | `19ed2de108f58207145cdfe4fb1dbf54bc359d1d65b0eae3cf14a6546b6dc82a` | `df54f248a12c1e9f2e49a3fa4ca53c69326f205df41e51747adfa54d34e7a842` |
 
 Recheck confirms the same strategy and placement coverage. Updated governing hashes include refreshed SPEC review evidence; no material contract/design change invalidates the prior coverage. Combined PLAN/layout readiness remains Ready, with actual layout acceptance/closure already recorded. TASKS implementation units retain their original boundaries despite removal of a stale proposed-state sentence in their introduction.
+
+## Revision 3 — Phase 3 release packaging
+
+The reloaded SDD Manager 0.16.4 requires version-free names for every hosted release artifact. The active release policy and layout now define exactly two stable wheel/source ZIP bundles and SHA256SUMS; each bundle contains its valid native package. This corrects the conflicting old direct-asset naming rule while preserving the accepted Python distribution contract, version metadata, source rebuild/install checks, phase boundaries, dependencies and release verification obligations. No public API, archive behavior, delivery count or task identity changed. Prior published assets and frozen phase reports remain historical evidence.
+
+The focused PLAN/layout recheck confirms unchanged SPEC conformance and task allocation. T-038 owns producers, complete-inventory naming vectors, actual bundle/content/checksum tests and installed archive examples; T-040 and post-integration release work retain final verification/publication ownership. Preparation/design acceptance remains applicable; this directed packaging-rule repair does not introduce a new product decision. The actual new gate rejects the previous versioned native asset even when its faulty expected list matches. Final executed candidate evidence belongs to the Phase 3 milestone/phase reports.
+
+| Current packaging source | SHA-256 |
+| --- | --- |
+| [PLAN.md](PLAN.md) | `74414e28622fd63bb0b3254a157d63abe7ef5d20597ddcc657335f728203904c` |
+| [layout.md](layout.md) | `cbe30c79abf2f4ea98da253521270e55a0d5498ef997b8d97417f004a97c3cb9` |
+| [layout/tests.md](layout/tests.md) | `7266b455d9aaf2934ba1e627b499a21a43151b93fc0792143177b123b7a14f41` |

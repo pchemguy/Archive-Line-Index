@@ -1,7 +1,8 @@
-"""Validate native source/wheel candidates and their exact SHA256SUMS inventory.
+"""Validate private native source/wheel inputs and their SHA256SUMS inventory.
 
 Run with --dist DIST --tag vVERSION and optional --write-checksums. This helper
-performs no hosted operations. Validation finishes before checksum generation.
+performs no hosted operations. Use scripts.prepare_release for the complete
+version-free hosted asset inventory. Validation precedes checksum generation.
 """
 
 from __future__ import annotations
