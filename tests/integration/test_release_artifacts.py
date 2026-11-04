@@ -14,7 +14,7 @@ pytestmark = [pytest.mark.integration, pytest.mark.timeout(300)]
 def test_real_candidate_inventory_and_cli(built_distributions: Path) -> None:
     repo = Path(__file__).resolve().parents[2]
     hashes = check_release_artifacts(
-        built_distributions, repo / "pyproject.toml", "v0.3.0", write_checksums=True
+        built_distributions, repo / "pyproject.toml", "v0.4.0", write_checksums=True
     )
     result = run_checked(
         [
@@ -25,7 +25,7 @@ def test_real_candidate_inventory_and_cli(built_distributions: Path) -> None:
             "--pyproject",
             str(repo / "pyproject.toml"),
             "--tag",
-            "v0.3.0",
+            "v0.4.0",
         ],
         built_distributions,
     )

@@ -18,7 +18,7 @@ import sys
 import archive_line_index as ali
 
 assert Path(ali.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
-assert metadata.version("archive-line-index") == "0.3.0"
+assert metadata.version("archive-line-index") == "0.4.0"
 assert metadata.version("py7zr")
 names = {d.metadata["Name"].lower() for d in metadata.distributions()}
 assert not names.intersection({"pytest", "mypy", "ruff", "build", "hatchling", "flowmark"})

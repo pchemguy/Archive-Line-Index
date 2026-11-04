@@ -25,10 +25,10 @@ GitHub releases provide a [wheel bundle](https://github.com/pchemguy/Archive-Lin
 
 ```bash
 python -m zipfile -e archive-line-index-wheel.zip .
-python -m pip install archive_line_index-0.3.0-py3-none-any.whl
+python -m pip install archive_line_index-0.4.0-py3-none-any.whl
 ```
 
-Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.3.0.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag. The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
+Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.4.0.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag. The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
 
 From a checkout, build private native package inputs with `python -m build`. The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library. The 7z dependency is loaded only when opening 7z content.
 
@@ -258,10 +258,10 @@ python -m ruff format --check src tests scripts
 python -m mypy
 python -m pytest --cov=archive_line_index --cov-report=term-missing
 python -m build
-python scripts/check_release_artifacts.py --dist dist --tag v0.3.0 --write-checksums
-python scripts/check_release_artifacts.py --dist dist --tag v0.3.0
-python -m scripts.prepare_release --native-dist dist --output release --tag v0.3.0
-python -m scripts.prepare_release --output release --tag v0.3.0 --check
+python scripts/check_release_artifacts.py --dist dist --tag v0.4.0 --write-checksums
+python scripts/check_release_artifacts.py --dist dist --tag v0.4.0
+python -m scripts.prepare_release --native-dist dist --output release --tag v0.4.0
+python -m scripts.prepare_release --output release --tag v0.4.0 --check
 ```
 
 Use clean `dist` and `release` directories: `dist` contains private native build inputs, while `release` is the complete hosted inventory of wheel/source ZIP bundles and SHA256SUMS. The native checker verifies package/tag/metadata agreement, safe contents and source/wheel equality. The release checker independently rejects versions in every hosted filename, validates the bundled native pair and verifies outer checksums; neither command publishes a release. The actual naming gate is tested against the shared notation vectors, including historical and single-component versions with matching faulty expected names. Installed integration tests build both artifacts, independently rebuild from the source distribution, and exercise clean runtimes outside the checkout. If mypy's native parser fails during container process discovery, `python -m mypy --no-native-parser` retains strict checking with its supported Python parser.

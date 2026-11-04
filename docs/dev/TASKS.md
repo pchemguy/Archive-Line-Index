@@ -345,11 +345,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Run complete supported-format/CLI examples, verify delivered export/ownership documentation and remove the temporary legacy reference at reimplementation closure. Product documents contain no migration narrative.
             - Contracts: API-01–05; CLI-01–06; PLAN final closure and layout documentation owners.
             - Verified result: README now documents every delivered format, lazy constrained 7z dependency, bounded callback transport and cancellation/ownership limits, preserving the source-linked bytes.find excerpt. All eight complete README Python examples and installed public exports/ZIP/TAR/7z CLI checks pass for native and independently source-rebuilt wheels. Maintained local links, strict mypy and full Ruff pass. Removed the root AGENTS temporary legacy reference without adding migration history; public API/module docstrings now describe delivered behavior.
-        - [ ] T-050 — Verify complete source and wheel release candidates
+        - [x] T-050 — Verify complete source and wheel release candidates
             - Scope: Version 0.4.0 build metadata, native inventory and installed distribution checks.
             - Depends on: T-048, T-049.
             - Acceptance/evidence: Build/install full artifacts, rebuild from source distribution, verify complete exports/entry points and runtime dependency constraints, reject development/log/credential entries and validate actual names/checksums against tag metadata.
             - Contracts: SYS-11–12; API-05; CLI-06; phase release gate.
+            - Verified result: Version 0.4.0 metadata and active installation/check examples agree. All 134 selected native metadata, source-rebuilt installation, export/runtime-boundary, all-format CLI, eight README example, release inventory and adversarial naming/checksum checks pass. Isolated Hatchling 1.33.0 builds produce valid wheel/sdist; independent native and stable bundle gates pass with complete safe inventories and checksums. Supported runtime dependency remains py7zr>=1.1.4,<1.2, actual 1.1.4. Ruff and strict src/scripts mypy pass. Candidates are preparation artifacts; exact merged release source will be rebuilt and installed again before tagging.
         - [ ] T-051 — Review test and report milestone 4.2
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-047, T-048, T-049, T-050.
