@@ -89,6 +89,8 @@ class _Source:
 
 
 class _ZipReader:
+    """Require CRC-validated member EOF and matching observable byte counts."""
+
     def __init__(
         self,
         member: IO[bytes],
@@ -100,6 +102,7 @@ class _ZipReader:
         self._source = source
         self._resources = resources
         self.declared_size = declared_size
+        self._delivered = 0
         self.completed = False
 
     def read(self, size: int, /) -> bytes:
@@ -114,6 +117,11 @@ class _ZipReader:
             raise ExtractionError(
                 "ZIP payload delivery or integrity validation failed"
             ) from error
+        self._delivered += len(data)
+        if self._delivered > self.declared_size or (
+            not data and self._delivered != self.declared_size
+        ):
+            raise ExtractionError("ZIP payload size does not match declared metadata")
         if not data:
             self.completed = True
         return data

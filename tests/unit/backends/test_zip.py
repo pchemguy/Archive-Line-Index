@@ -250,3 +250,44 @@ def test_delivery_position_io_failure_is_not_a_codec_error(tmp_path: Path) -> No
         assert error.value is failure
     finally:
         reader.close()
+
+
+@pytest.mark.parametrize(
+    "compression",
+    [zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED, zipfile.ZIP_BZIP2, zipfile.ZIP_LZMA],
+)
+@pytest.mark.parametrize("declared", [2, 100], ids=["underdeclared", "overdeclared"])
+def test_mismatched_size_cannot_complete(
+    tmp_path: Path, compression: int, declared: int
+) -> None:
+    from tests.helpers.archives import make_zip_with_size_metadata
+
+    from archive_line_index.backends.zip import open_zip_backend
+    from archive_line_index.errors import ExtractionError
+
+    target = make_zip_with_size_metadata(
+        tmp_path / "bad.zip", b"hello\n", declared, compression=compression
+    )
+    reader = open_zip_backend(target)
+    try:
+        with pytest.raises(ExtractionError):
+            while reader.read(2):
+                pass
+        assert not reader.completed
+    finally:
+        reader.close()
+
+
+def test_dependency_excess_bytes_are_rejected_before_delivery(tmp_path: Path) -> None:
+    from archive_line_index.backends.zip import open_zip_backend
+    from archive_line_index.errors import ExtractionError
+
+    target = make_zip(tmp_path / "data.zip", [("data", b"x", stat.S_IFREG)])
+    reader = open_zip_backend(target)
+    try:
+        with patch.object(zipfile.ZipExtFile, "read", return_value=b"excess"):
+            with pytest.raises(ExtractionError):
+                reader.read(6)
+        assert not reader.completed
+    finally:
+        reader.close()

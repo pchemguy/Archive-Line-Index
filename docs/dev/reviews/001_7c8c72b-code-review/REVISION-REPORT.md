@@ -13,7 +13,7 @@ The human authorized plan preparation and execution after the assessment. Existi
 | V-001 | Verified planning | Review source/config comparisons, seven-action plan, selected dispositions, maintained local links and staged diff checks; containing planning commit is the checkpoint. |
 | V-002 | Verified | R-007; see revision plan. |
 | V-003 | Verified | R-001, R-002; see revision plan. |
-| V-004 | Planned | R-004; see revision plan. |
+| V-004 | Verified | R-004; see revision plan. |
 | V-005 | Planned | R-005; see revision plan. |
 | V-006 | Planned | R-008 encoding only; see revision plan. |
 | V-007 | Planned | All accepted actions; R-006 evidence; see revision plan. |
@@ -37,5 +37,11 @@ The containing action commit records source/tests and this evidence together. Pu
 ### V-003 — Bound source inspection and plain-file buffering
 
 Revision source: `e3110f88b6f411886279b4c3628ea17b7511b909` plus this action’s owned diff. Three raw-I/O regressions first failed because read(512) requested a 128 KiB underlying buffer. The larger-default plain-stream regression separately failed at 150541 traced bytes. Explicit unbuffered detection now fills at most 512 bytes across legal short reads and unbuffered plain delivery avoids runtime-dependent read-ahead. Raw traces for chunks 1/17/512, both 8 KiB/128 KiB simulated defaults, long-line scanning and all 104 selected detector/plain/public/ZIP/TAR/7z checks pass. Strict src/scripts mypy and Ruff lint/format pass. Python 3.14 behavior is simulated on Python 3.12, not claimed native-verified; no universal 128 KiB product memory cap is introduced.
+
+The containing action commit records source/tests and this evidence together. Publish/read back the checkpoint before the next action; the final action index retains observed commit identities.
+
+### V-004 — Validate observable ZIP payload size before completion
+
+Revision source: `086fc84e8cf1d0b20bd763351d3c44bf7d69832a` plus this action’s owned diff. Seven regressions first failed: four actual stored/deflate/bzip2/lzma overdeclared members, dependency excess delivery, retained public terminal failure and no completed index/CLI publication. Four unchanged underdeclared-size/original-CRC cases already rejected and remain green. The reader now counts delivered bytes, rejects excess before return and requires equality at EOF; README describes the observable stream boundary. All 154 focused ZIP/common-stream/facade/CLI checks, strict mypy and Ruff pass. Separate actual ZIP characterization still returns [0,2] for a two-byte prefix with matching CRC when zipfile clips a six-byte compressed payload; this is retained as an observability limit, not a passing comprehensive underdeclared-tail detector.
 
 The containing action commit records source/tests and this evidence together. Publish/read back the checkpoint before the next action; the final action index retains observed commit identities.
