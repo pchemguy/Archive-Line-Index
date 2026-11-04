@@ -1,6 +1,6 @@
 # Comprehensive code and documentation review
 
-Campaign 005_544c112; exact starting/reviewed baseline 544c11280b807fd03c158023c5563dda5d453e34. Working branch revision/005_544c112-code-docs; creation parent/target main. [Plan](REVIEW-PLAN.md) defines coverage, criteria, authorization and evidence limits. Open: U-001 and U-002 assessed; U-003 remains planned. Linux/CPython 3.12 execution is available; native Windows execution is not available. Important confirmed repairs and closure are authorized, followed by a separate patch release.
+Campaign 005_544c112; exact starting/reviewed baseline 544c11280b807fd03c158023c5563dda5d453e34. Working branch revision/005_544c112-code-docs; creation parent/target main. [Plan](REVIEW-PLAN.md) defines coverage, criteria, authorization and evidence limits. Open: all three units assessed; three important defects accepted for correction and one minor recommendation deferred. Linux/CPython 3.12 execution is available; native Windows execution is not available. Important confirmed repairs and closure are authorized, followed by a separate patch release.
 
 
 ## U-001 — Runtime and contracts
@@ -29,3 +29,26 @@ Type: release producer filesystem defect. Priority: Important (unintended output
 Reject a symlink output directory before any producer writes or native-checksum generation. Preserve normal empty-directory construction and existing target contents; add a failure-path regression proving rejection leaves the target untouched. Recheck both the guard and actual bundle build/check workflows. This does not promise interprocess race resistance or forbid all symlink ancestors. Disposition: Accepted under the user's important-fix instruction; implementation not yet performed.
 
 Both defects affect tests/release tooling, not payload indexing. Synthetic unit fixtures intentionally using historical version numbers are not R-001 defects; retain those useful fixed vectors. Native platform coverage remains limited to Linux; symlink regression may be unavailable where creation rights are absent and must report that honestly.
+
+
+## U-003 — Current documentation and composition
+
+Inspected README purpose/input/output/interfaces, all eight executable Python examples and the source-linked bytes.find excerpt, installation/build/release instructions, root AGENTS/disclosures/SDD notice, current governing design/contracts/PLAN and all layout children. Product/script module documentation covers all 26 modules; no missing module docstring was found. Current file-link validation covered 21 maintained root/design/contract/layout documents with no missing linked file. Baseline installed-consumer tests executed all eight complete README examples against both native-wheel and source-rebuilt installations. Public defaults, BOM/EOF/line semantics, format limits, cleanup, CLI naming/aliases/statuses and paired-output limitations match accepted contracts and inspected implementation.
+
+Generated and third-party content is excluded; .agents is a development dependency, not product scope. Historical review, implementation/phase/manual/preparation evidence is excluded from current-validity checks. Existing release notes describe v0.4.0 and will be refreshed from complete Git coverage as part of the separately authorized release; their historical test count is not a new defect. Native platform support is distinguished from actually executed Linux evidence. Documentation composition uncovered R-003 and minor R-004 below.
+
+### R-003 — Documented development extras omit the required build backend
+
+Type: setup/configuration defect. Priority: Important (clean-checkout integration failure). Confidence: confirmed by clean-environment execution. Baseline locations: pyproject.toml optional dev/test groups, README Development and artifact verification, tests/integration/conftest.py built_distributions/rebuilt_wheel. The fixtures invoke python -m build --no-isolation, but Hatchling appears only in build-system.requires, which isolated installation does not retain in the caller's environment. The test extra also omits the build frontend. Installing the documented .[dev,test] into a clean temporary environment succeeds, but its no-isolation build fails with BackendUnavailable: Cannot import hatchling.build. Preinstalled tools masked this defect in the primary verification environment.
+
+Declare build and Hatchling in test prerequisites and Hatchling alongside existing build in dev prerequisites; clarify the documented setup relationship without dumping pyproject contents into AGENTS. Reinstall declared extras in that same clean environment and run real build/installed integration checks plus final full regression. No runtime dependency changes are needed. Disposition: Accepted under the important-fix instruction; implementation not yet performed.
+
+### R-004 — Test placement map contains obsolete planned filenames
+
+Type: documentation recommendation. Priority: Minor. Confidence: source inspection. Baseline location: docs/dev/layout/tests.md Integrated and installed behavior refers to test_index_building.py and test_resource_lifecycle.py, while delivered coverage resides in per-format files and test_full_format_lifecycle.py. The map explicitly describes allocation rather than claiming those files exist; current tests and contract ownership are discoverable, but maintainers may follow obsolete path suggestions. A later layout maintenance pass can reconcile exact filenames and add entry-point prerequisite checks. Disposition: Deferred because this is a nonblocking allocation-document cleanup, outside the selected important-defect repair queue; it does not change accepted behavior or invalidate current tests.
+
+## Consolidated assessment
+
+U-001–U-003 are assessed on product baseline 544c11280b807fd03c158023c5563dda5d453e34. Three important confirmed findings R-001–R-003 require bounded correction before release verification; minor recommendation R-004 is deferred with rationale. No confirmed production correctness defect was found. Coverage includes runtime/contract inspection, targeted test/harness assessment, actual complete tests/builds/installed examples, independent byte-oracle probes, isolated next-version failures, a symlink mutation reproduction and a clean declared-extras backend failure. These are distinct from unavailable native Windows/macOS/Python 3.11/3.14/big-endian execution and from arbitrary corruption/security guarantees not promised by the project.
+
+The user already authorized important corrections, closure and release, so proceed to an ordered revision plan without a new approval pause. Preserve these baseline observations and add recheck/disposition evidence rather than replacing them with later green results.
