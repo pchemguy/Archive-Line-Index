@@ -74,7 +74,9 @@ def flush_file(handle: BinaryIO) -> None:
 
 
 @contextmanager
-def open_binary_file(path: Path, mode: Literal["rb", "wb"]) -> Iterator[BinaryIO]:
+def open_binary_file(
+    path: Path, mode: Literal["rb", "wb", "r+b"]
+) -> Iterator[BinaryIO]:
     """Close a format-owned file without replacing a primary operation failure."""
     handle = path.open(mode)
     primary: BaseException | None = None

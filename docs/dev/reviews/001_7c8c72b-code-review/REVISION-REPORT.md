@@ -11,7 +11,7 @@ The human authorized plan preparation and execution after the assessment. Existi
 | Action | State | Evidence |
 | --- | --- | --- |
 | V-001 | Verified planning | Review source/config comparisons, seven-action plan, selected dispositions, maintained local links and staged diff checks; containing planning commit is the checkpoint. |
-| V-002 | Planned | R-007; see revision plan. |
+| V-002 | Verified | R-007; see revision plan. |
 | V-003 | Planned | R-001, R-002; see revision plan. |
 | V-004 | Planned | R-004; see revision plan. |
 | V-005 | Planned | R-005; see revision plan. |
@@ -27,3 +27,9 @@ Recorded selected corrections without rewriting original review observations, in
 ## Remaining work and limits
 
 V-002–V-007 remain. Actual target-native Windows and Python 3.14 execution are unavailable; simulations and existing Linux checks do not certify them. R-003 remains deferred by the selected scope. No version bump or release is selected. Final integration/closure waits for accepted repairs and feasible verification.
+
+### V-002 — Fix Windows-compatible SQLite synchronization
+
+Revision source: `58a05c80d0a08b190eeaf08df27f3a61326c3ede` plus this action’s owned diff. Two new create/overwrite regressions first failed with EBADF under a portable Windows writable-fsync precondition. A non-truncating writable temporary descriptor and widened internal mode annotation now pass both cases, preserving exact reloaded offsets, borrowed arrays and cleanup. All 159 focused persistence/filesystem/CLI/TAR checks, strict src/scripts mypy and Ruff lint/format pass after formatting repair. Real SQLite/fsync/publication runs on Linux; fresh native Windows execution remains unverified.
+
+The containing action commit records source/tests and this evidence together. Publish/read back the checkpoint before the next action; the final action index retains observed commit identities.

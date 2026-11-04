@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import errno
 import sqlite3
 from array import array
 from pathlib import Path
+from typing import BinaryIO
 from unittest.mock import patch
 
 import pytest
@@ -312,3 +314,31 @@ def test_reader_observes_committed_wal_without_modifying_data(tmp_path: Path) ->
         assert {p.name for p in tmp_path.iterdir()} == names
     finally:
         connection.close()
+
+
+@pytest.mark.parametrize("overwrite", [False, True])
+def test_publication_sync_has_writable_descriptor(
+    tmp_path: Path, overwrite: bool
+) -> None:
+    from archive_line_index.persistence.fs import flush_file
+    from archive_line_index.persistence.sqlite import read_sqlite_index
+
+    destination = tmp_path / "index.sqlite3"
+    if overwrite:
+        destination.write_bytes(b"previous output")
+    offsets = array("Q", [0, 2, 7])
+
+    def windows_sync_precondition(handle: BinaryIO) -> None:
+        # Windows FlushFileBuffers requires write access; POSIX fsync may not.
+        if not handle.writable():
+            raise OSError(errno.EBADF, "synchronization requires write access")
+        flush_file(handle)
+
+    with patch(
+        "archive_line_index.persistence.sqlite.flush_file",
+        side_effect=windows_sync_precondition,
+    ):
+        write_sqlite_index(offsets, destination, overwrite=overwrite)
+    assert read_sqlite_index(destination).tolist() == [0, 2, 7]
+    assert offsets.tolist() == [0, 2, 7]
+    assert list(tmp_path.iterdir()) == [destination]
