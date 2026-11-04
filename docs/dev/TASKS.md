@@ -313,11 +313,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Deliver exact bytes with declared/actual limits, transport extraction errors without false EOF and release worker/archive resources on opening/delivery/early-close paths.
             - Contracts: ARC-04–06; STR-01–06; SYS-04–06.
             - Verified result: 7z is lazily selected through the public facade, preserving signature precedence and dependency import boundaries. Real streams cover empty/normal bytes, readinto tails, zero/exact/declared limits, actual-count enforcement despite understated metadata, retained CRC failures and no surviving worker after close. Public 7z initially failed as unsupported; a separate startup-category regression failed before transport-error translation was repaired. All 88 7z/producer/registry/common-stream checks, strict mypy and Ruff pass.
-        - [ ] T-045 — Verify real 7z backpressure and terminal failure cleanup
+        - [x] T-045 — Verify real 7z backpressure and terminal failure cleanup
             - Scope: Real-dependency streaming/resource checks and any localized adapter corrections.
             - Depends on: T-044.
             - Acceptance/evidence: Demonstrate progressive bounded delivery with a slow consumer, callback subdivisions, full-queue cancellation, empty content and CRC/truncation failure, with no surviving owned thread after successful close.
             - Contracts: ARC-06; STR-02–06; SYS-05–06.
+            - Verified result: Actual py7zr 1.1.4 multi-block extraction demonstrates progressive delivery before producer completion, one queued block and bounded current-block storage with a slow consumer. Full-queue early close before/after first data joins the non-daemon worker and closes archive/source. Real late COPY CRC and truncated-header failures retain causes without false EOF or surviving threads. All 51 7z/transport checks, strict src/scripts mypy and full Ruff pass; these are integration characterization checks, not a fabricated new runtime RED cycle.
         - [ ] T-046 — Review test and report milestone 4.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-041, T-042, T-043, T-044, T-045.
