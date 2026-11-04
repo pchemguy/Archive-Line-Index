@@ -25,10 +25,10 @@ GitHub releases provide a [wheel bundle](https://github.com/pchemguy/Archive-Lin
 
 ```bash
 python -m zipfile -e archive-line-index-wheel.zip .
-python -m pip install archive_line_index-0.4.1-py3-none-any.whl
+python -m pip install archive_line_index-0.5.0-py3-none-any.whl
 ```
 
-Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.4.1.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag. The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
+Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.5.0.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag. The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
 
 From a checkout, build private native package inputs with `python -m build`. The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library. The 7z dependency is loaded only when opening 7z content.
 
@@ -61,10 +61,12 @@ The inclusive size limit counts all payload bytes, including a BOM. Exactly-at-l
 `scan_line_offsets` consumes from the reader's current position, defines that position as local offset zero and neither closes nor restores the reader. It needs only a blocking `read(size) -> bytes` operation; nonempty short reads are supported.
 
 ```python
+import logging
 from io import BytesIO
 
 from archive_line_index import scan_line_offsets
 
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 payload = b"\xef\xbb\xbfalpha\r\n\nomega"
 source = BytesIO(payload)
 offsets = scan_line_offsets(source, buffer_size=2)
@@ -211,6 +213,7 @@ Given an existing `data/events.txt` and an existing `results` directory:
 archive-line-index data/events.txt
 python -m archive_line_index data/events.txt --output results/custom
 archive-line-index data/events.txt --overwrite
+archive-line-index data/events.txt --overwrite --log-level WARNING
 archive-line-index -- -events.txt
 ```
 
@@ -241,6 +244,14 @@ with TemporaryDirectory() as directory:
 
 Importing the package, CLI or module runner performs no command execution. An explicit argv must be a sequence of strings; `None` uses process arguments. Library APIs continue to raise exceptions directly and do not acquire CLI printing or process-exit behavior.
 
+## Progress logging
+
+Indexing emits standard INFO records from `archive_line_index.scanner`, reporting cumulative uncompressed bytes in the original indexed byte space, including a skipped BOM. The scanner checks at chunk boundaries and emits periodic updates only after five seconds have elapsed; it adds an exact final count after validated EOF and offset checks. It performs no per-line logging. Short or empty scans may emit only the final count, and a blocked read does not produce a timer heartbeat. A scan-complete message does not mean SQLite/raw publication has succeeded.
+
+Library use stays quiet unless the application enables INFO logging; configure logging in the application, as in the borrowed-reader example above. No root logger or console/file handler is configured by library import or scanning. Disabled progress performs no clock reads or record formatting. There are no extra payload reads, copies or extraction workers.
+
+The CLI defaults to `--log-level INFO`. With no effective application handlers, it temporarily sends concise progress to stderr; an embedding application can instead route it through its existing handlers. `--log-level WARNING` (or ERROR/CRITICAL) suppresses progress while retaining ordinary error diagnostics. Levels are case-insensitive; DEBUG adds no per-line output. The previous scanner level is restored and only CLI-owned handlers are removed, so repeated serialized calls do not accumulate logging setup. Existing root/parent/handler settings remain application-owned. Standalone stream-only reads and row-by-row persistence do not report progress.
+
 ## Memory and failure behavior
 
 The default scanner buffer is 1 MiB. Working payload storage is bounded by the current block and at most three BOM-probe bytes; no complete line is assembled. The offset array grows by eight bytes per line start plus the EOF sentinel, excluding object/allocation overhead. Offsets lie in `0..2^63 - 1`. Streaming alone has no indexing-range restriction.
@@ -258,10 +269,10 @@ python -m ruff format --check src tests scripts
 python -m mypy
 python -m pytest --cov=archive_line_index --cov-report=term-missing
 python -m build
-python scripts/check_release_artifacts.py --dist dist --tag v0.4.1 --write-checksums
-python scripts/check_release_artifacts.py --dist dist --tag v0.4.1
-python -m scripts.prepare_release --native-dist dist --output release --tag v0.4.1
-python -m scripts.prepare_release --output release --tag v0.4.1 --check
+python scripts/check_release_artifacts.py --dist dist --tag v0.5.0 --write-checksums
+python scripts/check_release_artifacts.py --dist dist --tag v0.5.0
+python -m scripts.prepare_release --native-dist dist --output release --tag v0.5.0
+python -m scripts.prepare_release --output release --tag v0.5.0 --check
 ```
 
 Use clean `dist` and `release` directories: `dist` contains private native build inputs, while `release` is the complete hosted inventory of wheel/source ZIP bundles and SHA256SUMS. The native checker verifies package/tag/metadata agreement, safe contents and source/wheel equality. The release checker independently rejects versions in every hosted filename, validates the bundled native pair and verifies outer checksums; neither command publishes a release. The actual naming gate is tested against the shared notation vectors, including historical and single-component versions with matching faulty expected names. Installed integration tests build both artifacts, independently rebuild from the source distribution, and exercise clean runtimes outside the checkout. If mypy's native parser fails during container process discovery, `python -m mypy --no-native-parser` retains strict checking with its supported Python parser.

@@ -57,6 +57,8 @@ def build_line_index(
 
     All non-I/O arguments are checked before source acquisition. Read/allocation
     failures return no partial index. Mandatory cleanup must also succeed.
+    Caller-configured INFO logging on archive_line_index.scanner observes
+    five-second byte progress and validated scan completion, not publication.
     """
     validate_scan_options(skip_utf8_bom=skip_utf8_bom, buffer_size=buffer_size)
     validate_stream_limit(max_uncompressed_size)

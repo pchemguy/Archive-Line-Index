@@ -45,6 +45,19 @@ def _invoke(
     )
 
 
+def _assert_progress_success(
+    result: subprocess.CompletedProcess[str], byte_count: int
+) -> None:
+    """Retain success/diagnostic checks while accepting informational progress."""
+    assert result.returncode == 0, result.stderr
+    lines = result.stderr.splitlines()
+    assert (
+        lines and lines[-1] == f"INFO: Scan complete: {byte_count} uncompressed bytes"
+    )
+    assert sum("Scan complete:" in line for line in lines) == 1
+    assert all(line.startswith("INFO: Scanned ") or line == lines[-1] for line in lines)
+
+
 @pytest.mark.parametrize("route", ["console", "module", "imported"])
 def test_installed_forms_default_explicit_and_overwrite(
     installed_package: InstalledPackage, route: str
@@ -53,7 +66,7 @@ def test_installed_forms_default_explicit_and_overwrite(
     source.write_bytes(b"\xef\xbb\xbfabc\r\n\nlast")
     argv = ["--", source.name]
     result = _invoke(installed_package, route, argv)
-    assert result.returncode == 0 and not result.stderr, result.stderr
+    _assert_progress_success(result, 13)
     assert (
         ".sqlite3" in result.stdout
         and ".u64" in result.stdout
@@ -73,11 +86,11 @@ assert read_raw_index({stem + ".u64"!r}).tolist() == [3, 8, 9, 13]
     assert protected.returncode == 1 and not protected.stdout and protected.stderr
     assert all(source.with_suffix(s).read_bytes() == data for s, data in before.items())
     replaced = _invoke(installed_package, route, ["--overwrite", "--", source.name])
-    assert replaced.returncode == 0 and not replaced.stderr
+    _assert_progress_success(replaced, 13)
     explicit = _invoke(
         installed_package, route, ["-o", "explicit." + route, "--", source.name]
     )
-    assert explicit.returncode == 0 and not explicit.stderr
+    _assert_progress_success(explicit, 13)
     assert (installed_package.workdir / ("explicit." + route + ".sqlite3")).is_file()
     assert (installed_package.workdir / ("explicit." + route + ".u64")).is_file()
 
