@@ -107,3 +107,181 @@ def test_empty_send_and_cancel_check_do_not_invent_data() -> None:
     endpoint.cancel()
     with pytest.raises(_Cancelled):
         endpoint.check_cancelled()
+
+
+def test_worker_reader_fifo_failure_and_non_daemon_lifecycle() -> None:
+    from archive_line_index.backends.producer import start_queue_reader
+
+    failure = ValueError("producer failed")
+    workers: list[threading.Thread] = []
+
+    def produce(endpoint: object) -> None:
+        workers.append(threading.current_thread())
+        endpoint.send(b"abcdef")  # type: ignore[attr-defined]
+        raise failure
+
+    reader = start_queue_reader(
+        produce, declared_size=6, queue_capacity=1, block_size=2
+    )
+    try:
+        assert reader.declared_size == 6
+        assert b"".join(reader.read(1) for _ in range(6)) == b"abcdef"
+        with pytest.raises(ValueError) as first:
+            reader.read(99)
+        assert first.value is failure and not reader.completed
+        with pytest.raises(ValueError) as second:
+            reader.read(1)
+        assert second.value is failure
+    finally:
+        reader.close()
+    assert len(workers) == 1 and not workers[0].daemon and not workers[0].is_alive()
+    reader.close()
+    with pytest.raises(ValueError):
+        reader.read(1)
+
+
+def test_full_queue_reader_close_joins_worker() -> None:
+    from archive_line_index.backends.producer import start_queue_reader
+
+    def produce(endpoint: object) -> None:
+        while True:
+            endpoint.send(b"abcdefgh")  # type: ignore[attr-defined]
+
+    reader = start_queue_reader(
+        produce, declared_size=None, queue_capacity=1, block_size=2
+    )
+    try:
+        assert reader.read(1) == b"a"
+    finally:
+        reader.close()
+    assert not reader._thread.is_alive()
+    assert not reader._endpoint.blocks and reader._current == b""
+
+
+def test_empty_worker_success_and_invalid_sizes() -> None:
+    from archive_line_index.backends.producer import start_queue_reader
+
+    reader = start_queue_reader(
+        lambda endpoint: None, declared_size=0, queue_capacity=1, block_size=1
+    )
+    try:
+        for value, error in [
+            (0, ValueError),
+            (-1, ValueError),
+            (True, TypeError),
+            (1.5, TypeError),
+        ]:
+            with pytest.raises(error):
+                reader.read(value)  # type: ignore[arg-type]
+        assert not reader.completed
+        assert reader.read(1) == b"" and reader.completed
+        assert reader.read(1) == b""
+    finally:
+        reader.close()
+
+
+def test_start_failure_after_launch_cancels_and_joins(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from archive_line_index.backends.producer import start_queue_reader
+
+    original = threading.Thread.start
+    launched: list[threading.Thread] = []
+
+    def start_then_fail(thread: threading.Thread) -> None:
+        launched.append(thread)
+        original(thread)
+        raise RuntimeError("startup bookkeeping")
+
+    def produce(endpoint: object) -> None:
+        while True:
+            endpoint.send(b"data")  # type: ignore[attr-defined]
+
+    monkeypatch.setattr(threading.Thread, "start", start_then_fail)
+    with pytest.raises(RuntimeError, match="startup bookkeeping"):
+        start_queue_reader(produce, declared_size=None, queue_capacity=1, block_size=1)
+    assert len(launched) == 1 and not launched[0].is_alive()
+
+
+def test_join_failure_does_not_claim_closed_and_can_retry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from archive_line_index.backends.producer import start_queue_reader
+
+    reader = start_queue_reader(
+        lambda endpoint: endpoint.send(b"x"),
+        declared_size=1,
+        queue_capacity=1,
+        block_size=1,
+    )
+    with monkeypatch.context() as patcher:
+        patcher.setattr(
+            reader._thread, "join", lambda: (_ for _ in ()).throw(RuntimeError("join"))
+        )
+        with pytest.raises(RuntimeError, match="join"):
+            reader.close()
+    assert not reader._closed
+    reader.close()
+    assert reader._closed and not reader._thread.is_alive()
+
+
+def test_close_wakes_waiting_reader_and_joins_producer(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from archive_line_index.backends.producer import start_queue_reader
+
+    def produce(endpoint: object) -> None:
+        while True:
+            endpoint.check_cancelled()  # type: ignore[attr-defined]
+            threading.Event().wait(0.01)
+
+    reader = start_queue_reader(
+        produce, declared_size=None, queue_capacity=1, block_size=1
+    )
+    entered = threading.Event()
+    original = reader._endpoint.condition.wait
+
+    def observed_wait(timeout: float | None = None) -> bool:
+        entered.set()
+        return original(timeout)
+
+    monkeypatch.setattr(reader._endpoint.condition, "wait", observed_wait)
+    errors: list[BaseException] = []
+
+    def consume() -> None:
+        try:
+            reader.read(1)
+        except BaseException as error:
+            errors.append(error)
+
+    consumer = threading.Thread(target=consume)
+    consumer.start()
+    try:
+        assert entered.wait(2)
+        reader.close()
+    finally:
+        reader.close()
+        consumer.join(2)
+    assert not consumer.is_alive() and not reader._thread.is_alive()
+    assert len(errors) == 1 and isinstance(errors[0], ValueError)
+
+
+@pytest.mark.parametrize(
+    "declared,error", [(True, TypeError), (-1, ValueError), (1.5, TypeError)]
+)
+def test_invalid_declared_size_does_not_start_worker(
+    declared: object, error: type[Exception], monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from archive_line_index.backends.producer import start_queue_reader
+
+    def forbidden(thread: threading.Thread) -> None:
+        raise AssertionError("started with invalid options")
+
+    monkeypatch.setattr(threading.Thread, "start", forbidden)
+    with pytest.raises(error):
+        start_queue_reader(
+            lambda endpoint: None,
+            declared_size=declared,
+            queue_capacity=1,
+            block_size=1,
+        )  # type: ignore[arg-type]

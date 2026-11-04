@@ -295,11 +295,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Validate positive finite settings, subdivide callback buffers, enforce queue capacity and cancellation checks, and keep success/failure/data outcomes distinct without a full-queue close sentinel.
             - Contracts: STR-05–06; internal QueueProducer/message model.
             - Verified result: Bounded producer endpoint validates finite positive integer settings, snapshots/subdivides callback buffers, enforces finite capacity and preserves FIFO data before distinct success/failure outcomes. Cancellation independently wakes full-queue waits without a sentinel. New-module tests initially failed because the bridge was absent; 11 controlled endpoint checks, strict src/scripts mypy and full Ruff pass. Remaining Phase 4 (T-041–T-052), full integration and 0.4.0 release are authorized; parent d1d233a179cb249ddff3cc510ad89974d0ca53c2 and issue/milestone associations #50–61/#13–15 are verified.
-        - [ ] T-042 — Implement the worker-backed reader lifecycle
+        - [x] T-042 — Implement the worker-backed reader lifecycle
             - Scope: backends/producer.py reader/startup/join operations and lifecycle checks.
             - Depends on: T-041.
             - Acceptance/evidence: Start one outer non-daemon worker, preserve FIFO data and terminal outcome, bound positive reads, retain failures, unblock package waits and join on successful close including startup failure ownership.
             - Contracts: STR-01–06; BackendReader/start_queue_reader contract.
+            - Verified result: Worker-backed reader starts one non-daemon thread, returns bounded FIFO blocks before terminal failure, retains failed outcomes, validates settings before startup and joins on successful close. Full-queue and explicitly waiting-reader cancellation, startup failure after actual launch and failed-join retry are exercised. The lifecycle entry point was absent before implementation; all 56 producer/common-stream checks, strict src/scripts mypy and full Ruff pass.
         - [ ] T-043 — Implement 7z member selection and callback extraction
             - Scope: backends/sevenzip.py, actual dependency suitability checks and supported dependency constraint.
             - Depends on: T-042.

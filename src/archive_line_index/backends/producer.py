@@ -8,8 +8,11 @@ from __future__ import annotations
 
 import threading
 from collections import deque
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Protocol
+
+from .base import BackendReader, validate_positive_size
 
 
 @dataclass(frozen=True)
@@ -117,4 +120,107 @@ class _Endpoint:
         with self.condition:
             self.cancelled = True
             self.blocks.clear()
+            self.terminal = None
             self.condition.notify_all()
+
+
+class _QueueReader:
+    """Deliver one current block and join the owned worker on successful close."""
+
+    def __init__(
+        self, endpoint: _Endpoint, worker: threading.Thread, declared_size: int | None
+    ) -> None:
+        self._endpoint = endpoint
+        self._thread = worker
+        self.declared_size = declared_size
+        self.completed = False
+        self._closed = False
+        self._failure: BaseException | None = None
+        self._current = b""
+        self._offset = 0
+        self._closing = threading.Lock()
+
+    def read(self, size: int, /) -> bytes:
+        if self._closed:
+            raise ValueError("read from closed producer reader")
+        validate_positive_size(size)
+        if self._failure is not None:
+            raise self._failure
+        if self.completed:
+            return b""
+        if not self._current:
+            try:
+                outcome = self._endpoint.receive()
+            except _Cancelled:
+                raise ValueError("producer reader is closing") from None
+            if isinstance(outcome, Failed):
+                self._failure = outcome.error
+                raise outcome.error
+            if isinstance(outcome, Finished):
+                self.completed = True
+                return b""
+            self._current = outcome.data
+            self._offset = 0
+        end = min(len(self._current), self._offset + size)
+        result = self._current[self._offset : end]
+        self._offset = end
+        if end == len(self._current):
+            self._current = b""
+            self._offset = 0
+        return result
+
+    def close(self) -> None:
+        with self._closing:
+            if self._closed:
+                return
+            self._endpoint.cancel()
+            self._current = b""
+            self._offset = 0
+            self._thread.join()
+            self._failure = None
+            self._closed = True
+
+
+def start_queue_reader(
+    producer: Callable[[QueueProducer], None],
+    *,
+    declared_size: int | None,
+    queue_capacity: int,
+    block_size: int,
+) -> BackendReader:
+    """Start one non-daemon extraction worker and return its owned reader.
+
+    All options are checked before thread startup. The callback owns its acquired
+    extraction resources while running and must unwind them on every exit.
+    A failed startup cancels/joins any worker actually launched before raising.
+    """
+    endpoint = _Endpoint(queue_capacity=queue_capacity, block_size=block_size)
+    if declared_size is not None:
+        if isinstance(declared_size, bool) or not isinstance(declared_size, int):
+            raise TypeError("declared_size must be an integer or None")
+        if declared_size < 0:
+            raise ValueError("declared_size must be nonnegative")
+    if not callable(producer):
+        raise TypeError("producer must be callable")
+
+    def run() -> None:
+        try:
+            producer(endpoint)
+        except _Cancelled as error:
+            if not endpoint.cancelled:
+                endpoint.finish(error)
+        except BaseException as error:
+            endpoint.finish(error)
+        else:
+            endpoint.finish(None)
+
+    worker = threading.Thread(target=run, name="ali-7z-extract", daemon=False)
+    reader = _QueueReader(endpoint, worker, declared_size)
+    try:
+        worker.start()
+    except BaseException:
+        endpoint.cancel()
+        if worker.ident is not None:
+            worker.join()
+        raise
+    return reader
