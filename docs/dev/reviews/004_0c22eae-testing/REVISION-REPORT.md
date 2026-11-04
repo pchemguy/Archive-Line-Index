@@ -4,7 +4,7 @@
 
 Campaign `004_0c22eae`, opened on 2026-11-04. [Scope and gates](REVISION-PLAN.md). Working branch `revision/004_0c22eae-testing`; creation parent/integration/return target `main`; full starting code/branch-off `0c22eae396ed04b3d090e287f8c58af79c05f939`.
 
-State: Open. The opening itself performed no testing. The subsequent user-reported collection failure and pyproject instruction selected V-001; that bounded fix and its checks are now verified below; the subsequent plugin-warning instruction selected verified V-002. The later Windows runner-termination report selected verified V-003 below. Broader testing assessment remains unselected.
+State: Complete within the three selected focused repairs; final closure is the verified published two-parent integration into main. The opening itself performed no testing. The subsequent user-reported collection failure and pyproject instruction selected V-001; that bounded fix and its checks are now verified below; the subsequent plugin-warning instruction selected verified V-002. The later Windows runner-termination report selected verified V-003 below. Broader testing assessment remains unselected.
 
 ## Opening evidence
 
@@ -60,3 +60,8 @@ Observed RED: with the original os.kill call retained inside the new isolated sc
 The exact pytest console command pytest -vv then completed with 711 passed in 35.60 seconds. Its actual verbose completion lines include 233 integration tests and all 478 unit tests; both interruption parameters passed at 18%, and the first unit test passed at 32%. Ruff lint/format passed over 74 files; strict src/scripts mypy passed over 26 files using --no-native-parser. These are fresh Linux/CPython 3.12.14 results, not native Windows results; the Windows hard-exit behavior was simulated in the child. The latest run did not request coverage; the prior 95% coverage result belongs to V-002.
 
 The containing checkpoint owns this test-harness repair and active campaign continuity/evidence only. Publish/read back on revision/004_0c22eae-testing and stop. Main, production modules, original task state, frozen records, version and releases remain unchanged; the testing campaign remains open.
+
+
+## Finalization
+
+The human accepted V-003 and requested campaign closure on 2026-11-04. All three bounded repairs are verified and published, most recently V-003 095a2bd623bee106ade80428d7cee925dc205110. No broader testing assessment was performed or implied. The complete delta contains the pytest import/plugin configuration, prerequisite/collection regressions, portable isolated SIGINT test, README installation guidance and this campaign's evidence. It leaves campaigns 001–003, implementation/phase/manual records, product version and releases unchanged. The exact full console run passed 711 tests; final integration repeats the suite on the prospective merged tree. Closure uses the published integration commit and Git parent/readback evidence; a separate comprehensive code/docs campaign and patch release follow under the new user instruction.
