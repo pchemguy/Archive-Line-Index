@@ -26,7 +26,7 @@ class _PlainReader:
 
 def open_plain_backend(path: Path) -> BackendReader:
     """Open and own a file, releasing its handle if metadata acquisition fails."""
-    handle = path.open("rb")
+    handle = path.open("rb", buffering=0)
     try:
         return _PlainReader(handle, os.fstat(handle.fileno()).st_size)
     except BaseException as error:

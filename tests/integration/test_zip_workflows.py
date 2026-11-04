@@ -2,8 +2,10 @@
 
 import zipfile
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
+from tests.helpers.archives import make_zip_with_size_metadata
 
 from archive_line_index import (
     ExtractionError,
@@ -54,3 +56,40 @@ def test_corrupt_zip_cannot_return_completed_index(tmp_path: Path) -> None:
     with pytest.raises(ExtractionError):
         build_line_index(p, buffer_size=1)
     p.unlink()
+
+
+def test_late_zip_size_failure_is_retained(tmp_path: Path) -> None:
+    target = make_zip_with_size_metadata(tmp_path / "bad.zip", b"hello\n", 100)
+    stream = open_content_stream(target)
+    try:
+        assert stream.read(6) == b"hello\n"
+        with pytest.raises(ExtractionError) as first:
+            stream.read(1)
+        with pytest.raises(ExtractionError) as second:
+            stream.read(0)
+        assert second.value is first.value
+        assert not stream.closed
+    finally:
+        stream.close()
+    assert stream.closed
+
+
+def test_zip_size_failure_cannot_complete_or_publish(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    from archive_line_index import cli
+
+    target = make_zip_with_size_metadata(tmp_path / "bad.zip", b"hello\n", 100)
+    with pytest.raises(ExtractionError):
+        build_line_index(target, buffer_size=1)
+    with (
+        patch.object(cli, "write_sqlite_index") as sqlite,
+        patch.object(cli, "write_raw_index") as raw,
+    ):
+        assert cli.main([str(target)]) == 1
+    sqlite.assert_not_called()
+    raw.assert_not_called()
+    out, err = capsys.readouterr()
+    assert not out and err
+    assert not target.with_suffix(".sqlite3").exists()
+    assert not target.with_suffix(".u64").exists()

@@ -27,7 +27,9 @@ ASSET_NAMES = [
 
 
 def _version(project: Path, tag: str) -> str:
-    version = str(tomllib.loads(project.read_text())["project"]["version"])
+    version = str(
+        tomllib.loads(project.read_text(encoding="utf-8"))["project"]["version"]
+    )
     if tag != "v" + version:
         raise ValueError("Release tag disagrees with package metadata")
     return version

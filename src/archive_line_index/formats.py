@@ -42,8 +42,15 @@ def _signature(prefix: bytes) -> FormatKind | None:
 
 def detect_format(path: Path) -> FormatCandidate:
     """Read at most 512 bytes and select a candidate; do not parse an archive."""
-    with path.open("rb") as source:
-        signature = _signature(source.read(512))
+    # Avoid interpreter-dependent read-ahead beyond the inspection budget.
+    with path.open("rb", buffering=0) as source:
+        prefix = bytearray()
+        while len(prefix) < 512:
+            block = source.read(512 - len(prefix))
+            if not block:
+                break
+            prefix.extend(block)
+        signature = _signature(bytes(prefix))
     name = path.name.lower()
     suffix = None
     if name.endswith(".zip"):

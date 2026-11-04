@@ -12,7 +12,7 @@ def test_project_gate_runs_shared_contract_vectors() -> None:
     vectors = json.loads(
         (
             Path(__file__).resolve().parents[2] / "scripts/release-asset-cases.json"
-        ).read_text()
+        ).read_text(encoding="utf-8")
     )
     check_names(vectors["valid"], vectors["valid"], vectors["release_version"])
     for marker in vectors["invalid_markers"]:

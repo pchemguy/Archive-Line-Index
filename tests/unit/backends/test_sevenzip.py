@@ -15,7 +15,9 @@ from archive_line_index.errors import (
 
 
 @pytest.mark.parametrize(
-    "payload", [b"", b"\xef\xbb\xbfalpha\r\n\nomega", b"\0\xff" * 10000]
+    "payload",
+    [b"", b"\xef\xbb\xbfalpha\r\n\nomega", b"\0\xff" * 10000],
+    ids=["empty", "bom-text", "binary-20k"],
 )
 def test_real_7z_nested_payload_without_filesystem_extraction(
     tmp_path: Path, payload: bytes

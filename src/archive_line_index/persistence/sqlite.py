@@ -126,7 +126,7 @@ def write_sqlite_index(
     try:
         with temporary_sibling(path) as temporary:
             _write_database(temporary, offsets)
-            with open_binary_file(temporary, "rb") as handle:
+            with open_binary_file(temporary, "r+b") as handle:
                 flush_file(handle)
             publish_index_file(temporary, path, overwrite=overwrite)
             published = True

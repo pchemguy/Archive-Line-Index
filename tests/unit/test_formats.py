@@ -74,4 +74,44 @@ def test_inspection_reads_at_most_512_bytes(tmp_path: Path) -> None:
 
     with patch.object(Path, "open", return_value=Probe(b"x" * 4096)) as opened:
         assert detect_format(tmp_path / "x").kind == FormatKind.PLAIN
-        opened.assert_called_once_with("rb")
+        opened.assert_called_once()
+
+
+@pytest.mark.parametrize("chunk", [1, 17, 512])
+def test_detection_limits_raw_reads_and_handles_short_reads(
+    tmp_path: Path, chunk: int
+) -> None:
+    class Raw(io.RawIOBase):
+        def __init__(self) -> None:
+            self.payload = tarfile.TarInfo("payload").tobuf() + b"x" * 4096
+            self.position = 0
+            self.requests: list[int] = []
+
+        def readable(self) -> bool:
+            return True
+
+        def readinto(self, buffer: bytearray) -> int:
+            self.requests.append(len(buffer))
+            count = min(chunk, len(buffer), len(self.payload) - self.position)
+            buffer[:count] = self.payload[self.position : self.position + count]
+            self.position += count
+            return count
+
+    raw = Raw()
+
+    def opened(
+        path: Path, mode: str = "r", buffering: int = -1
+    ) -> io.RawIOBase | io.BufferedReader:
+        assert mode == "rb"
+        if buffering == 0:
+            return raw
+        return io.BufferedReader(
+            raw, buffer_size=131072 if buffering < 0 else buffering
+        )
+
+    with patch.object(Path, "open", new=opened):
+        candidate = detect_format(tmp_path / "unconventional.bin")
+    assert candidate.signature_kind == FormatKind.TAR
+    assert raw.position == 512
+    assert all(0 < count <= 512 for count in raw.requests)
+    assert raw.closed
