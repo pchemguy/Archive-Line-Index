@@ -42,6 +42,10 @@ Existing destinations are protected by default. Explicit replacement publishes a
 
 A user can index one filesystem target with a single positional command-line argument. The CLI builds the index through the library and writes both SQLite and raw-binary indexes in the input directory using the input filename without its final extension as the default artifact stem, with an optional explicit output stem and explicit overwrite permission. Its callable entry point is importable for in-process use; importing it performs no indexing or argument parsing.
 
+### Lightweight progress
+
+Index construction exposes cumulative uncompressed-byte progress through standard Python logging, checked at chunk boundaries at five-second intervals with a final validated-scan total. Library callers own logging configuration; the CLI defaults to INFO progress on stderr and provides logging-level suppression. No per-line logging, background heartbeat, extra payload pass or progress bar is required. Scan completion is distinct from successful index-file publication.
+
 ## Constraints and quality priorities
 
 - Python 3.11 or later, with Windows, Linux and macOS as intended platforms.

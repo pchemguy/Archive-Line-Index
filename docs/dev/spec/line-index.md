@@ -45,3 +45,7 @@ A `ContentStream` scan proceeds to validated terminal EOF, including late archiv
 - IDX-04: A long line does not cause line-sized accumulation; requested reads remain bounded and scanning uses block search rather than Python per-byte iteration.
 - IDX-05: Direct stream borrowing, caller read errors, invalid read results, offset overflow and allocation failures return no partial array and follow the stated error/ownership rules.
 - IDX-06: Completed-array validation accepts scanner output and rejects empty arrays, wrong representations, invalid first offsets/singletons, duplicate/decreasing values and values beyond the shared range.
+
+## Progress observation
+
+The scanner's existing indexed-byte position also supplies optional INFO observations under the [progress contract](progress-logging.md). Counts include skipped BOM bytes, finish at EOF and do not alter offsets or read bounds. Observation happens outside the LF-match loop, with no per-line work, extra payload storage or additional reads. A final scan message follows successful EOF and completed-array validation; it does not certify later source cleanup or persistence publication.

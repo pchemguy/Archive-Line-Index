@@ -5,13 +5,13 @@
 The CLI adapter in [DECOMPOSITION](../DECOMPOSITION.md) implements the callable and execution entry points declared in [public API design](../decomposition/public-api.md). The installed command, module runner and imported callable share one parser and execution path.
 
 ```text
-archive-line-index TARGET [-o OUTPUT_STEM | --output OUTPUT_STEM] [--overwrite]
-python -m archive_line_index TARGET [-o OUTPUT_STEM | --output OUTPUT_STEM] [--overwrite]
+archive-line-index TARGET [-o OUTPUT_STEM | --output OUTPUT_STEM] [--overwrite] [--log-level LEVEL]
+python -m archive_line_index TARGET [-o OUTPUT_STEM | --output OUTPUT_STEM] [--overwrite] [--log-level LEVEL]
 ```
 
 Exactly one target is required. `-h`/`--help` displays usage and returns success without path inspection or indexing. Missing/extra positional targets, unknown options and a missing output-option value are usage errors. Standard `--` ends option parsing for a target whose name starts with a hyphen. Shell quoting and explicit argv elements preserve paths containing spaces.
 
-There are no subcommands, recursive/batch processing, stdin payloads, progress UI, single-format selection, source mutation or configuration-file discovery. Both index formats are produced from one completed array. The CLI uses the library defaults for BOM handling, buffer size and decompressed-size limit.
+There are no subcommands, recursive/batch processing, stdin payloads, progress bars, single-format selection, source mutation or configuration-file discovery. Both index formats are produced from one completed array. The CLI uses the library defaults for BOM handling, buffer size and decompressed-size limit.
 
 ## Output names and execution
 
@@ -41,7 +41,7 @@ The callable returns an integer for the outcomes below and does not raise `Syste
 
 | Outcome | Status | Required output and side effects |
 | --- | --- | --- |
-| Both index writes and their cleanup succeed | 0 | One concise stdout summary identifying both output paths and line count `len(offsets) - 1`; no payload or full offset-array dump. Stderr is empty. |
+| Both index writes and their cleanup succeed | 0 | One concise stdout summary identifying both output paths and line count `len(offsets) - 1`; no payload or full offset-array dump. Default INFO scan progress goes to stderr unless suppressed or routed through application handlers. |
 | Help | 0 | Usage/help on stdout; no source/output inspection or mutation. |
 | Usage error | 2 | Usage and a concise diagnostic on stderr; stdout is empty; no source/output inspection or mutation. |
 | Expected indexing, validation or filesystem failure | 1 | A concise diagnostic on stderr, no traceback by default and no success summary. Identify any output already published before the failure. Source/destination alias rejection is an operational failure. |
@@ -57,3 +57,7 @@ Expected operational failures include package exceptions, ordinary filesystem er
 - CLI-04: Either protected existing output or a source/output alias is rejected before scanning or writing; explicit overwrite replaces only distinct outputs through the existing publication guarantees.
 - CLI-05: Source, archive, index and either writer failure produce nonzero status and stderr without a success summary. SQLite failure prevents the raw write; raw failure retains and identifies completed SQLite output; post-publication cleanup failure reports the publication note, and interruption releases owned resources.
 - CLI-06: Installed execution outside the checkout exposes the console command, `python -m` runner and importable callable without development dependencies or source-path injection, and both persisted outputs load through their independent library readers.
+
+## Progress verbosity
+
+The [progress contract](progress-logging.md) owns --log-level values/default, exact byte/cadence/completion meanings and handler configuration/restoration. Normal standalone execution enables INFO scan progress; --log-level WARNING suppresses it while retaining ordinary diagnostics. Existing application handlers may route records elsewhere. Import performs no configuration, help/usage does no scan work and stdout summary/statuses remain unchanged. A scan-complete record is not paired-output publication success.

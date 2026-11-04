@@ -136,3 +136,9 @@ The filesystem publication component provides these operations to both persisten
 `publish_index_file` performs publication only; it does not mix successful publication with later temporary-path cleanup. For protected creation it uses an exclusive publication primitive that fails when the destination already exists; for replacement it uses same-filesystem atomic replacement. A platform/filesystem without the required primitive reports failure without a weaker overwriting fallback. The outer temporary context performs cleanup even after publication failure and tolerates a temporary path consumed by successful replacement.
 
 The caller can therefore distinguish a publication failure from a cleanup failure after publication returned successfully. SPEC defines the surfaced errors and post-publication outcomes. No locks, cross-output transaction or temporary-path callback into a persistence adapter is required.
+
+## Progress observation and invocation configuration
+
+Scanner-local observation consumes the existing processed-byte position, retains per-operation monotonic interval state and emits through archive_line_index.scanner. It does not require a new cross-component protocol, payload callback or worker. Exact private helper shape remains implementation-owned; disabled observation performs no clock/record work and the LF-search provider has no logging call.
+
+The CLI configures the emitting scanner logger through Python logging, not a private scanner method. It snapshots/restores that logger's explicit level and owns a temporary current-stderr handler only if no effective handler exists. Existing application handlers and root/parent/propagation/disabled settings remain untouched. Selecting the actual emitting logger ensures suppression even when it had an explicit INFO level. Repeated configuration is serialized by the embedding application. No persistence or adapter contract changes.

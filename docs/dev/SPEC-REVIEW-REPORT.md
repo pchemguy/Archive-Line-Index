@@ -98,3 +98,23 @@ The current reviewed identities cover SPEC and six children. Governing hashes ma
 Whole-package QC found that PROJECT still described APIs, formats, versioning and release policy as unsettled, while ARCHITECTURE/DECOMPOSITION used future/proposal wording for definitions already owned by the completed suite. The design owners replaced these stale statements with present-tense ownership links and retained the existing product constraints. No public declaration, line/stream/archive/persistence/CLI contract or acceptance condition changed.
 
 Recheck against the existing SPEC contracts confirms unchanged behavior and responsibility boundaries. The current governing identity table reflects the editorial updates; their original accepted scope remains recoverable from the prior proposal/acceptance commits. Document conformance remains Ready. No new human scope decision is inferred and no implementation evidence is claimed.
+
+## Revision 4 — Progress feature incorporation
+
+Current design, public signatures, CLI behavior and all seven LOG conditions agree; retained 49 baseline conditions plus seven LOG conditions total 56. Scanner byte/timing/cost ownership, caller logging configuration and scan-versus-publication limits remain explicit. No root configuration, public callback or archive/persistence change is introduced.
+
+Reviewed root and affected child content identities:
+
+- SPEC.md: 19e7993488fc4cce5a2933b0fcabc8ee52f2eddace7ca702da7d406d6a090333.
+
+- decomposition/public-api.md: 968c11373661e34abbc334efee97380a8da09ec66865b8430b7aebe72927e1e3.
+
+- decomposition/internal-api.md: 8640a5404f6b686aac57a1368e4e0509963b83cc5bc1f01fa7e91a6c890ed147.
+
+- spec/progress-logging.md: 8fedbe93a056b67cfe28396e2dd3abdf938efc3a085ab6e9c4df842813574810.
+
+- spec/cli.md: 0cfe971bf66fc54751a0eb09b7b21a178c109e3803f484824d516afff1eb2a9f.
+
+- spec/line-index.md: 79a66feb3eb9ae5ea9eacd01ca1bbe5d0ee3a16cafe9b00cefb13f89a703e74c.
+
+Assessment: Ready for the scoped resulting main system after incorporation. No unresolved conformance finding; previous report observations retain their own identities. Runtime evidence is the separate feature milestone/phase verification, not this document assessment. Task transfer/archive and final source/package checks remain final-phase work.

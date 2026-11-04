@@ -1,5 +1,7 @@
 # FEATURE-PLAN conformance review
 
+Historical feature source/evidence. Current behavior and canonical completed task ownership are in [main SPEC](../../SPEC.md), [main PLAN](../../PLAN.md) and [main TASKS](../../TASKS.md). Retained preparation/task observations describe their recorded checkpoints; archived checklists are not executable owners.
+
 Reviewed content blob 14f3a981d84ba1733687315751525d7f660b89f6; governing inputs FEATURE-SPEC LOG-01–07; accepted main architecture/decomposition and physical layout. Reviewer: current agent, 2026-11-04. Source inspection and document conformance assessment, not runtime verification.
 
 Revision 2 adds the scoped physical allocation. Scanner/CLI remain sole production owners, tests stay under unit/integration, and public docs/governing incorporation retain established homes. No dependency cycles, duplicate behavior owners, unsupported FEATURE-LAYOUT file or new production module is introduced. One delivery milestone/three planned delivery tasks remain cohesive; the separate one-task phase review is excluded from delivery counts. Full LOG coverage, packaging, final incorporation and source-retirement paths remain feasible. Ready for tasks.

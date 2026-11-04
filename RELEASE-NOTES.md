@@ -1,34 +1,33 @@
-Archive Line Index 0.4.1 is a maintenance release improving bounded input reads, ZIP validation, SQLite publication and the reliability of development and release checks. Public library and CLI interfaces and supported formats are unchanged.
+Archive Line Index 0.5.0 adds lightweight progress logging for large indexing jobs through Python's standard logging facility.
 
-## Fixes
+## Compatibility
 
-- Keep format inspection within a 512-byte raw-read budget, including legal short reads, and avoid implicit read-ahead in plain payload delivery.
-- Reject ZIP delivery whose observable byte count disagrees with declared member size before reporting successful completion.
-- Synchronize completed SQLite indexes through a writable, non-truncating handle, addressing Windows file-synchronization requirements.
-- Make console pytest resolve checkout release helpers, report missing required plugins clearly and isolate SIGINT cleanup tests so a signal regression cannot terminate the test runner. Signal injection now uses signal.raise_signal instead of self-process os.kill.
-- Make release integration checks follow the authoritative package version, include build/Hatchling in test setup, read project/example inputs explicitly as UTF-8 and use portable archive test IDs.
-- Reject symlink bundle-staging directories before writing files into their targets.
+The CLI now emits INFO progress on stderr by default. Its stdout success summary, exit statuses, index formats and public Python function signatures are unchanged. Use --log-level WARNING to suppress progress while retaining ordinary error diagnostics. Library use remains quiet unless the application enables INFO on archive_line_index.scanner.
 
-## Installation and compatibility
+## Progress reporting
 
-Requires Python 3.11 or later and py7zr>=1.1.4,<1.2; actual dependency integration uses py7zr 1.1.4. No separate archive executable is required. This patch preserves line/BOM/EOF semantics, source/output naming, SQLite/raw formats and public signatures.
+- Report cumulative uncompressed bytes processed in the original indexed byte space, including an initial BOM. Plain files, all supported archives and borrowed binary-reader scans use the same scanner position.
+- Check progress at chunk boundaries and emit periodic updates only after five seconds have elapsed, plus an exact final total after validated EOF and offset checks. Short or empty inputs may produce only the final total; blocked reads produce no background heartbeat.
+- Keep logging outside the LF-match loop. Disabled progress reads no clock and formats no records; there are no per-line events, extra payload passes/copies, workers or dependencies.
+- Respect application logging: named library records configure no root logger or handlers. The CLI reuses effective application handlers or owns one temporary stderr handler, restores the prior scanner level and does not accumulate handlers across repeated serialized calls. Log-level values are case-insensitive; DEBUG adds no per-line output.
 
-Download archive-line-index-wheel.zip, archive-line-index-source.zip and SHA256SUMS from this release. Verify the bundles against SHA256SUMS, then extract and install the native wheel:
+A scan-complete record does not mean SQLite/raw publication succeeded. Existing source validation, cleanup, independent two-output publication and failure diagnostics remain in force. Standalone stream-only reads and row-by-row persistence progress are outside this feature.
+
+## Installation
+
+Requires Python 3.11 or later and py7zr>=1.1.4,<1.2, tested with 1.1.4. Download archive-line-index-wheel.zip, archive-line-index-source.zip and SHA256SUMS, verify the bundle hashes, then extract and install the native wheel:
 
 ```bash
 python -m zipfile -e archive-line-index-wheel.zip .
-python -m pip install archive_line_index-0.4.1-py3-none-any.whl
+python -m pip install archive_line_index-0.5.0-py3-none-any.whl
+archive-line-index data/events.txt
+archive-line-index data/events.txt --overwrite --log-level WARNING
 ```
 
-The source bundle contains archive_line_index-0.4.1.tar.gz and independently rebuilds the wheel. Hosted names remain stable and version-free; native package filenames and metadata inside the bundles carry version identity. For checkout development/testing, install the declared prerequisites with the same interpreter:
+The source bundle contains archive_line_index-0.5.0.tar.gz and independently rebuilds the wheel. Hosted artifact names remain stable and version-free; native package metadata and the release tag identify the version. See README for application-owned logging configuration and CLI suppression examples.
 
-```bash
-python -m pip install ".[dev,test]"
-python -m pytest -vv
-```
+## Verification and limits
 
-## Verification and limitations
+The full suite passes 755 tests with 95% production statement/branch coverage. Verification includes controlled five-second timing, disabled/dense-line costs, failures and configuration restoration, actual supported archive totals, all three installed CLI routes, native/source-rebuilt packages and all eight README Python examples. Ruff lint/format and strict type checks pass. Fresh whole-branch review found no Critical or Important issue.
 
-The complete suite passes 713 tests with 95% production statement/branch coverage, including native builds, source-distribution rebuilds, isolated installed consumers and all eight README Python examples. Ruff lint/format and strict type checks pass. Next-version checks, symlink staging and clean test-setup fixes have observed failure-before-fix and successful rechecks.
-
-Actual execution is Linux/CPython 3.12.14 with py7zr 1.1.4. Windows termination and synchronization requirements have targeted regression coverage, but native Windows/macOS/Python 3.11/3.14/big-endian execution remains unverified. ZIP checks cannot detect bytes hidden by the standard-library member stream. Existing cooperative 7z cancellation and independent two-output publication limitations still apply; no fixed dependency-call cancellation latency or cross-file rollback is promised.
+Actual execution is Linux/CPython 3.12.14 with py7zr 1.1.4. Native Windows/macOS/Python 3.11/3.14/big-endian execution remains unverified. Applications own handler performance/error behavior and serialize shared logging reconfiguration/imported CLI invocations. Existing cooperative 7z cancellation and observable-only ZIP validation limits still apply.

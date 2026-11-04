@@ -1,5 +1,7 @@
 # Progress logging delivery plan
 
+Historical feature source/evidence. Current behavior and canonical completed task ownership are in [main SPEC](../../SPEC.md), [main PLAN](../../PLAN.md) and [main TASKS](../../TASKS.md). Retained preparation/task observations describe their recorded checkpoints; archived checklists are not executable owners.
+
 Deliver [FEATURE-SPEC](FEATURE-SPEC.md) in one bounded Phase 5 — Lightweight progress logging, package version 0.5.0, retaining the 0.4.1 baseline. This is one coherent cross-cutting capability, not a new platform or archive subsystem.
 
 | Milestone | Outcome and exits |

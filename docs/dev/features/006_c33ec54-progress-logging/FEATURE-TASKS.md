@@ -1,8 +1,10 @@
 # Lightweight progress logging tasks
 
+Historical feature source/evidence. Current behavior and canonical completed task ownership are in [main SPEC](../../SPEC.md), [main PLAN](../../PLAN.md) and [main TASKS](../../TASKS.md). Retained preparation/task observations describe their recorded checkpoints; archived checklists are not executable owners.
+
 [FEATURE-PLAN](FEATURE-PLAN.md) and [FEATURE-SPEC](FEATURE-SPEC.md) govern this bounded Phase 5. IDs continue the project-wide main list after T-052; only this list owns T-053–T-056 during implementation. Existing completed main tasks remain unchanged. All task checks run from the root using the selected interpreter.
 
-- [ ] Phase 5 — Lightweight progress logging
+- [x] Phase 5 — Lightweight progress logging
     - [x] Milestone 5.1 — Progress logging
         - [x] T-053 — Report bounded scanner progress through standard logging
             - Scope: scanner.py private operation-local observer and logger; tests/unit/test_progress_logging.py; scanner docstrings. Public function signatures and byte/index behavior remain unchanged.
@@ -22,9 +24,12 @@
             - Contracts: LOG-01–07, API/CLI installed behavior and milestone 5.1 exits.
             - Acceptance/evidence: Test installed default INFO and WARNING on console/module/imported routes, import/configuration side effects, actual archive totals and unchanged stored pairs. Run complete README examples, package/native checks and relevant failure/lifecycle tests. Perform whole-milestone code review separately from execution, resolve blockers, write reports/5.1.md and HANDOFF, and retain observed checks/native limits with this completion.
             - Verified result: Actual plain/ZIP/TAR/required filters/7z builds and direct scanners report payload totals with unchanged arrays; both wheel/source-rebuilt installed console/module/imported routes pass default INFO, warning suppression, invalid-level usage and logger-state preservation. Six old quiet-stderr success assertions were intentionally updated to INFO progress plus exact final totals while keeping all status/persistence/protection checks. README and API docs explain standard application configuration, five-second cadence, disabled cost and scan/publication limits; metadata and install examples are 0.5.0. Full suite 755 passed in 28.07 seconds at 95% coverage; Ruff/format 77 files and strict mypy 26 files pass. Whole-milestone review finds no blocker; reports/5.1.md and HANDOFF retain the evidence and pending T-056/integration/release state.
-    - [ ] Milestone 5.2 — Phase review
-        - [ ] T-056 — Review verify and report the complete logging phase
+    - [x] Milestone 5.2 — Phase review
+        - [x] T-056 — Review verify and report the complete logging phase
             - Scope: complete Phase 5 coupling, accepted main-document incorporation, completed feature-source archive and current-owner reconciliation, whole-source/package readiness, phase report and HANDOFF.
             - Depends on: T-055 and verified hosted milestone 5.1 closure.
             - Contracts: All LOG conditions, retained main behavior and Phase 5/release exits.
             - Acceptance/evidence: Assess implementation code and logging configuration separately from test results; run full pytest/coverage, Ruff/format, strict mypy and current links. Incorporate resulting scope/API-behavior/CLI/options/physical allocation into main docs with affected conformance rechecks; retain accepted feature sources/QC as historical evidence with corrected in-scope links and unique task ownership. Verify actual source/wheel candidates, naming/checksum contract and intended 0.5.0 notes; audit one initial task checkbox/result commit per T ID and per-commit publication. Persist reports/PHASE-REPORT.md and HANDOFF with this task's initial completion. Integration, exact-source release commit/tag and hosted publication remain pending until their actual verified effects.
+            - Verification boundary: Final phase code review and accepted main incorporation are complete; actual final regression/package evidence and result are retained in reports/PHASE-REPORT.md and the containing completion checkpoint. Target integration and release remain pending until verified.
+
+            - Verified result: Fresh whole-branch read-only review found no Critical/Important issue; two minor permanent-regression coverage suggestions are deferred, with current package-import/root-state and corrupt ZIP/TAR/7z no-completion behavior independently probed successfully. Accepted logging is incorporated into main scope/design/API/SPEC/progress/CLI/PLAN/layout; main TASKS uniquely owns 56 completed IDs and archived feature sources/QC retain historical provenance. All 56 acceptance conditions and single-task completion/transfer/protected-record audits pass. Full final tree suite 755 passed in 34.24 seconds at 95% coverage; Ruff/format 77 files and strict mypy 26 files pass. Actual 0.5.0 source/wheel candidates and stable bundles pass content/metadata/checksum and independent complete-name gates. Phase report/HANDOFF retain review dispositions and native limits; target integration and exact-committed-source release remain pending.

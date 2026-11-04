@@ -2,7 +2,7 @@
 
 ## Objective and strategy
 
-Deliver the complete [PROJECT](PROJECT.md) scope through four useful increments conforming to [SPEC](SPEC.md), its contracts and the accepted [component/API design](DECOMPOSITION.md). The first usable product streams and indexes a plain file through an installed library. Persistence and the paired-output CLI follow; standard-library archives extend that workflow; the bounded threaded 7z adapter completes archive coverage.
+Deliver the complete [PROJECT](PROJECT.md) scope through five useful increments conforming to [SPEC](SPEC.md), its contracts and the accepted [component/API design](DECOMPOSITION.md). The first usable product streams and indexes a plain file through an installed library. Persistence and the paired-output CLI follow; standard-library archives extend that workflow; the bounded threaded 7z adapter completes archive coverage.
 
 This sequence makes the scanner, ownership rules and installed-library path usable before introducing file publication or producer concurrency. Every increment retains working prior behavior. The complete specification remains the intended system; intermediate versions expose and document only their delivered capabilities, without presenting planned entry points or formats as implemented. Recognized archive candidates without an implemented adapter are rejected explicitly rather than indexed as plain bytes.
 
@@ -12,8 +12,9 @@ This sequence makes the scanner, ownership rules and installed-library path usab
 | 2 — Paired persistence and CLI | Persist/reload either index format and index one plain target through console, module or imported CLI, producing both outputs | 0.2.0 | Phase 1 reviewed, integrated and its GitHub release published |
 | 3 — ZIP and TAR workflows | The same public APIs and CLI work with ZIP, TAR and required compressed-TAR variants | 0.3.0 | Phase 2 reviewed, integrated and its GitHub release published |
 | 4 — 7z and complete-system delivery | Bounded 7z streaming/indexing and paired CLI outputs, with complete accepted-scope evidence | 0.4.0 | Phase 3 reviewed, integrated and its GitHub release published |
+| 5 — Lightweight progress logging | Five-second cumulative indexing bytes through standard logging, scoped CLI INFO/stderr and suppression, with preserved library configuration/semantics | 0.5.0 | Phase 4 reviewed/integrated/released; accepted feature preparation and tracking ready |
 
-After each implementation phase is complete, verified and integrated into the default branch, create and publish a GitHub release for its package version, tagged `v0.1.0` through `v0.4.0` respectively. Each release includes release notes and explicitly attached source-distribution and wheel artifacts built from the exact tagged source, with matching metadata and SHA-256 checksums. Automatic GitHub source links do not substitute for the attached source distribution.
+After each implementation phase is complete, verified and integrated into the default branch, create and publish a GitHub release for its package version, tagged `v0.1.0` through `v0.5.0` respectively. Each release includes release notes and explicitly attached source-distribution and wheel artifacts built from the exact tagged source, with matching metadata and SHA-256 checksums. Automatic GitHub source links do not substitute for the attached source distribution.
 
 ## Phase 1 — Plain-file library
 
@@ -71,7 +72,7 @@ Two delivery milestones are intentional: ZIP's random-access member metadata and
 | 4.2 — 7z indexing and complete distribution | Complete structure/error/limit and cancellation integration with source-based indexing and the existing paired CLI. Demonstrate dependency failures, full-queue cancellation, no surviving owned thread after successful close and unchanged line/persistence semantics. Build/install the full package, update complete usage/API guidance and remove the temporary legacy reference from root AGENTS when reimplementation is complete. |
 | 4.3 — Phase and final review | Review the complete accepted system, run integrated regressions and installed-artifact checks, aggregate remaining findings/TODOs in the final implementation report and retain phase/final evidence before integration. |
 
-**Exit:** All 49 SPEC acceptance conditions have applicable evidence, with actual dependency versions, host capabilities and unavailable native execution identified. Existing milestones' evidence can be retained when still current, while changes trigger affected regressions. Full-scope public exports, formats, errors, lifecycles and both CLI artifacts match their contracts. The legacy reference is absent from active agent guidance, and product documents contain no migration narrative.
+**Exit:** All 49 baseline Phase 4 SPEC acceptance conditions have applicable evidence, with actual dependency versions, host capabilities and unavailable native execution identified. Existing milestones' evidence can be retained when still current, while changes trigger affected regressions. Full-scope public exports, formats, errors, lifecycles and both CLI artifacts match their contracts. The legacy reference is absent from active agent guidance, and product documents contain no migration narrative.
 
 Two delivery milestones keep the adapter's bounded streaming/ownership risk distinct from its completed indexing/CLI and distribution outcome. Final verification is the dedicated phase review, not a backlog milestone containing unplanned features. A dependency that cannot satisfy callback fidelity or cooperative cleanup blocks the affected 7z completion and requires a design/dependency decision before proceeding; it does not retroactively erase the usable Phase 3 package.
 
@@ -93,3 +94,11 @@ Every hosted release artifact has a stable version-free name. The complete expec
 ## Implementation ownership
 
 [Layout](layout.md) assigns physical ownership, and [TASKS](TASKS.md) defines executable units and task-level dependencies within these phase/milestone boundaries. [PLAN review](PLAN-REVIEW-REPORT.md) records strategy and placement conformance. Source/test allocation, the executable checklist and its status retain their respective owners.
+
+## Phase 5 — Lightweight progress logging
+
+Deliver standard named-logger observations of cumulative uncompressed indexing bytes at five-second chunk-boundary intervals and a final validated-scan total. Library callers configure their handlers; CLI default INFO progress is visible on stderr without altering root/parent settings or accumulating handlers. --log-level WARNING restores quiet progress behavior. Preserve all earlier line/archive/persistence/resource semantics and public signatures; do not add compressed counters, per-line events, workers, a custom framework or progress bars.
+
+Delivery milestone 5.1 contains three meaningful outcomes: scanner observation, CLI configuration and installed/documented distribution behavior. Its final implementation task owns whole-milestone review/report because no standalone review is justified for three tasks. Review milestone 5.2 contains exactly one final phase review/testing/report task covering coupled code, all LOG-01–07 checks, incorporation/current-owner consistency, complete regressions, packages and source/release readiness. One cohesive delivery milestone is intentional for this narrow feature; padding separate setup/clock/handler milestones would add no independent value. Earlier phases retain their scoped identities and exits; the seven LOG conditions extend the baseline acceptance set.
+
+Phase exit requires the library/CLI logging contracts, complete regression/tooling and installed/source-rebuilt example evidence, verified task/milestone closures and code review. Version 0.5.0 follows the existing default-branch exact-source/tag/source-wheel-bundle/SHA256SUMS/hosted-readback release gate. Native execution limits remain explicit. See completed [feature evidence](features/006_c33ec54-progress-logging/reports/5.1.md) and the canonical [task list](TASKS.md).

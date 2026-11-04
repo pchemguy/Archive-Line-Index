@@ -1,6 +1,6 @@
-# Indexing progress specification
+# Progress logging contract
 
-This delta implements [FEATURE](FEATURE.md) and [component design](FEATURE_DECOMPOSITION.md). Main [SPEC](SPEC.md), [line-index](spec/line-index.md) and [CLI](spec/cli.md) contracts remain normative except for the explicit logging/CLI additions here.
+The [component design](../DECOMPOSITION.md) assigns observation to the scanner and invocation configuration to the CLI. This contract defines standard logging behavior alongside [line indexing](line-index.md) and the [CLI contract](cli.md). Public function signatures and index formats remain unchanged.
 
 ## Scan records and cost
 

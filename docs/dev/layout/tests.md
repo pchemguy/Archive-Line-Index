@@ -37,3 +37,7 @@ Installed-artifact checks use actual built package bytes and a working directory
 Milestone and phase review evidence follows the [document map](docs.md) and PLAN boundaries. This allocation does not prescribe a test per contract sentence or claim that any test file already exists or has passed.
 
 Release naming is exercised by `tests/unit/test_release_names.py` against the shared contract vectors, including matching faulty expected sets. `tests/integration/test_release_bundles.py` builds/checks actual stable bundles from native inputs and rejects inventory, content and checksum faults. `test_installed_archives.py` covers actual ZIP/TAR commands, required filters/suffixes, empty payloads and late invalid archives in clean native/source-rebuilt installations.
+
+## Progress logging checks
+
+`tests/unit/test_progress_logging.py` owns exact original-byte totals, controlled five-second boundaries/no catch-up, disabled clock/record cost, LF-density-independent observation, failure/completion and per-scan state. `tests/unit/test_cli_logging.py` owns level parsing, default/suppressed progress, actual child-level control, application-handler/root preservation, repeated calls and exceptional restoration. `tests/integration/test_progress_logging.py` owns actual format totals, no duplicate standalone-stream observation and native/source-rebuilt installed console/module/imported progress/suppression/state checks. Existing installed CLI/archive tests retain result/protection/failure checks while expecting the informational stderr contract.
