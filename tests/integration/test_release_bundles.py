@@ -13,17 +13,23 @@ pytestmark = [pytest.mark.integration, pytest.mark.timeout(300)]
 
 
 def test_real_bundles_and_independent_cli(
-    built_distributions: Path, tmp_path: Path
+    built_distributions: Path, tmp_path: Path, project_version: str
 ) -> None:
     repo = Path(__file__).resolve().parents[2]
     hashes = prepare_bundles(
-        built_distributions, tmp_path / "release", repo / "pyproject.toml", "v0.4.0"
+        built_distributions,
+        tmp_path / "release",
+        repo / "pyproject.toml",
+        "v" + project_version,
     )
     assert sorted(p.name for p in (tmp_path / "release").iterdir()) == sorted(
         ASSET_NAMES
     )
     assert (
-        check_bundles(tmp_path / "release", repo / "pyproject.toml", "v0.4.0") == hashes
+        check_bundles(
+            tmp_path / "release", repo / "pyproject.toml", "v" + project_version
+        )
+        == hashes
     )
     result = run_checked(
         [
@@ -33,7 +39,7 @@ def test_real_bundles_and_independent_cli(
             "--output",
             str(tmp_path / "release"),
             "--tag",
-            "v0.4.0",
+            "v" + project_version,
             "--check",
         ],
         repo,
@@ -49,11 +55,13 @@ def test_real_bundles_and_independent_cli(
     ["unknown-versioned", "case-collision", "tamper", "checksum", "extra-member"],
 )
 def test_release_inventory_faults_are_rejected(
-    built_distributions: Path, tmp_path: Path, fault: str
+    built_distributions: Path, tmp_path: Path, fault: str, project_version: str
 ) -> None:
     repo = Path(__file__).resolve().parents[2]
     output = tmp_path / "release"
-    prepare_bundles(built_distributions, output, repo / "pyproject.toml", "v0.4.0")
+    prepare_bundles(
+        built_distributions, output, repo / "pyproject.toml", "v" + project_version
+    )
     if fault == "unknown-versioned":
         (output / "surprise-v2.weird").write_bytes(b"x")
     elif fault == "case-collision":
@@ -66,4 +74,4 @@ def test_release_inventory_faults_are_rejected(
         with zipfile.ZipFile(output / ASSET_NAMES[0], "a") as archive:
             archive.writestr("unexpected", b"extra")
     with pytest.raises((ValueError, zipfile.BadZipFile)):
-        check_bundles(output, repo / "pyproject.toml", "v0.4.0")
+        check_bundles(output, repo / "pyproject.toml", "v" + project_version)

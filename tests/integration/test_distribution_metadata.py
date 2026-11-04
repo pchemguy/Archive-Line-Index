@@ -10,21 +10,30 @@ import pytest
 pytestmark = [pytest.mark.integration, pytest.mark.timeout(300)]
 
 
-def test_native_distribution_metadata_and_inventory(built_distributions: Path) -> None:
-    wheel = built_distributions / "archive_line_index-0.4.0-py3-none-any.whl"
-    source = built_distributions / "archive_line_index-0.4.0.tar.gz"
+def test_native_distribution_metadata_and_inventory(
+    built_distributions: Path, project_version: str
+) -> None:
+    wheel = (
+        built_distributions / f"archive_line_index-{project_version}-py3-none-any.whl"
+    )
+    source = built_distributions / f"archive_line_index-{project_version}.tar.gz"
     with zipfile.ZipFile(wheel) as archive:
         names = archive.namelist()
         metadata = BytesParser().parsebytes(
-            archive.read("archive_line_index-0.4.0.dist-info/METADATA")
+            archive.read(f"archive_line_index-{project_version}.dist-info/METADATA")
         )
         assert "archive_line_index/py.typed" in names
         assert all(
-            n.startswith(("archive_line_index/", "archive_line_index-0.4.0.dist-info/"))
+            n.startswith(
+                (
+                    "archive_line_index/",
+                    f"archive_line_index-{project_version}.dist-info/",
+                )
+            )
             for n in names
         )
     assert metadata["Name"] == "archive-line-index"
-    assert metadata["Version"] == "0.4.0"
+    assert metadata["Version"] == project_version
     assert metadata["Requires-Python"] == ">=3.11"
     assert "py7zr<1.2,>=1.1.4" in metadata.get_all("Requires-Dist")
     with tarfile.open(source) as archive:
@@ -41,4 +50,4 @@ def test_native_distribution_metadata_and_inventory(built_distributions: Path) -
         "AI_DISCLOSURE.md",
         "SDD-MANAGER.md",
     ):
-        assert "archive_line_index-0.4.0/" + required in names
+        assert f"archive_line_index-{project_version}/" + required in names

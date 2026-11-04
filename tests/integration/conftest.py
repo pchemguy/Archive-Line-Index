@@ -6,11 +6,19 @@ import os
 import shutil
 import sys
 import tarfile
+import tomllib
 import venv
 from pathlib import Path
 
 import pytest
 from tests.helpers.packaging import InstalledPackage, run_checked
+
+
+@pytest.fixture(scope="session")
+def project_version() -> str:
+    """Authoritative expected version, independent of built/installed metadata."""
+    project = Path(__file__).resolve().parents[2] / "pyproject.toml"
+    return str(tomllib.loads(project.read_text(encoding="utf-8"))["project"]["version"])
 
 
 @pytest.fixture(scope="session")

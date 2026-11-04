@@ -52,3 +52,8 @@ Type: documentation recommendation. Priority: Minor. Confidence: source inspecti
 U-001–U-003 are assessed on product baseline 544c11280b807fd03c158023c5563dda5d453e34. Three important confirmed findings R-001–R-003 require bounded correction before release verification; minor recommendation R-004 is deferred with rationale. No confirmed production correctness defect was found. Coverage includes runtime/contract inspection, targeted test/harness assessment, actual complete tests/builds/installed examples, independent byte-oracle probes, isolated next-version failures, a symlink mutation reproduction and a clean declared-extras backend failure. These are distinct from unavailable native Windows/macOS/Python 3.11/3.14/big-endian execution and from arbitrary corruption/security guarantees not promised by the project.
 
 The user already authorized important corrections, closure and release, so proceed to an ordered revision plan without a new approval pause. Preserve these baseline observations and add recheck/disposition evidence rather than replacing them with later green results.
+
+
+## Revision dispositions
+
+R-001: Verified by [V-001](REVISION-REPORT.md), including observed next-version RED/GREEN and current-version integration checks. Baseline observations above are retained. R-002/R-003 remain accepted and pending; R-004 remains deferred.
