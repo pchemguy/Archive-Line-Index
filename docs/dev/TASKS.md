@@ -287,7 +287,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 ## Phase 4 — 7z and complete-system delivery
 
-- [ ] Phase 4 — 7z and complete-system delivery
+- [x] Phase 4 — 7z and complete-system delivery
     - [x] Milestone 4.1 — Bounded 7z streaming
         - [x] T-041 — Implement bounded producer messages and cancellation endpoint
             - Scope: backends/producer.py message/endpoint operations and controlled-producer unit checks.
@@ -358,11 +358,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
             - Verified result: Separate whole-milestone code/documentation review finds no blocking issue. Full complete-system regression passes 687 tests at 95% production coverage; all 134 selected native/source-rebuilt installed/package/release checks, eight README examples, isolated builds, complete inventory/naming/checksum gates, strict src/scripts mypy and Ruff pass. Actual py7zr 1.1.4 lifecycle, real SIGINT and partial CLI publication retain verified ownership. Report/HANDOFF preserve complete remaining authority, actual host/dependency limits and exact pending T-052/integration/release effects.
             - Report: `docs/dev/reports/phases/4/4.2.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 4.3 — Phase and final review
-        - [ ] T-052 — Review test and report phase 4 and the complete implementation
+    - [x] Milestone 4.3 — Phase and final review
+        - [x] T-052 — Review test and report phase 4 and the complete implementation
             - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence. Include the final implementation report and cumulative TODO resolution/deferral evidence.
             - Depends on: T-046, T-051. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
             - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.4.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
             - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Verified result: Separate complete-system review finds no unresolved functional blocker; all 49 acceptance conditions map individually to executable evidence and cumulative TODO/options/owners/resolutions are recorded. Delivery milestones #13/#14 are verified closed. Full regression passes 687 tests at 95% coverage; 134 package/installed checks, eight examples, fresh isolated 0.4.0 candidates, complete native/stable name/content/checksum gates, strict mypy and Ruff pass. Initial task composition and frozen-record audits pass. Phase/final reports, notes and HANDOFF retain actual host/dependency limits and pending authorized main integration, exact-source rebuild/tag and hosted-byte verification.
             - Report: `docs/dev/reports/phases/4/PHASE-REPORT.md`; include HANDOFF with this boundary.
             - Final evidence: `docs/dev/reports/IMPLEMENTATION-REPORT.md` aggregates all unresolved/deferred TODOs, options, owners and resolution provenance; full-scope acceptance must be supported.
