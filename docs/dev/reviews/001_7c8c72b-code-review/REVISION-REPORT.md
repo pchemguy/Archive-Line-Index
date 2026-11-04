@@ -14,7 +14,7 @@ The human authorized plan preparation and execution after the assessment. Existi
 | V-002 | Verified | R-007; see revision plan. |
 | V-003 | Verified | R-001, R-002; see revision plan. |
 | V-004 | Verified | R-004; see revision plan. |
-| V-005 | Planned | R-005; see revision plan. |
+| V-005 | Verified | R-005; see revision plan. |
 | V-006 | Planned | R-008 encoding only; see revision plan. |
 | V-007 | Planned | All accepted actions; R-006 evidence; see revision plan. |
 
@@ -43,5 +43,11 @@ The containing action commit records source/tests and this evidence together. Pu
 ### V-004 — Validate observable ZIP payload size before completion
 
 Revision source: `086fc84e8cf1d0b20bd763351d3c44bf7d69832a` plus this action’s owned diff. Seven regressions first failed: four actual stored/deflate/bzip2/lzma overdeclared members, dependency excess delivery, retained public terminal failure and no completed index/CLI publication. Four unchanged underdeclared-size/original-CRC cases already rejected and remain green. The reader now counts delivered bytes, rejects excess before return and requires equality at EOF; README describes the observable stream boundary. All 154 focused ZIP/common-stream/facade/CLI checks, strict mypy and Ruff pass. Separate actual ZIP characterization still returns [0,2] for a two-byte prefix with matching CRC when zipfile clips a six-byte compressed payload; this is retained as an observability limit, not a passing comprehensive underdeclared-tail detector.
+
+The containing action commit records source/tests and this evidence together. Publish/read back the checkpoint before the next action; the final action index retains observed commit identities.
+
+### V-005 — Keep large archive parameter IDs portable
+
+Revision source: `0f21042ddca656194d2a43e4c9c6e0418d8e1d13` plus this action’s owned diff. Before the change, actual legacy-strategy pytest collection produced node IDs of 70082/80097 characters for TAR/7z; default pytest 9.2 already shortened them. Explicit descriptive IDs now keep both default and legacy collections below 108 characters. All 60 affected actual TAR/7z tests and focused Ruff pass. This action changes test metadata only and has characterization/collection evidence rather than a fabricated runtime RED cycle. Native Windows setup/teardown execution remains unverified; the oversized environment-value trigger is removed.
 
 The containing action commit records source/tests and this evidence together. Publish/read back the checkpoint before the next action; the final action index retains observed commit identities.

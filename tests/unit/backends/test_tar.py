@@ -10,7 +10,9 @@ from tests.helpers.archives import make_tar
 from archive_line_index.errors import ArchiveStructureError, InvalidArchiveError
 
 
-@pytest.mark.parametrize("payload", [b"", b"a\n\xff" * 10000])
+@pytest.mark.parametrize(
+    "payload", [b"", b"a\n\xff" * 10000], ids=["empty", "binary-30k"]
+)
 @pytest.mark.parametrize(
     "format", [tarfile.USTAR_FORMAT, tarfile.PAX_FORMAT, tarfile.GNU_FORMAT]
 )

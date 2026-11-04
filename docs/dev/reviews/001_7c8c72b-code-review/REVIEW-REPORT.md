@@ -43,7 +43,7 @@ Current selected scope is four defect findings (R-001/R-004/R-005/R-007, with na
 | R-002 | Defect | Medium | Verified overhead/portability repair | R-001 |
 | R-003 | Recommendation | Low | Deferred | R-006 |
 | R-004 | Defect | Medium | Verified observable size checks | None |
-| R-005 | Defect | Medium | Accepted | None |
+| R-005 | Defect | Medium | Verified portable IDs; native execution unverified | None |
 | R-006 | Evidence gap | Low | Environment evidence gap | R-003 |
 | R-007 | Defect | High | Verified portable regression; native execution unverified | None |
 | R-008 | Recommendation | Low | Configuration rejected; encoding accepted | None |
