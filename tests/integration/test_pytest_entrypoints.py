@@ -46,3 +46,48 @@ def test_release_tests_collect_without_implicit_checkout_import(
         timeout=60,
     )
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize("disabled", ["asyncio", "timeout", "all"])
+def test_missing_test_plugins_fail_with_clear_prerequisite(
+    tmp_path: Path, disabled: str
+) -> None:
+    root = Path(__file__).resolve().parents[2]
+    env = {
+        key: value
+        for key, value in os.environ.items()
+        if key not in {"PYTHONPATH", "PYTHONHOME", "PYTEST_ADDOPTS"}
+    }
+    blocked = [] if disabled == "all" else ["-p", "no:" + disabled]
+    if disabled == "all":
+        env["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-P",
+            "-m",
+            "pytest",
+            "-c",
+            str(root / "pyproject.toml"),
+            *blocked,
+            "--collect-only",
+            str(root / "tests/integration/test_distribution_metadata.py"),
+        ],
+        cwd=tmp_path,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    diagnostic = result.stdout + result.stderr
+    assert result.returncode == 4, diagnostic
+    assert "Missing required plugins" in diagnostic
+    for plugin in (
+        ["pytest-asyncio", "pytest-timeout"]
+        if disabled == "all"
+        else ["pytest-" + disabled]
+    ):
+        assert plugin in diagnostic
+    assert "PytestConfigWarning" not in diagnostic
+    assert "PytestUnknownMarkWarning" not in diagnostic

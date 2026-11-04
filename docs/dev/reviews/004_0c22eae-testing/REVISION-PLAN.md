@@ -7,7 +7,7 @@
 - Creation parent, eventual integration and return target: actual current `main`.
 - Opening request: “open testing revision campaign.” That preparation-only checkpoint was published; the later reported collection failure and pyproject instruction select bounded V-001 below.
 - Companion: [REVISION-REPORT.md](REVISION-REPORT.md).
-- State: Open; V-001 is verified. The broader testing scope has not been assessed or accepted for execution.
+- State: Open; V-001 and V-002 are verified. The broader testing scope has not been assessed or accepted for execution.
 
 ## Testing scope
 
@@ -39,6 +39,8 @@ The human reported four ModuleNotFoundError failures importing scripts from rele
 
 Add the repository root alongside src in the existing pytest pythonpath, preserving importlib mode, strictness and declared dependencies. Add behavioral subprocess collection regressions without implicit current-directory/PYTHONPATH injection, then run the full suite through the pytest console executable and check module collection. Keep installed consumers isolated; no library/source behavior or governing-contract changes are selected. Record observed RED/GREEN and native limits with the fix, publish/read back on the active testing branch and stop for further instructions. This focused request does not select broader campaign assessment, main integration/closure, version bump or release.
 
-## Queued focused instruction
+## Selected V-002 — Require the configured pytest plugins
 
 The later plugin-warning report selects V-002 after V-001 publication: reproduce missing plugin diagnostics, require the declared pytest plugins clearly and verify both provisioned and disabled-plugin outcomes. Retain timeout enforcement rather than merely registering an inert marker.
+
+V-002 uses pytest required_plugins for pytest-asyncio and pytest-timeout, which are already declared in the existing dev/test extras. Preserve async/timeout options and effective timeout behavior; do not hide missing enforcement with inert marker registration. Verify each disabled plugin and disabled autoload produce a clear prerequisite error, then run the full provisioned console suite. Document installing extras with the same interpreter; use double quotes in the install command for CMD and shell compatibility. Publish/read back and remain on the active testing branch; no main integration or closure is selected.
