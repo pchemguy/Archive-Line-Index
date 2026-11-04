@@ -15,6 +15,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "build",
+    "hatchling",
     "mypy",
     "pytest>=9",
     "pytest-cov",
@@ -32,6 +33,8 @@ tools = [
     "uv",
 ]
 test = [
+    "build",
+    "hatchling",
     "pytest>=9",
     "pytest-cov",
     "pytest-benchmark",

@@ -56,4 +56,4 @@ The user already authorized important corrections, closure and release, so proce
 
 ## Revision dispositions
 
-R-001: Verified by [V-001](REVISION-REPORT.md), including observed next-version RED/GREEN and current-version integration checks. Baseline observations above are retained. R-002: Verified by V-002 and both actual-filesystem RED/GREEN cases in the revision report. R-003 remains accepted and pending; R-004 remains deferred.
+R-001: Verified by [V-001](REVISION-REPORT.md), including observed next-version RED/GREEN and current-version integration checks. Baseline observations above are retained. R-002: Verified by V-002 and both actual-filesystem RED/GREEN cases in the revision report. R-003: Verified by V-003 with clean declared-extras installation and the full 713-test/95% run. R-004 remains deferred. All three important findings are verified; no important finding remains unresolved. See the revision report for final composition and integration boundary.
