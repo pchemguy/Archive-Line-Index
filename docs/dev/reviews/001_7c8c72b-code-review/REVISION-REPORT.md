@@ -15,7 +15,7 @@ The human authorized plan preparation and execution after the assessment. Existi
 | V-003 | Verified | R-001, R-002; see revision plan. |
 | V-004 | Verified | R-004; see revision plan. |
 | V-005 | Verified | R-005; see revision plan. |
-| V-006 | Planned | R-008 encoding only; see revision plan. |
+| V-006 | Verified | R-008 encoding only; see revision plan. |
 | V-007 | Planned | All accepted actions; R-006 evidence; see revision plan. |
 
 ## Action evidence
@@ -49,5 +49,11 @@ The containing action commit records source/tests and this evidence together. Pu
 ### V-005 — Keep large archive parameter IDs portable
 
 Revision source: `0f21042ddca656194d2a43e4c9c6e0418d8e1d13` plus this action’s owned diff. Before the change, actual legacy-strategy pytest collection produced node IDs of 70082/80097 characters for TAR/7z; default pytest 9.2 already shortened them. Explicit descriptive IDs now keep both default and legacy collections below 108 characters. All 60 affected actual TAR/7z tests and focused Ruff pass. This action changes test metadata only and has characterization/collection evidence rather than a fabricated runtime RED cycle. Native Windows setup/teardown execution remains unverified; the oversized environment-value trigger is removed.
+
+The containing action commit records source/tests and this evidence together. Publish/read back the checkpoint before the next action; the final action index retains observed commit identities.
+
+### V-006 — Read release and example inputs explicitly as UTF-8
+
+Revision source: `95fc30c35735a61b8b8e6cf69aaa55445de58125` plus this action’s owned diff. A new valid UTF-8 TOML case first failed with UnicodeDecodeError under a controlled cp1252-default boundary. Explicit UTF-8 now reads project metadata, shared JSON vectors and README examples independently of the host text locale. All 41 selected locale/release inventory/naming/bundle/installed-example checks pass, including actual native/source-rebuilt consumers; Ruff and strict src/scripts mypy pass. Existing pytest extras/configuration and py7zr>=1.1.4,<1.2 are unchanged. Temporary installed consumers are created only by the existing declared integration fixtures; the tool runtime is not reprovisioned.
 
 The containing action commit records source/tests and this evidence together. Publish/read back the checkpoint before the next action; the final action index retains observed commit identities.

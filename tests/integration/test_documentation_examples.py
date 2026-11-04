@@ -14,7 +14,7 @@ def test_readme_examples_are_complete_and_installed(
 ) -> None:
     readme = Path(__file__).resolve().parents[2] / "README.md"
     examples = re.findall(
-        r"^```python\n(.*?)^```", readme.read_text(), flags=re.M | re.S
+        r"^```python\n(.*?)^```", readme.read_text(encoding="utf-8"), flags=re.M | re.S
     )
     assert len(examples) == 8, (
         "stream, scan, build, ZIP, TAR, 7z, persistence and imported CLI examples required"
