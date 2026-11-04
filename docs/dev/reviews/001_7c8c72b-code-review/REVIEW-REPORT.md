@@ -8,7 +8,22 @@
 - Scope and criteria: [REVIEW-PLAN.md](REVIEW-PLAN.md).
 - Request and state: campaign opened and executed on 2026-11-04; all seven review units (`U-001` through `U-007`) completed and consolidated at the review-only stopping boundary.
 - Evidence boundary: direct source inspection of pinned baseline `7c8c72b0791be95f3b28bbf193bbc29f8432d0c2` across all `src/archive_line_index/`, `scripts/`, `tests/`, `pyproject.toml`, `README.md`, and `RELEASE-NOTES.md` files, plus focused execution on Windows CMD with root Python 3.14.5 (`G:\ProgramsMisc\Anaconda\LLM-CLI\Anaconda\python.exe`). In the root Python 3.14.5 environment, `py7zr` is not installed and virtual environment creation is disallowed (`R-006`).
-- Readiness: conditionally ready for revision planning (`8` canonical findings recorded: `5` `Defect` — `1` `High` (`R-007`), `4` `Medium` (`R-001`, `R-002`, `R-004`, `R-005`); `2` `Recommendation` — `2` `Low` (`R-003`, `R-008`); `1` `Evidence gap` — `1` `Low` (`R-006`)). Windows SQLite publication (`R-007`), Python 3.14 plain/format buffering (`R-001`, `R-002`), ZIP terminal `declared_size` verification (`R-004`), and Windows pytest node-ID length (`R-005`) should be repaired before claiming native Windows / Python 3.14 support.
+- Original reviewer conclusion (partly superseded by the assessment corrections below): conditionally ready for revision planning (`8` canonical findings recorded: `5` `Defect` — `1` `High` (`R-007`), `4` `Medium` (`R-001`, `R-002`, `R-004`, `R-005`); `2` `Recommendation` — `2` `Low` (`R-003`, `R-008`); `1` `Evidence gap` — `1` `Low` (`R-006`)). Windows SQLite publication (`R-007`), Python 3.14 plain/format buffering (`R-001`, `R-002`), ZIP terminal `declared_size` verification (`R-004`), and Windows pytest node-ID length (`R-005`) should be repaired before claiming native Windows / Python 3.14 support.
+
+## Revision decisions and assessment corrections
+
+The human authorized planning and execution after the follow-up assessment. [REVISION-PLAN.md](REVISION-PLAN.md) owns the selected actions and [REVISION-REPORT.md](REVISION-REPORT.md) owns subsequent results. Original reviewer observations/scenario counts below are retained for provenance; the original defect counts and readiness statement do not override the corrections here.
+
+- R-001: controlled raw reads request 8192 or 131072 bytes beneath read(512); accept explicit inspection buffering and short-read handling. This is not limited to Python 3.14.
+- R-002: a simulated 128 KiB default produces approximately 150 KiB peak storage, reproducing the test threshold failure. Constant read-ahead is still bounded; accept portability/overhead repair as a recommendation, not a claim of payload-sized growth.
+- R-004: actual mutated deflated ZIP bytes with declared size 100 deliver six bytes and complete; this confirms the missing terminal count. Declared size 2 with the original CRC already raises ExtractionError. Size 2 plus a prefix CRC returns two bytes and satisfies a delivered-byte counter, because zipfile clips the member stream. Narrow the proposed acceptance to observable mismatches; no comprehensive underdeclared-tail detection is claimed.
+- R-005: current pytest 9.2 shortens large values (observed node IDs <=125 characters), while its legacy strategy yields TAR/7z IDs of 70082/80097 characters. Accept explicit IDs for older permitted versions and legacy behavior. The original Windows review omitted its pytest version.
+- R-003: defer. The public facade opens through detection before importing the required 7z dependency; the internal double-failure precedence does not justify a redundant stat/open or dependency ownership refactor.
+- R-006: the existing Linux CPython 3.12.14 / py7zr 1.1.4 runtime passed 78 focused real-7z/lifecycle checks and strict src/scripts mypy (26 files) in follow-up assessment. This does not certify Windows execution. The recorded proposed >=1.1.0,<2 dependency range is incorrect; preserve >=1.1.4,<1.2.
+- R-008 configuration allegation is rejected: the pinned pyproject has [project.optional-dependencies] dev/test extras declaring pytest-asyncio and pytest-timeout, not [dependency-groups].dev; [tool.pytest] uses asyncio_mode=strict, not the described [tool.pytest.ini_options]/auto state. Missing installed plugins describe reviewer provisioning, not absent declarations. Explicit UTF-8 reads are accepted separately.
+- Other baseline description corrections: cli.py has no _was_published helper; diagnostics retain publication information via exception notes and known completed outputs. The actual sdist includes src, tests, scripts, docs/dev and listed root files, not the four-entry inventory described in U-007. Preserve these original descriptions below as superseded observations rather than repair source to match them.
+
+Current selected scope is four defect findings (R-001/R-004/R-005/R-007, with narrowed R-004 acceptance), accepted R-002 overhead guidance and R-008 encoding cleanup, deferred R-003 and environment-bounded R-006. Fresh verification belongs to the revision report; no repair is Verified at the planning checkpoint.
 
 ## Coverage and findings index
 
@@ -24,14 +39,14 @@
 
 | Finding | Type | Priority | Status | Related findings |
 | --- | --- | --- | --- | --- |
-| R-001 | Defect | Medium | Open | R-002 |
-| R-002 | Defect | Medium | Open | R-001 |
-| R-003 | Recommendation | Low | Open | R-006 |
-| R-004 | Defect | Medium | Open | None |
-| R-005 | Defect | Medium | Open | None |
-| R-006 | Evidence gap | Low | Open | R-003 |
-| R-007 | Defect | High | Open | None |
-| R-008 | Recommendation | Low | Open | None |
+| R-001 | Defect | Medium | Accepted | R-002 |
+| R-002 | Defect | Medium | Accepted; reclassified recommendation | R-001 |
+| R-003 | Recommendation | Low | Deferred | R-006 |
+| R-004 | Defect | Medium | Accepted with narrowed criteria | None |
+| R-005 | Defect | Medium | Accepted | None |
+| R-006 | Evidence gap | Low | Environment evidence gap | R-003 |
+| R-007 | Defect | High | Accepted | None |
+| R-008 | Recommendation | Low | Configuration rejected; encoding accepted | None |
 
 ## Unit assessments
 
@@ -85,7 +100,7 @@
 | Observation and consequence | `detect_format` opens the file with `with path.open("rb") as source: signature = _signature(source.read(512))`. Because `buffering` is omitted, Python creates an `io.BufferedReader` with `io.DEFAULT_BUFFER_SIZE` (which increased to 131,072 bytes / 128 KiB in Python 3.14), issuing an underlying OS read and buffer allocation up to 128 KiB instead of reading at most 512 source bytes as specified in `docs/dev/spec/archive-handling.md:L11`. `tests/unit/test_formats.py:L69-L77` did not catch this because it patched `Path.open` with an `io.BytesIO` double rather than inspecting raw I/O or buffer allocation. Combined with default buffering in `open_plain_backend`, this causes `tests/integration/test_large_inputs.py:L33-L54` (`assert peak < 128 * 1024`) to fail on Python 3.14 (`peak = 148881`). |
 | Correction and dependencies | Open the inspection handle with bounded or unbuffered I/O (for example `path.open("rb", buffering=0)` with a short-read loop up to 512 bytes, or `buffering=512`) and strengthen `test_formats.py` to verify the underlying raw read/buffer bound. Coordinates with `R-002`. |
 | Objective recheck | Verify that `detect_format` allocates and reads at most 512 bytes from the underlying raw stream and that `tests/unit/test_formats.py` and `tests/integration/test_large_inputs.py` pass under Python 3.14. |
-| Current disposition | Open (review-only campaign; no source repair performed). |
+| Baseline disposition | Open at original review; current selected disposition is recorded in the revision decisions above. |
 
 ### R-002 — `open_plain_backend` uses default `BufferedReader` buffering (`128 KiB` on Python 3.14), exceeding bounded plain-stream memory expectations
 
@@ -95,7 +110,7 @@
 | Observation and consequence | `open_plain_backend` opens the file with `handle = path.open("rb")`, which wraps the raw file in an `io.BufferedReader` using Python's default buffer size (128 KiB on Python 3.14). When a caller requests small bounded reads such as `stream.read(3)` and `stream.read(8192)`, `BufferedReader` still allocates a 131,072-byte internal buffer, causing `test_plain_stream_delivers_incrementally_with_bounded_storage` (`assert peak < 128 * 1024`) to fail with `peak = 148881`. Because `_PlainReader.read(size)` forwards caller-requested sizes directly and `ContentStream`/`scan_line_offsets` accept short reads, an unconfigured `BufferedReader` adds redundant buffering. |
 | Correction and dependencies | Open plain files unbuffered (`path.open("rb", buffering=0)`) or with an explicit small buffer in `open_plain_backend` alongside `R-001`. |
 | Objective recheck | Run `python -m pytest tests/unit/backends/test_plain.py tests/integration/test_large_inputs.py` on Python 3.14 and confirm `peak < 128 * 1024`. |
-| Current disposition | Open (review-only campaign; no source repair performed). |
+| Baseline disposition | Open at original review; current selected disposition is recorded in the revision decisions above. |
 
 ### R-003 — `open_backend` imports `.sevenzip` (`py7zr`) before opening the source path, masking `FileNotFoundError` when `py7zr` is absent
 
@@ -105,7 +120,7 @@
 | Observation and consequence | In `open_backend`, `FormatKind.SEVEN_Z` executes `from .sevenzip import open_7z_backend` (which runs top-level `import py7zr` in `sevenzip.py:L14`) before `open_7z_backend` opens `path` (`sevenzip.py:L202`). When `open_backend` is called on a missing or inaccessible path in an environment without `py7zr` (or if `path` disappears between `detect_format` and `open_backend` when `py7zr` fails to import), `open_backend` raises `UnsupportedFormatError("7z dependency is unavailable")` instead of `FileNotFoundError`/`OSError`, causing `test_missing_source_retains_filesystem_category[FormatKind.SEVEN_Z]` to fail when `py7zr` is absent. |
 | Correction and dependencies | Either defer `py7zr` imports in `sevenzip.py` until after `path.open("rb")` succeeds in `open_7z_backend` (with `TYPE_CHECKING` annotations for `mypy`), or open/stat the source before importing `py7zr`. |
 | Objective recheck | Verify that `tests/unit/backends/test_registry.py::test_missing_source_retains_filesystem_category[FormatKind.SEVEN_Z]` raises `FileNotFoundError` both with and without `py7zr` installed, while an existing 7z path still raises `UnsupportedFormatError` when `py7zr` is unavailable. |
-| Current disposition | Open (review-only campaign; no source repair performed). |
+| Baseline disposition | Open at original review; current selected disposition is recorded in the revision decisions above. |
 
 ### R-004 — `_ZipReader` does not verify that total delivered uncompressed bytes match `declared_size` at EOF
 
@@ -115,7 +130,7 @@
 | Observation and consequence | `_ZipReader` exposes `self.declared_size = info.file_size` (`zip.py:L102, L146`), which `make_content_stream` (`stream.py:L218-L221`) treats as trustworthy metadata for `SizeLimitExceededError` prechecks, and sets `self.completed = True` whenever `self._member.read(size)` returns `b""` (`zip.py:L117-L118`). However, Python's `zipfile.ZipExtFile` only checks `_running_crc == _expected_crc` and compressed byte counts; for `ZIP_DEFLATED`, `ZIP_BZIP2`, and `ZIP_LZMA` it never verifies that the total decompressed byte count equals `ZipInfo.file_size` (and for `ZIP_STORED` it only uses `file_size` as an upper read cap without verifying `_left == 0` at EOF if truncated with a matching prefix CRC). Consequently, a ZIP archive whose local/central-directory `file_size` metadata is corrupted (for example, `file_size = 100` or `file_size = 2` for a 6-byte `b"hello\n"` deflated member) completes with `completed = True` instead of raising `ExtractionError`, unlike `sevenzip.py:L248-L250` (`if writer.size() != info.uncompressed: raise ExtractionError(...)`) and `tarfile._FileInFile`. |
 | Correction and dependencies | Track total delivered uncompressed bytes in `_ZipReader` (`self._delivered += len(data)`) and verify `self._delivered == self.declared_size` (or raise `ExtractionError("ZIP payload size does not match metadata")` if `self._delivered > self.declared_size` during reads or `self._delivered != self.declared_size` when `not data` at EOF), and add unit tests covering both under-declared and over-declared `file_size` headers. |
 | Objective recheck | Verify that `_ZipReader` and `open_content_stream` raise `ExtractionError` when a ZIP member's `file_size` metadata is smaller or larger than the actual decompressed payload stream, and that `tests/unit/backends/test_zip.py` passes. |
-| Current disposition | Open (review-only campaign; no source repair performed). |
+| Baseline disposition | Open at original review; current selected disposition is recorded in the revision decisions above. |
 
 ### R-005 — `test_tar.py` and `test_sevenzip.py` omit parameter IDs for 20–30 KiB binary payloads, overflowing Windows `PYTEST_CURRENT_TEST` (`32,767` chars)
 
@@ -125,7 +140,7 @@
 | Observation and consequence | `test_plain_tar_nested_empty_and_bounded_reads` (`test_tar.py:L13`) is decorated with `@pytest.mark.parametrize("payload", [b"", b"a\n\xff" * 10000])` and `test_real_7z_nested_payload_without_filesystem_extraction` (`test_sevenzip.py:L17-L19`) is decorated with `@pytest.mark.parametrize("payload", [b"", b"\xef\xbb\xbfalpha\r\n\nomega", b"\0\xff" * 10000])`, both without explicit `ids`. Pytest embeds the escaped byte representations (>70,000 characters in `test_tar.py` and 80,108 characters in `test_sevenzip.py`) into the test node ID and assigns them to `os.environ["PYTEST_CURRENT_TEST"]` during test setup and teardown (`_pytest/runner.py:L210`). Because Windows CRT / environment variables enforce a 32,767-character limit, those parametrized cases fail at both setup and teardown on Windows with `ValueError: the environment variable is longer than 32767 characters`, even though the test bodies pass when invoked directly without pytest's oversized node IDs. |
 | Correction and dependencies | Supply explicit short parameter IDs (for example `ids=["empty", "binary_30k"]` in `tests/unit/backends/test_tar.py:L13` and `ids=["empty", "bom_text", "binary_20k"]` in `tests/unit/backends/test_sevenzip.py:L17-L19`). |
 | Objective recheck | Run `python -m pytest tests/unit/backends/test_tar.py tests/unit/backends/test_sevenzip.py` on Windows (in an environment with `py7zr` installed) and confirm all parametrized cases pass with 0 setup/teardown errors. |
-| Current disposition | Open (review-only campaign; no source repair performed). |
+| Baseline disposition | Open at original review; current selected disposition is recorded in the revision decisions above. |
 
 ### R-006 — Root Python 3.14.5 environment lacks `py7zr`, deferring live `py7zr` test execution and `sevenzip.py` stub typecheck
 
@@ -145,7 +160,7 @@
 | Observation and consequence | After `_write_database(temporary, offsets)` commits and closes the SQLite connection, `write_sqlite_index` runs `with open_binary_file(temporary, "rb") as handle: flush_file(handle)` (`sqlite.py:L129-L130`). `flush_file` calls `os.fsync(handle.fileno())` (`fs.py:L70`), ignoring only `EINVAL`, `ENOSYS`, and `ENOTSUP`. On Windows, `os.fsync` calls CRT `_commit(fd)` -> Win32 `FlushFileBuffers(hFile)`, which requires `GENERIC_WRITE` access on the handle; when `temporary` is opened read-only (`"rb"`), Windows returns `ERROR_ACCESS_DENIED` and the CRT translates it to `errno.EBADF` (`OSError: [Errno 9] Bad file descriptor`). Consequently, every unmocked `write_sqlite_index` call, every real CLI invocation (`cli.main`) that reaches SQLite publication, and README Examples 7 and 8 fail unconditionally on Windows with `OSError: [Errno 9] Bad file descriptor`. |
 | Correction and dependencies | Widen `open_binary_file`'s mode annotation in `src/archive_line_index/persistence/fs.py:L77` to `Literal["rb", "wb", "r+b"]` and open `temporary` with `"r+b"` in `src/archive_line_index/persistence/sqlite.py:L129` so `os.fsync` has a writable descriptor without truncating or modifying the committed SQLite file. |
 | Objective recheck | Run `python -m pytest tests/unit/persistence/test_fs.py tests/unit/persistence/test_raw.py tests/unit/persistence/test_sqlite.py tests/integration/test_persistence_equivalence.py tests/integration/test_filesystem_publication.py tests/unit/test_cli.py tests/integration/test_cli.py tests/integration/test_tar_workflows.py` and the README examples on Windows and confirm all pass (`SC-009`, `SC-011`, and `SC-013` verified that all 81 persistence tests, all 95 CLI/workflow tests, and all 7 non-7z README examples pass when `"r+b"` is used). |
-| Current disposition | Open (review-only campaign; no source repair performed). |
+| Baseline disposition | Open at original review; current selected disposition is recorded in the revision decisions above. |
 
 ### R-008 — `pyproject.toml` configures `pytest-asyncio` and `pytest-timeout` options and `@pytest.mark.timeout` without declaring those plugins in `[dependency-groups].dev`
 
@@ -155,7 +170,7 @@
 | Observation and consequence | `[tool.pytest.ini_options]` in `pyproject.toml:L47-L53` sets `asyncio_default_fixture_loop_scope = "function"`, `asyncio_mode = "auto"`, and `timeout = 60`, and four integration test modules apply `pytest.mark.timeout(300)` without registering `timeout` in `markers = [...]`. However, `[dependency-groups].dev` (`pyproject.toml:L23-L30`) lists only `build`, `mypy`, `pytest`, `pytest-cov`, and `ruff` (and the codebase uses no `asyncio` tests). In any environment provisioned strictly from `[dependency-groups].dev` or lacking those optional pytest plugins, pytest emits three `PytestConfigWarning` warnings and four `PytestUnknownMarkWarning` warnings (and would fail under `--strict-config` / `--strict-markers`). In addition, `scripts/prepare_release.py:L30` and `tests/unit/test_release_names.py:L15` call `Path.read_text()` without `encoding="utf-8"`, relying on the host locale encoding when UTF-8 mode is not forced. |
 | Correction and dependencies | Remove the unused `asyncio_default_fixture_loop_scope` and `asyncio_mode` settings from `pyproject.toml`, either add `pytest-timeout` to `[dependency-groups].dev` or remove `timeout = 60` / register or remove `pytest.mark.timeout`, and pass `encoding="utf-8"` to `read_text()` in `scripts/prepare_release.py` and test files. |
 | Objective recheck | Run `python -m pytest` in an environment provisioned solely from `[dependency-groups].dev` and confirm zero `PytestConfigWarning` or `PytestUnknownMarkWarning` messages. |
-| Current disposition | Open (review-only campaign; no source repair performed). |
+| Baseline disposition | Open at original review; current selected disposition is recorded in the revision decisions above. |
 
 ## Scenarios and limits
 
