@@ -16,3 +16,6 @@ build/
 
 # Complete version-free hosted release staging.
 /release/
+
+# Local curated release coverage checkpoint.
+/.release-highlights.md

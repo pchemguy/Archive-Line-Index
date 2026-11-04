@@ -1,31 +1,34 @@
-Archive Line Index 0.4.0 adds single-payload 7z streaming and indexing, completing the supported archive formats through the library and paired-output CLI.
+Archive Line Index 0.4.1 is a maintenance release improving bounded input reads, ZIP validation, SQLite publication and the reliability of development and release checks. Public library and CLI interfaces and supported formats are unchanged.
 
-## Highlights
+## Fixes
 
-- Stream a sole regular 7z member without extracting member paths or retaining the whole payload in package buffers. Empty and nested payloads are supported; extra files, links and special entries are rejected.
-- Build canonical LF/BOM byte-offset arrays and matching SQLite/raw outputs from 7z using the existing library, console, module and importable CLI interfaces. CRC, extraction and terminal-size failures cannot yield a completed index or start output publication.
-- Use one non-daemon extraction worker and bounded callback transport. Early close, consumer exceptions and interruption cancel package waits, release resources and join the worker. Failed reads retain their error rather than becoming successful EOF; cleanup failures preserve primary exceptions and permit close retry.
-- Document every supported format with eight executable README examples and retain the source-linked explanation of blockwise bytes.find line scanning.
+- Keep format inspection within a 512-byte raw-read budget, including legal short reads, and avoid implicit read-ahead in plain payload delivery.
+- Reject ZIP delivery whose observable byte count disagrees with declared member size before reporting successful completion.
+- Synchronize completed SQLite indexes through a writable, non-truncating handle, addressing Windows file-synchronization requirements.
+- Make console pytest resolve checkout release helpers, report missing required plugins clearly and isolate SIGINT cleanup tests so a signal regression cannot terminate the test runner. Signal injection now uses signal.raise_signal instead of self-process os.kill.
+- Make release integration checks follow the authoritative package version, include build/Hatchling in test setup, read project/example inputs explicitly as UTF-8 and use portable archive test IDs.
+- Reject symlink bundle-staging directories before writing files into their targets.
 
 ## Installation and compatibility
 
-Requires Python 3.11 or later. The 7z runtime dependency is now constrained to `py7zr>=1.1.4,<1.2`, tested with 1.1.4. No development tools or separate archive executable are needed for installed use. Plain, ZIP, TAR and persistence behavior and public signatures remain available; 7z loads its dependency only when selected.
+Requires Python 3.11 or later and py7zr>=1.1.4,<1.2; actual dependency integration uses py7zr 1.1.4. No separate archive executable is required. This patch preserves line/BOM/EOF semantics, source/output naming, SQLite/raw formats and public signatures.
 
-Download `archive-line-index-wheel.zip`, `archive-line-index-source.zip` and `SHA256SUMS`. Verify the bundles against SHA256SUMS, then extract and install the native wheel:
+Download archive-line-index-wheel.zip, archive-line-index-source.zip and SHA256SUMS from this release. Verify the bundles against SHA256SUMS, then extract and install the native wheel:
 
 ```bash
 python -m zipfile -e archive-line-index-wheel.zip .
-python -m pip install archive_line_index-0.4.0-py3-none-any.whl
-archive-line-index data/records.7z
-python -m archive_line_index data/records.7z --output results/custom
+python -m pip install archive_line_index-0.4.1-py3-none-any.whl
 ```
 
-The source bundle contains `archive_line_index-0.4.0.tar.gz`, which independently rebuilds the wheel. Hosted names remain stable and version-free; valid native package filenames and metadata inside the bundles carry version identity. The complete inventory is checked for safe contents, metadata agreement and checksums.
+The source bundle contains archive_line_index-0.4.1.tar.gz and independently rebuilds the wheel. Hosted names remain stable and version-free; native package filenames and metadata inside the bundles carry version identity. For checkout development/testing, install the declared prerequisites with the same interpreter:
 
-For `records.7z`, default CLI outputs are `records.sqlite3` and `records.u64` beside the archive. Only the final suffix is removed. Parent directories must exist; existing outputs require `--overwrite`, and source aliases remain protected. One scan feeds SQLite then raw. If the second writer fails after SQLite succeeds, the SQLite output remains and the diagnostic identifies it; the pair has no cross-file transaction.
+```bash
+python -m pip install ".[dev,test]"
+python -m pytest -vv
+```
 
-## Verification and limits
+## Verification and limitations
 
-All 687 tests pass with 95% production statement/branch coverage, plus Ruff and strict type checks. Native-wheel and independently source-rebuilt installations exercise all supported formats, all three CLI routes and all eight README examples outside the checkout. Actual 7z checks cover LZMA2/COPY/deflate/bzip2, slow-consumer progressive delivery, bounded queue occupancy, empty content, full-queue early close, CRC/truncation, cleanup retry and real SIGINT.
+The complete suite passes 713 tests with 95% production statement/branch coverage, including native builds, source-distribution rebuilds, isolated installed consumers and all eight README Python examples. Ruff lint/format and strict type checks pass. Next-version checks, symlink staging and clean test-setup fixes have observed failure-before-fix and successful rechecks.
 
-Runtime verification is Linux/CPython 3.12.14 with py7zr 1.1.4. Native Windows/macOS/Python 3.11/big-endian execution remains unverified. Package transport uses one queued block and one current consumer block of at most 1 MiB each; dependency decompressor/callback allocations are separate. Package waits check cancellation at 0.05-second intervals, but dependency operations can delay close, so no total close-latency guarantee is made. Early close does not claim archive integrity. Inputs must remain stable, integrity checks are those available through supported dependencies, and encrypted/multi-payload archives remain outside scope.
+Actual execution is Linux/CPython 3.12.14 with py7zr 1.1.4. Windows termination and synchronization requirements have targeted regression coverage, but native Windows/macOS/Python 3.11/3.14/big-endian execution remains unverified. ZIP checks cannot detect bytes hidden by the standard-library member stream. Existing cooperative 7z cancellation and independent two-output publication limitations still apply; no fixed dependency-call cancellation latency or cross-file rollback is promised.

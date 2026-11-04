@@ -32,13 +32,16 @@ def test_exact_delivered_exports() -> None:
 
 
 def test_version_and_console_metadata() -> None:
+    import re
     import tomllib
     from pathlib import Path
 
     project = tomllib.loads(
-        (Path(__file__).resolve().parents[2] / "pyproject.toml").read_text()
+        (Path(__file__).resolve().parents[2] / "pyproject.toml").read_text(
+            encoding="utf-8"
+        )
     )["project"]
-    assert project["version"] == "0.4.0"
+    assert re.fullmatch(r"\d+\.\d+\.\d+", project["version"])
     assert project["scripts"] == {"archive-line-index": "archive_line_index.cli:main"}
 
 
