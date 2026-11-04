@@ -84,3 +84,7 @@ Reviewed current source/tests/scripts, accepted PROJECT/ARCHITECTURE/DECOMPOSITI
 | Main merge, exact-source 0.4.0 rebuild/tag and live release/download verification | Pending at this initial T-052 checkpoint; all are explicitly authorized and must finish before final completion. | T-052; final outcome records exact identities, hashes and links. |
 
 No functional deferral requires another product decision. This report and [Phase 4 report](phases/4/PHASE-REPORT.md) retain final publication evidence when observed. Root RELEASE-NOTES.md is retained after publication; only the owned ignored highlights checkpoint is eligible for verified-consumption cleanup.
+
+## Verified integration and release boundary
+
+Explicit two-parent integration `72a4e5f0c8766651a9921ccbaa259fe4d5b2397a` is published on actual default main with matching exact remote readback. Its receiving parent is `d1d233a179cb249ddff3cc510ad89974d0ca53c2` and incoming completed phase tip is `f890028d90794138ada64824b6af646903184642`. All 687 merged-state tests, Ruff and strict mypy pass; product/test source is unchanged from the reviewed phase. All 52 tasks, Phase 4 issues #50–61 and native milestones #13–15 are complete/closed. The next containing direct main release commit uses exact retained RELEASE-NOTES.md bytes as its body. Exact-source build/install/tag and actual hosted release/download verification remain pending.
