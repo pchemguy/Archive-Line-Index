@@ -326,7 +326,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
             - Verified result: Separate whole-milestone code/lifecycle review finds no blocking issue. Full source regression passes 630 tests at 94% coverage; all 56 focused real-7z/bridge checks pass after adding cleanup-retry and source read/seek/tell identity cases. Actual py7zr 1.1.4 metadata/codecs, bounded progressive delivery, startup/early-close/full-queue/CRC/truncation and primary-error ownership are evidenced. Ruff and strict mypy pass. Report/HANDOFF retain complete remaining-task/release authority, dependency/host limits and pending hosted closure.
             - Report: `docs/dev/reports/phases/4/4.1.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 4.2 — 7z indexing and complete distribution
+    - [x] Milestone 4.2 — 7z indexing and complete distribution
         - [x] T-047 — Integrate 7z indexing and paired CLI failure ownership
             - Scope: 7z public indexing/CLI integration checks with localized adapter/facade corrections.
             - Depends on: T-046.
@@ -351,11 +351,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Build/install full artifacts, rebuild from source distribution, verify complete exports/entry points and runtime dependency constraints, reject development/log/credential entries and validate actual names/checksums against tag metadata.
             - Contracts: SYS-11–12; API-05; CLI-06; phase release gate.
             - Verified result: Version 0.4.0 metadata and active installation/check examples agree. All 134 selected native metadata, source-rebuilt installation, export/runtime-boundary, all-format CLI, eight README example, release inventory and adversarial naming/checksum checks pass. Isolated Hatchling 1.33.0 builds produce valid wheel/sdist; independent native and stable bundle gates pass with complete safe inventories and checksums. Supported runtime dependency remains py7zr>=1.1.4,<1.2, actual 1.1.4. Ruff and strict src/scripts mypy pass. Candidates are preparation artifacts; exact merged release source will be rebuilt and installed again before tagging.
-        - [ ] T-051 — Review test and report milestone 4.2
+        - [x] T-051 — Review test and report milestone 4.2
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-047, T-048, T-049, T-050.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Separate whole-milestone code/documentation review finds no blocking issue. Full complete-system regression passes 687 tests at 95% production coverage; all 134 selected native/source-rebuilt installed/package/release checks, eight README examples, isolated builds, complete inventory/naming/checksum gates, strict src/scripts mypy and Ruff pass. Actual py7zr 1.1.4 lifecycle, real SIGINT and partial CLI publication retain verified ownership. Report/HANDOFF preserve complete remaining authority, actual host/dependency limits and exact pending T-052/integration/release effects.
             - Report: `docs/dev/reports/phases/4/4.2.md`; include HANDOFF at this boundary.
     - [ ] Milestone 4.3 — Phase and final review
         - [ ] T-052 — Review test and report phase 4 and the complete implementation
