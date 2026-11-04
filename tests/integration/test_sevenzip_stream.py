@@ -102,3 +102,36 @@ def test_failed_7z_worker_start_releases_archive_and_source(tmp_path: Path) -> N
             open_content_stream(target)
     assert isinstance(error.value.__cause__, RuntimeError)
     assert source.closed
+
+
+@pytest.mark.parametrize("corrupt", [False, True])
+def test_7z_cleanup_failure_preserves_primary_and_remains_retryable(
+    tmp_path: Path, corrupt: bool
+) -> None:
+    target = make_7z(
+        tmp_path / "source.7z",
+        [("data", b"payload\n")],
+        filters=[{"id": py7zr.FILTER_COPY}],
+    )
+    if corrupt:
+        raw = bytearray(target.read_bytes())
+        raw[32] ^= 1
+        target.write_bytes(raw)
+    before = owned_threads()
+    with patch.object(
+        py7zr.SevenZipFile, "close", side_effect=OSError("archive cleanup")
+    ):
+        stream = open_content_stream(target)
+        backend = stream._reader
+        source = backend._owner.source
+        error_type = ExtractionError if corrupt else OSError
+        with pytest.raises(error_type) as error:
+            stream.read()
+        assert source.closed and not backend._reader._thread.is_alive()
+        assert not stream.closed
+        assert getattr(error.value, "__notes__", [])
+        with pytest.raises(OSError, match="archive cleanup"):
+            stream.close()
+    stream.close()
+    assert stream.closed and backend._owner.archive is None
+    assert owned_threads() == before

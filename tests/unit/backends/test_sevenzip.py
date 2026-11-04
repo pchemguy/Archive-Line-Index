@@ -205,3 +205,34 @@ def test_opening_allocation_failure_releases_owned_file(
         assert handle.closed
     finally:
         handle.close()
+
+
+@pytest.mark.parametrize("operation", ["read", "seek", "tell"])
+def test_real_dependency_source_io_failure_stays_ordinary(
+    tmp_path: Path, operation: str
+) -> None:
+    from archive_line_index.backends.sevenzip import open_7z_backend
+
+    p = make_7z(tmp_path / "source.7z", [("data", b"payload\n")])
+    source = p.open("rb")
+    failure = PermissionError("source " + operation)
+    original = py7zr.SevenZipFile.extract
+
+    def extract(
+        archive: py7zr.SevenZipFile, *, targets: object = None, factory: object = None
+    ) -> None:
+        with patch.object(source, operation, side_effect=failure):
+            original(archive, targets=targets, factory=factory)
+
+    with (
+        patch.object(Path, "open", return_value=source),
+        patch.object(py7zr.SevenZipFile, "extract", extract),
+    ):
+        reader = open_7z_backend(p)
+        try:
+            with pytest.raises(PermissionError) as error:
+                reader.read(1)
+            assert error.value is failure
+        finally:
+            reader.close()
+    assert source.closed

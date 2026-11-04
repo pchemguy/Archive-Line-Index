@@ -288,7 +288,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 ## Phase 4 — 7z and complete-system delivery
 
 - [ ] Phase 4 — 7z and complete-system delivery
-    - [ ] Milestone 4.1 — Bounded 7z streaming
+    - [x] Milestone 4.1 — Bounded 7z streaming
         - [x] T-041 — Implement bounded producer messages and cancellation endpoint
             - Scope: backends/producer.py message/endpoint operations and controlled-producer unit checks.
             - Depends on: T-040.
@@ -319,11 +319,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Demonstrate progressive bounded delivery with a slow consumer, callback subdivisions, full-queue cancellation, empty content and CRC/truncation failure, with no surviving owned thread after successful close.
             - Contracts: ARC-06; STR-02–06; SYS-05–06.
             - Verified result: Actual py7zr 1.1.4 multi-block extraction demonstrates progressive delivery before producer completion, one queued block and bounded current-block storage with a slow consumer. Full-queue early close before/after first data joins the non-daemon worker and closes archive/source. Real late COPY CRC and truncated-header failures retain causes without false EOF or surviving threads. All 51 7z/transport checks, strict src/scripts mypy and full Ruff pass; these are integration characterization checks, not a fabricated new runtime RED cycle.
-        - [ ] T-046 — Review test and report milestone 4.1
+        - [x] T-046 — Review test and report milestone 4.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-041, T-042, T-043, T-044, T-045.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Separate whole-milestone code/lifecycle review finds no blocking issue. Full source regression passes 630 tests at 94% coverage; all 56 focused real-7z/bridge checks pass after adding cleanup-retry and source read/seek/tell identity cases. Actual py7zr 1.1.4 metadata/codecs, bounded progressive delivery, startup/early-close/full-queue/CRC/truncation and primary-error ownership are evidenced. Ruff and strict mypy pass. Report/HANDOFF retain complete remaining-task/release authority, dependency/host limits and pending hosted closure.
             - Report: `docs/dev/reports/phases/4/4.1.md`; include HANDOFF at this boundary.
     - [ ] Milestone 4.2 — 7z indexing and complete distribution
         - [ ] T-047 — Integrate 7z indexing and paired CLI failure ownership
