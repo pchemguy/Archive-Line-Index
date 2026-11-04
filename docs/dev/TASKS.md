@@ -257,11 +257,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Support required filters/suffix forms, reject compressed non-TAR payloads, preserve unavailable-codec errors and verify available header/trailer/truncation checks and cleanup.
             - Contracts: ARC-01–05; STR-01–05.
             - Verified result: Required gzip/bzip2/xz TAR decoding uses owned standard-library readers and drains through compression trailers before successful EOF. Real compressed TAR fixtures first failed as invalid plain TAR; 104 TAR/ZIP/common-stream checks now pass, including compressed non-TAR, corruption/truncation, missing selected codec with cause, filesystem errors and a gzip CRC failure after payload delivery. Interrupted owned edits were preserved and reconciled; strict mypy and full Ruff pass.
-        - [ ] T-037 — Integrate TAR selection with source and CLI workflows
+        - [x] T-037 — Integrate TAR selection with source and CLI workflows
             - Scope: backends/registry.py and TAR public/paired-CLI integration checks.
             - Depends on: T-036.
             - Acceptance/evidence: Compare exact arrays and both persisted outputs across plain/ZIP/TAR filters; ensure arbitrary chunk boundaries and late validation propagate through the generic facade.
             - Contracts: SYS-01, SYS-03–10, SYS-13; CLI-01–06; IDX-01–06.
+            - Verified result: TAR selection now lazily enables plain/gzip/bzip2/xz adapters through public streams, indexing and paired CLI output. New public TAR checks failed as unsupported before integration; required suffixes, unconventional and misleading names, one-byte buffers, payload coordinates, size limits and SQLite/raw equivalence pass. Late extra members and gzip trailer errors return no completed index or outputs. All 474 selected unit/public/CLI/persistence/ZIP/TAR checks, strict mypy and full Ruff pass.
         - [ ] T-038 — Complete installed standard-archive artifacts and examples
             - Scope: Version 0.3.0 metadata, installed cross-format checks and user documentation.
             - Depends on: T-037.

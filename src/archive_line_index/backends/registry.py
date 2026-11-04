@@ -16,6 +16,10 @@ def open_backend(path: Path, candidate: FormatCandidate) -> BackendReader:
         from .zip import open_zip_backend
 
         return open_zip_backend(path)
+    if candidate.kind == FormatKind.TAR:
+        from .tar import open_tar_backend
+
+        return open_tar_backend(path)
     raise UnsupportedFormatError(
         f"{candidate.kind.value} delivery is not implemented yet"
     )
