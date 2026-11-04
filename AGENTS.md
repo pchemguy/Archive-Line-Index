@@ -61,6 +61,4 @@ Use Python 3.11 or later. Run checks from the repository root with the selected 
 
 Use Ruff to format Python, mypy for type checking, pytest for tests and Flowmark for Markdown formatting. Write Google-style Python docstrings. Do not hard-wrap any Markdown file unless the human explicitly requests it. Keep prose paragraphs and list items on single source lines.
 
-Temporary reference: [legacy project](https://github.com/pchemguy/Archive-Line-Index-Legacy). Remove this reference when reimplementation is complete.
-
 Release preparation uses `python -m scripts.prepare_release --native-dist dist --output release --tag vVERSION`, followed by the same command with `--check` and no native input. Use clean directories; the complete hosted inventory is the stable wheel/source ZIP bundles and SHA256SUMS defined in PLAN. Native package filenames inside the bundles retain valid Python packaging metadata.

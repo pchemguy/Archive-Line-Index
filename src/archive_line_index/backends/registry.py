@@ -1,4 +1,4 @@
-"""Explicit adapter selection without premature archive support claims."""
+"""Lazy adapter selection that preserves archive claims and dependency errors."""
 
 from pathlib import Path
 

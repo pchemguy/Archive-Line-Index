@@ -26,7 +26,7 @@ def open_content_stream(
     Raises:
         TypeError: If a source or option has the wrong kind.
         ValueError: If the limit is negative.
-        UnsupportedFormatError: If an archive adapter is not yet delivered.
+        UnsupportedFormatError: If encryption or a required archive dependency/codec is unsupported.
         SizeLimitExceededError: If trustworthy size metadata exceeds the limit.
         OSError: If filesystem acquisition fails.
     """

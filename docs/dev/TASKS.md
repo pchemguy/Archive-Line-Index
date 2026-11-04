@@ -339,11 +339,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Compare all supported source families, independent concurrent instances, inclusive limits, terminal integrity and actual exceptional cleanup; retain measured dependency/host capability limits rather than claiming unavailable-native verification.
             - Contracts: SYS-01–10, SYS-12–13; ARC-01–06; STR-01–06; PER-01–07.
             - Verified result: All seven source families pass simultaneous independent-instance fidelity, exact/zero/below-size limits, zero-operation no-backend-progress, nonbyte readinto capacity and consumer-exception ownership. A real SIGINT during an actual 7z callback/consumer wait cancels extraction, closes resources and joins the worker without a surviving owned thread. All 57 selected full-format/7z lifecycle/index checks, strict src/scripts mypy and Ruff pass; native host/dependency limits remain explicitly recorded.
-        - [ ] T-049 — Finalize complete public guidance and agent orientation
+        - [x] T-049 — Finalize complete public guidance and agent orientation
             - Scope: README, public module/API examples and root AGENTS temporary reference.
             - Depends on: T-047, T-048.
             - Acceptance/evidence: Run complete supported-format/CLI examples, verify delivered export/ownership documentation and remove the temporary legacy reference at reimplementation closure. Product documents contain no migration narrative.
             - Contracts: API-01–05; CLI-01–06; PLAN final closure and layout documentation owners.
+            - Verified result: README now documents every delivered format, lazy constrained 7z dependency, bounded callback transport and cancellation/ownership limits, preserving the source-linked bytes.find excerpt. All eight complete README Python examples and installed public exports/ZIP/TAR/7z CLI checks pass for native and independently source-rebuilt wheels. Maintained local links, strict mypy and full Ruff pass. Removed the root AGENTS temporary legacy reference without adding migration history; public API/module docstrings now describe delivered behavior.
         - [ ] T-050 — Verify complete source and wheel release candidates
             - Scope: Version 0.4.0 build metadata, native inventory and installed distribution checks.
             - Depends on: T-048, T-049.
