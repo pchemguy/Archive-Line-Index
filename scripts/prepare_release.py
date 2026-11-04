@@ -87,6 +87,8 @@ def prepare_bundles(
     native: Path, directory: Path, project: Path, tag: str
 ) -> dict[str, str]:
     """Validate native inputs and create a new complete stable asset set."""
+    if directory.is_symlink():
+        raise ValueError("Release staging requires an ordinary directory")
     version = _version(project, tag)
     check_names(ASSET_NAMES, ASSET_NAMES, version)
     check_release_artifacts(native, project, tag, write_checksums=True)

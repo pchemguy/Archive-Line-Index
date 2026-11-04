@@ -75,3 +75,31 @@ def test_release_inventory_faults_are_rejected(
             archive.writestr("unexpected", b"extra")
     with pytest.raises((ValueError, zipfile.BadZipFile)):
         check_bundles(output, repo / "pyproject.toml", "v" + project_version)
+
+
+@pytest.mark.parametrize("target_exists", [True, False], ids=["existing", "dangling"])
+def test_symlink_output_is_rejected_before_any_write(
+    built_distributions: Path,
+    tmp_path: Path,
+    project_version: str,
+    target_exists: bool,
+) -> None:
+    repo = Path(__file__).resolve().parents[2]
+    target = tmp_path / "external"
+    if target_exists:
+        target.mkdir()
+    output = tmp_path / "release-link"
+    try:
+        output.symlink_to(target, target_is_directory=True)
+    except (OSError, NotImplementedError):
+        pytest.skip("symlink creation unavailable")
+    before = {p.name: p.read_bytes() for p in built_distributions.iterdir()}
+    with pytest.raises(ValueError, match="ordinary"):
+        prepare_bundles(
+            built_distributions, output, repo / "pyproject.toml", "v" + project_version
+        )
+    assert output.is_symlink()
+    assert target.exists() == target_exists
+    if target_exists:
+        assert list(target.iterdir()) == []
+    assert {p.name: p.read_bytes() for p in built_distributions.iterdir()} == before
