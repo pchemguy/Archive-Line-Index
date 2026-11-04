@@ -289,11 +289,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 - [ ] Phase 4 — 7z and complete-system delivery
     - [ ] Milestone 4.1 — Bounded 7z streaming
-        - [ ] T-041 — Implement bounded producer messages and cancellation endpoint
+        - [x] T-041 — Implement bounded producer messages and cancellation endpoint
             - Scope: backends/producer.py message/endpoint operations and controlled-producer unit checks.
             - Depends on: T-040.
             - Acceptance/evidence: Validate positive finite settings, subdivide callback buffers, enforce queue capacity and cancellation checks, and keep success/failure/data outcomes distinct without a full-queue close sentinel.
             - Contracts: STR-05–06; internal QueueProducer/message model.
+            - Verified result: Bounded producer endpoint validates finite positive integer settings, snapshots/subdivides callback buffers, enforces finite capacity and preserves FIFO data before distinct success/failure outcomes. Cancellation independently wakes full-queue waits without a sentinel. New-module tests initially failed because the bridge was absent; 11 controlled endpoint checks, strict src/scripts mypy and full Ruff pass. Remaining Phase 4 (T-041–T-052), full integration and 0.4.0 release are authorized; parent d1d233a179cb249ddff3cc510ad89974d0ca53c2 and issue/milestone associations #50–61/#13–15 are verified.
         - [ ] T-042 — Implement the worker-backed reader lifecycle
             - Scope: backends/producer.py reader/startup/join operations and lifecycle checks.
             - Depends on: T-041.
