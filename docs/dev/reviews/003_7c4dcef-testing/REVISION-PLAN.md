@@ -1,12 +1,14 @@
 # Testing revision campaign
 
+Status: Cancelled at the human’s request before assessment, test execution or implementation. The scope below is retained as historical preparation, not an active work queue.
+
 ## Identity and opening scope
 
 - Campaign: `003_7c4dcef`; branch: `revision/003_7c4dcef-testing`; package: `docs/dev/reviews/003_7c4dcef-testing/`.
 - Starting code and full branch-off baseline: `7c4dcef1c171572e7868d3a03c959ea1c2f87b32`, matching fetched origin/main.
 - Creation parent, eventual integration and return target: current published `main`.
 - Request: “open testing revision campaign.” This checkpoint reserves the campaign, records its testing scope and HANDOFF, commits/publishes/read backs, then stops. No testing assessment, repair, environment provisioning, merge or release is selected by opening alone.
-- [Revision report](REVISION-REPORT.md) records actual progress. State: Open; preparation only, no implementation action accepted or executed.
+- [Revision report](REVISION-REPORT.md) records actual progress. Opening state: preparation only, no implementation action accepted or executed; subsequently cancelled.
 
 ## Testing focus
 
@@ -33,3 +35,7 @@ After separately authorized execution and feasible verification, complete campai
 Campaign sequence 002 is already reserved by the separate remote code-review branch `revision/002_7c4dcef-code-review-5856224455108738895`, opening commit `49c033a8ec123cf899c18dae9188d019109f227c`. This testing campaign is separately rooted at the current main context; no parent campaign was selected in the request. Preserve 002 unchanged; its existence does not authorize resuming, nesting into, suspending or merging it. Do not consume its later conclusions without pinning their source and assessing relevance.
 
 Campaign 001 is closed and its records remain frozen. Prior implementation evidence reports 705 passing tests and 95% coverage at this baseline; no test has been rerun here. Actual available host is Linux/bash with the existing CPython 3.12/py7zr tooling. Unavailable Windows/macOS/Python 3.11/Python 3.14/big-endian execution remains unverified; simulations do not certify those targets. Preserve original task/tracking closures and the v0.4.0 tag/release. No version bump or release is selected.
+
+## Cancellation
+
+On 2026-11-04 the human said “stop”, then “Cancel/close opened review campaign”. This cancels campaign 003 at its opening checkpoint. No assessment, test run, finding or repair occurred; no preparation unit or future implementation action remains selected. Preserve this record and the original opening commit `fa0ce76ef3094796fc122c17be7b3943818e320f`. Final closure requires publication of the cancellation checkpoint and its documentation-only explicit merge into the recorded main parent; do not resume testing.
