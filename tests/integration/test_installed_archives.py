@@ -106,3 +106,40 @@ assert read_sqlite_index({str(empty.with_suffix(".sqlite3"))!r}).tolist() == [0]
     assert result.returncode == 1 and not result.stdout and result.stderr
     assert not bad.with_suffix(".sqlite3").exists()
     assert not bad.with_suffix(".u64").exists()
+
+
+@pytest.mark.parametrize("route", ["console", "module", "imported"])
+@pytest.mark.parametrize(
+    "payload,expected", [(b"", [0]), (b"\xef\xbb\xbfalpha\r\n\nomega", [3, 10, 11, 16])]
+)
+def test_installed_7z_pairs_and_corruption(
+    installed_package: InstalledPackage, route: str, payload: bytes, expected: list[int]
+) -> None:
+    import py7zr
+    from tests.helpers.sevenzip import make_7z
+
+    key = route + ("-empty" if not payload else "-data")
+    target = make_7z(
+        installed_package.workdir / ("seven-" + key + ".7z"), [("nested/data", payload)]
+    )
+    result = _invoke(installed_package, route, [target.name])
+    assert result.returncode == 0 and not result.stderr, result.stderr
+    stem = target.with_suffix("")
+    installed_package.run(f"""
+from archive_line_index import build_line_index, read_raw_index, read_sqlite_index
+assert build_line_index({target.name!r}, buffer_size=1).tolist() == {expected!r}
+assert read_raw_index({str(stem) + ".u64"!r}).tolist() == {expected!r}
+assert read_sqlite_index({str(stem) + ".sqlite3"!r}).tolist() == {expected!r}
+""")
+    bad = make_7z(
+        installed_package.workdir / ("corrupt-seven-" + key + ".7z"),
+        [("data", b"a\nb\n")],
+        filters=[{"id": py7zr.FILTER_COPY}],
+    )
+    raw = bytearray(bad.read_bytes())
+    raw[32] ^= 1
+    bad.write_bytes(raw)
+    failed = _invoke(installed_package, route, [bad.name])
+    assert failed.returncode == 1 and not failed.stdout and failed.stderr
+    assert not bad.with_suffix(".sqlite3").exists()
+    assert not bad.with_suffix(".u64").exists()

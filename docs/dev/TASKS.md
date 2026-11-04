@@ -327,11 +327,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Verified result: Separate whole-milestone code/lifecycle review finds no blocking issue. Full source regression passes 630 tests at 94% coverage; all 56 focused real-7z/bridge checks pass after adding cleanup-retry and source read/seek/tell identity cases. Actual py7zr 1.1.4 metadata/codecs, bounded progressive delivery, startup/early-close/full-queue/CRC/truncation and primary-error ownership are evidenced. Ruff and strict mypy pass. Report/HANDOFF retain complete remaining-task/release authority, dependency/host limits and pending hosted closure.
             - Report: `docs/dev/reports/phases/4/4.1.md`; include HANDOFF at this boundary.
     - [ ] Milestone 4.2 — 7z indexing and complete distribution
-        - [ ] T-047 — Integrate 7z indexing and paired CLI failure ownership
+        - [x] T-047 — Integrate 7z indexing and paired CLI failure ownership
             - Scope: 7z public indexing/CLI integration checks with localized adapter/facade corrections.
             - Depends on: T-046.
             - Acceptance/evidence: Use existing builder/scanner/writers for actual 7z corpora, verify LF/BOM offsets and pair equivalence, and ensure late source/producer failure returns no completed index or CLI output publication.
             - Contracts: CLI-01–06 for 7z; SYS-01, SYS-03–10, SYS-13; IDX-01–06.
+            - Verified result: Existing scanner/builder/writers compose actual 7z payloads into canonical BOM/LF/EOF arrays and matching SQLite/raw pairs, including empty and one-byte-buffer cases. Late CRC failure invokes neither writer; raw failure retains readable SQLite only after the worker has joined. Native and source-rebuilt installed console/module/imported 7z paths pass empty/normal/corrupt cases. All 106 selected indexing/installed/archive/plain-CLI checks, strict src/scripts mypy and Ruff pass; no unnecessary facade rewrite was introduced.
         - [ ] T-048 — Verify full-format lifecycle and independent instance behavior
             - Scope: Cross-format/resource integration checks and localized contract-completion fixes.
             - Depends on: T-047.
