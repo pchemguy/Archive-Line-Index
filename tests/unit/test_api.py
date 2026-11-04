@@ -96,7 +96,7 @@ def test_filesystem_and_undelivered_archive_failures(tmp_path: Path) -> None:
         build_line_index(tmp_path / "missing")
     path = tmp_path / "claimed.zip"
     path.write_bytes(b"invalid claimed archive")
-    with pytest.raises(ali.UnsupportedFormatError):
+    with pytest.raises(ali.InvalidArchiveError):
         build_line_index(path)
 
 

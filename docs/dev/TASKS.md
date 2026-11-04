@@ -205,72 +205,84 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 ## Phase 3 — ZIP and TAR workflows
 
-- [ ] Phase 3 — ZIP and TAR workflows
-    - [ ] Milestone 3.1 — ZIP source integration
-        - [ ] T-029 — Implement ZIP metadata and member validation
+- [x] Phase 3 — ZIP and TAR workflows
+    - [x] Milestone 3.1 — ZIP source integration
+        - [x] T-029 — Implement ZIP metadata and member validation
             - Scope: backends/zip.py opening/selection and archive-factory/unit checks.
             - Depends on: T-028.
             - Acceptance/evidence: Accept sole empty/nested regular members, account for directories/metadata files and reject count/special/encrypted cases through the required public categories with cleanup on opening failure.
             - Contracts: ARC-01, ARC-03–04; API-04.
-        - [ ] T-030 — Implement ZIP reader completion and resource cleanup
+            - Verified result: ZIP opening validates sole empty/nested regular payloads, directory metadata, extra metadata files, special Unix types and encryption without extraction. Opening failures release the owned source and preserve parsing causes. New-adapter test initially failed because the module was absent; 13 real-fixture tests and Ruff passed before the initial commit; the final mypy result exposed an IO[bytes] annotation mismatch. The follow-up corrects that annotation: strict mypy, all 13 ZIP tests, full Ruff lint and format checks pass. The original verification claim was premature and is superseded by this observed recheck. Phase 3 source parent is e19750c6e79b3c0eb0b135bb9db042a51b6fed70; issues #38–49 and milestones #10–12 are activated and read back.
+        - [x] T-030 — Implement ZIP reader completion and resource cleanup
             - Scope: backends/zip.py bounded delivery/finalization and corruption/limit checks.
             - Depends on: T-029.
             - Acceptance/evidence: Return exact bytes through BackendReader, surface CRC/truncation errors instead of EOF, preserve declared/actual size handling and release member/archive resources on every exit.
             - Contracts: ARC-04–05; STR-01–05.
-        - [ ] T-031 — Integrate ZIP selection with public stream and indexing
+            - Verified result: ZIP delivery now bounds requested reads, translates CRC/decompression/truncation failures to ExtractionError with causes, distinguishes source I/O failures, and completes only after validated exhaustion. Resources are all attempted on close and failed closes remain retryable. CRC regression failed with raw BadZipFile before correction; 66 ZIP/common-stream integration and unit checks, strict mypy and full Ruff checks pass.
+        - [x] T-031 — Integrate ZIP selection with public stream and indexing
             - Scope: backends/registry.py and ZIP public workflow integration checks.
             - Depends on: T-030.
             - Acceptance/evidence: Enable signature/suffix-selected ZIP without changing scanner/persistence; verify plain/ZIP equivalence, misleading names, late errors and no completed index on failure.
             - Contracts: SYS-01, SYS-04–06; ARC-01–05; IDX-01–06.
-        - [ ] T-032 — Verify installed ZIP paired indexing and usage
+            - Verified result: Public ZIP selection now lazily opens the delivered adapter, preserving signature precedence and malformed-claim rejection without changing scanning or persistence. Real ZIP/plain equivalence covers original BOM/LF coordinates, buffers from one byte to 1 MiB, readinto, exact/declared limits and corrupted input returning no completed index. The public ZIP workflow failed as unsupported before integration; 402 unit/public-stream/persistence/ZIP checks, strict mypy and full Ruff pass.
+        - [x] T-032 — Verify installed ZIP paired indexing and usage
             - Scope: Installed CLI/content integration and ZIP examples/documentation.
             - Depends on: T-031.
             - Acceptance/evidence: Exercise actual ZIP through console/module/imported workflows, load identical SQLite/raw results and retain the previously working plain/persistence surface under installed artifacts.
             - Contracts: CLI-01–06 for ZIP; SYS-01, SYS-07–13.
-        - [ ] T-033 — Review test and report milestone 3.1
+            - Verified result: ZIP console/module/imported paired indexing and corruption rejection pass on both native and independently source-rebuilt installed wheels outside the checkout. Six complete README examples execute, including nested compressed ZIP indexing; the exact scanner excerpt remains unchanged. README now distinguishes delivered ZIP from planned TAR/7z. All 22 selected installed/documentation/plain CLI checks, strict mypy and Ruff pass; no new runtime behavior or test-first claim is introduced by this documentation/integration task.
+        - [x] T-033 — Review test and report milestone 3.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-029, T-030, T-031, T-032.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Whole ZIP milestone code review found and repaired source tell() misclassification with an observed failing regression. Full verification passes 444 tests, 96% production coverage, Ruff lint/format and strict mypy; actual native/source-rebuilt installs run all commands and six README examples. Report records acceptance, T-029 forward recovery and T-031 readback reconciliation; HANDOFF preserves complete Phase 3 authority and the stop before Phase 4.
             - Report: `docs/dev/reports/phases/3/3.1.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 3.2 — Sequential TAR integration
-        - [ ] T-034 — Implement sequential plain-TAR payload delivery
+    - [x] Milestone 3.2 — Sequential TAR integration
+        - [x] T-034 — Implement sequential plain-TAR payload delivery
             - Scope: backends/tar.py and TAR reader/fixture checks.
             - Depends on: T-033.
             - Acceptance/evidence: Expose a sole regular payload through sequential iteration with exact bytes, empty/nested-member support, correct handle ownership and early close.
             - Contracts: ARC-01, ARC-03; STR-01, STR-05.
-        - [ ] T-035 — Implement TAR trailing-entry and structure validation
+            - Verified result: Sequential plain-TAR payload access uses stream mode and owns source/archive/member handles without filesystem extraction. Real USTAR/PAX/GNU fixtures cover empty/nested payloads, consumed extension headers, special entries before payload, bounded reads, early close and failed-opening cleanup. New-module checks first failed because the adapter was absent; 40 TAR/ZIP tests, strict mypy and full Ruff pass. Trailing validation remains explicitly assigned to T-035 before public TAR selection.
+        - [x] T-035 — Implement TAR trailing-entry and structure validation
             - Scope: backends/tar.py finalization and late-invalid-member tests.
             - Depends on: T-034.
             - Acceptance/evidence: Keep validation after payload delivery, reject additional files/special entries and malformed trailing structure before validated EOF, and return no completed index after late failure.
             - Contracts: ARC-03–05; STR-02, STR-04–05; SYS-04.
-        - [ ] T-036 — Complete required compressed-TAR filters and integrity
+            - Verified result: TAR terminal completion now validates every trailing exposed entry, requires a complete end marker, rejects malformed/truncated later headers and drains only zero padding before EOF. A real late-member regression failed with false success before correction; additional files/special entries, incomplete payload/end markers and nonzero tails cannot return a completed index. Trailing directories and repeated EOF are valid. All 92 TAR/ZIP/common-stream checks, strict mypy and full Ruff pass.
+        - [x] T-036 — Complete required compressed-TAR filters and integrity
             - Scope: backends/tar.py gzip/bzip2/xz paths and compressed failure checks.
             - Depends on: T-035.
             - Acceptance/evidence: Support required filters/suffix forms, reject compressed non-TAR payloads, preserve unavailable-codec errors and verify available header/trailer/truncation checks and cleanup.
             - Contracts: ARC-01–05; STR-01–05.
-        - [ ] T-037 — Integrate TAR selection with source and CLI workflows
+            - Verified result: Required gzip/bzip2/xz TAR decoding uses owned standard-library readers and drains through compression trailers before successful EOF. Real compressed TAR fixtures first failed as invalid plain TAR; 104 TAR/ZIP/common-stream checks now pass, including compressed non-TAR, corruption/truncation, missing selected codec with cause, filesystem errors and a gzip CRC failure after payload delivery. Interrupted owned edits were preserved and reconciled; strict mypy and full Ruff pass.
+        - [x] T-037 — Integrate TAR selection with source and CLI workflows
             - Scope: backends/registry.py and TAR public/paired-CLI integration checks.
             - Depends on: T-036.
             - Acceptance/evidence: Compare exact arrays and both persisted outputs across plain/ZIP/TAR filters; ensure arbitrary chunk boundaries and late validation propagate through the generic facade.
             - Contracts: SYS-01, SYS-03–10, SYS-13; CLI-01–06; IDX-01–06.
-        - [ ] T-038 — Complete installed standard-archive artifacts and examples
+            - Verified result: TAR selection now lazily enables plain/gzip/bzip2/xz adapters through public streams, indexing and paired CLI output. New public TAR checks failed as unsupported before integration; required suffixes, unconventional and misleading names, one-byte buffers, payload coordinates, size limits and SQLite/raw equivalence pass. Late extra members and gzip trailer errors return no completed index or outputs. All 474 selected unit/public/CLI/persistence/ZIP/TAR checks, strict mypy and full Ruff pass.
+        - [x] T-038 — Complete installed standard-archive artifacts and examples
             - Scope: Version 0.3.0 metadata, installed cross-format checks and user documentation.
             - Depends on: T-037.
             - Acceptance/evidence: Build/install/rebuild native candidates, verify inventory/checksums and demonstrate supported ZIP/TAR variants plus corruption/ownership regressions without exposing 7z as delivered.
             - Contracts: API-05; SYS-11–12; ARC-01–05; phase release gate.
-        - [ ] T-039 — Review test and report milestone 3.2
+            - Verified result: Version 0.3.0 supports installed ZIP/plain-gzip-bzip2-xz TAR through all three CLI forms and seven executable README examples. Stable wheel/source ZIP bundles preserve valid native package filenames internally; PLAN/layout/guidance/checks now match the reloaded naming rule. The actual gate rejects old versioned assets with matching faulty expectations and passes shared notation vectors. All 77 selected installed/metadata/bundle/example checks, isolated native source-wheel builds, independent bundle/checksum verification, strict mypy for src/scripts, Ruff and local-link checks pass. 7z remains undelivered.
+        - [x] T-039 — Review test and report milestone 3.2
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-034, T-035, T-036, T-037, T-038.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Separate TAR milestone code review and focused invalid-size/cleanup-retry checks found no unresolved runtime blocker. Corrected a stale unit version assertion; full regression passes 574 tests at 96% production coverage, strict src/scripts mypy and Ruff. Native/source-rebuilt installed ZIP/TAR commands, seven README examples, isolated builds and stable bundle/name/content/checksum checks pass. Report/HANDOFF retain acceptance, recovery, platform limits and exact release/Phase 4 boundaries.
             - Report: `docs/dev/reports/phases/3/3.2.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 3.3 — Phase review
-        - [ ] T-040 — Review test and report phase 3
+    - [x] Milestone 3.3 — Phase review
+        - [x] T-040 — Review test and report phase 3
             - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence.
             - Depends on: T-033, T-039. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
             - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.3.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
             - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Verified result: Cross-milestone review establishes ZIP/sequential plain-gzip-bzip2-xz TAR phase exits without changing scanner/persistence contracts. Delivery milestones #10/#11 are verified closed. Full boundary evidence is 574 tests at 96% coverage; fresh exact-scope candidates pass 159 installed/integration/example/naming checks, isolated source-wheel builds and independent complete bundle/checksum validation. Release notes, phase report and HANDOFF retain recovery, source/platform limits and pending integration/tag/hosted effects. Stop before Phase 4 after authorized 0.3.0 publication.
             - Report: `docs/dev/reports/phases/3/PHASE-REPORT.md`; include HANDOFF with this boundary.
 
 ## Phase 4 — 7z and complete-system delivery

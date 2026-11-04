@@ -13,3 +13,6 @@ dist/
 build/
 .venv/
 *.egg-info/
+
+# Complete version-free hosted release staging.
+/release/

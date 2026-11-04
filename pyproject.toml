@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "archive-line-index"
-version = "0.2.0"
+version = "0.3.0"
 description = "Sequential archive payload streaming and byte-line indexing."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -51,6 +51,7 @@ exclude = [
     "/.ruff_cache",
     "/.venv",
     "/dist",
+    "/release",
     "/**/__pycache__",
     "/**/*.tkn",
     "/**/.env",

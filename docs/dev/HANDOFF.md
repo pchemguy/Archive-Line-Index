@@ -1,23 +1,19 @@
 # Project handoff
 
-Checkpoint: Phase 2 is complete, integrated on main and published as [v0.2.0](https://github.com/pchemguy/Archive-Line-Index/releases/tag/v0.2.0). This containing commit records the final verified outcome; confirm its own publication separately from the already verified release. Stop before Phase 3/T-029.
+Checkpoint: Phase 3 review passes for ZIP and sequential plain/gzip/bzip2/xz TAR, including installed paired-output commands and stable release packaging. T-040 04b665b4121847e91b8911673cdd50e0768b043a is published and all Phase 3 issues/milestones are closed. This containing merge integrates it into receiving main e19750c6e79b3c0eb0b135bb9db042a51b6fed70 without conflicts; merged verification/publication and exact-source release effects require actual confirmation.
 
 ## Scope and authority
 
-The human selected complete Phase 2 (T-016–T-028), main integration and a stable 0.2.0 release with source, wheel, checksums and downloaded-byte verification. All selected work is complete; no new approval is pending within that range. Phase 3 is unselected. Preserve the accepted [TASKS](TASKS.md), design/contracts/PLAN/layout and GitHub tracking policy. Markdown prose and list items must remain unwrapped.
+The human selected and resumed complete Phase 3 (T-029–T-040), verification, main integration and the stable 0.3.0 GitHub release. Stop before Phase 4/T-041. Tracking remains enabled and Markdown prose/list items remain unwrapped. Accepted [TASKS](TASKS.md), design/contracts/PLAN/layout and [Phase 3 report](reports/phases/3/PHASE-REPORT.md) own scope, findings and evidence.
 
-## Delivered and verified
+## Branch and completed evidence
 
-Independent canonical SQLite/raw persistence and the single-target CLI are available through console, module and importable callable. Default/explicit stems, both-output protection, source aliases and partial-publication/interruption diagnostics are covered. [Phase 2 report](reports/phases/2/PHASE-REPORT.md) owns acceptance, review, recovery, integration and release evidence.
+Working branch: `phase/3-zip-tar`. Creation/integration parent: main `e19750c6e79b3c0eb0b135bb9db042a51b6fed70`. Issues #38–48 and delivery milestones #10/#11 are closed after verified source publication/readback. All initial associations were activated before task execution. The eleven earlier initial task closures pass the composition audit; the phase report retains T-029's published acceptance correction, T-031 readback recovery and interrupted T-036 preservation. No blocker remains.
 
-Verification passes 399 tests with 96% production coverage, Ruff lint/format, strict mypy and artifact checks. Exact release source and wheel, plus an independent wheel rebuilt from the source archive, pass clean installed library/CLI workflows and five README examples outside the checkout. Actual runtime: Linux/CPython 3.12.14; mypy uses --no-native-parser for the container discovery issue. Native Windows/macOS/Python 3.11/big-endian execution remains unverified. Archive adapters remain later scope.
+Full checks pass: 574 tests at 96% production coverage, Ruff lint/format and strict src/scripts mypy (--no-native-parser). Actual native/source-rebuilt clean installations run all command forms, required archive variants and seven README examples. Isolated builds and complete bundle/name/content/checksum checks pass; the actual naming gate executes all 38 shared cases. Runtime is Linux/CPython 3.12.14; other native platforms remain unverified. 7z is unimplemented.
 
-## Git and hosted state
+## Remaining authorized effects
 
-Phase branch `phase/2-persistence-cli` was created from main `eaa2dcfdfd756d367c15b9ec4eb763dda2e49c97`; its final tip is `15cf302066fa0932e072cb00cdfe406fbdd6a909`. Explicit two-parent merge `d4acf064974c7867c713dc01dba94c0180fb4a61` is verified and published on main. All 13 task closing commits pass the parent-diff composition audit. Issues #25–37 and native milestones #6–9 are closed; no hosted transitions remain pending.
+The full 12-task closing audit passes and issue #49/milestone #12 closure is verified. Verify/publish the explicit two-parent main merge, create the direct release commit using RELEASE-NOTES.md as its exact body, then rebuild and install its exact source/wheel payloads. The hosted inventory is exactly `archive-line-index-wheel.zip`, `archive-line-index-source.zip` and `SHA256SUMS`; native package version filenames remain inside. Execute the naming gate before the tag/publisher and against actual draft/hosted names. Verify v0.3.0 source/body/latest/downloaded bytes; preserve notes and consume only the owned ignored highlights checkpoint after body readback. Persist/publish actual final outcomes and stop before Phase 4.
 
-Release commit/tag v0.2.0 is `0227494d2e2874f8b09e71cfc49f2c42fc7a3ef8`, directly on main with the integration merge as its parent. Its body, root RELEASE-NOTES.md and actual published release body match exactly. Release ID 432949524 is stable/latest; source, wheel and SHA256SUMS uploads and downloads match the hashes in the phase report. The ignored highlights checkpoint was consumed after body readback. Preserve retained notes, prior branches/design/manual records and v0.1.0 at `2d0435cc731d608843ad71cfa9c7688d1d8b5d09`.
-
-## Stop and next decision
-
-Publish/read back this documentation outcome commit, then report Phase 2 complete and stop. There are no unfinished implementation or release effects. T-029/Phase 3 remains unchecked and requires a new human selection. The temporary legacy reference remains until full reimplementation closure under T-049.
+Preserve prior branches/manual records and v0.2.0 at `0227494d2e2874f8b09e71cfc49f2c42fc7a3ef8`. Previous published tags/assets remain intact. The temporary legacy reference stays until T-049/full reimplementation closure.
