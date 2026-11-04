@@ -8,7 +8,7 @@
 - Working branch: `revision/001_7c8c72b-code-review`; creation parent and integration/return target: actual default `main`.
 - Sources: [review plan](REVIEW-PLAN.md), [original review and assessment corrections](REVIEW-REPORT.md), [revision report](REVISION-REPORT.md), accepted SPEC and its children, and inspected source/tests/configuration.
 - Authority: the human requested “Prepare revision plan, then execute it” after the evidence-based assessment. Prepare/publish the plan, perform its focused repairs and verification, then finish the campaign through verified main integration/publication. No new product scope, version bump or GitHub release is selected; preserve v0.4.0.
-- Execution: existing Linux/bash, CPython 3.12.14 with py7zr 1.1.4, pytest 9.2.0 and configured tooling. Prior Windows reviewer execution is attributed evidence, not fresh execution here. Do not provision a new environment or claim native Windows/Python 3.14 verification.
+- Execution: existing Linux/bash, CPython 3.12.14 with py7zr 1.1.4, pytest 9.2.0 and configured tooling. Prior Windows reviewer execution is attributed evidence, not fresh execution here. Use the existing tool runtime; declared package tests may create their temporary installed-consumer environments. Do not reprovision the tool runtime or claim native Windows/Python 3.14 verification.
 
 | Finding | Selected decision and rationale |
 | --- | --- |

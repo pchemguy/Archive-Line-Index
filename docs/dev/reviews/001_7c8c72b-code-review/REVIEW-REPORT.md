@@ -40,11 +40,11 @@ Current selected scope is four defect findings (R-001/R-004/R-005/R-007, with na
 | Finding | Type | Priority | Status | Related findings |
 | --- | --- | --- | --- | --- |
 | R-001 | Defect | Medium | Verified | R-002 |
-| R-002 | Defect | Medium | Verified overhead/portability repair | R-001 |
+| R-002 | Recommendation | Low | Verified overhead/portability repair | R-001 |
 | R-003 | Recommendation | Low | Deferred | R-006 |
 | R-004 | Defect | Medium | Verified observable size checks | None |
 | R-005 | Defect | Medium | Verified portable IDs; native execution unverified | None |
-| R-006 | Evidence gap | Low | Environment evidence gap | R-003 |
+| R-006 | Evidence gap | Low | Linux verification complete; native gap retained | R-003 |
 | R-007 | Defect | High | Verified portable regression; native execution unverified | None |
 | R-008 | Recommendation | Low | Configuration rejected; UTF-8 reads verified | None |
 
@@ -203,3 +203,7 @@ Current selected scope is four defect findings (R-001/R-004/R-005/R-007, with na
     6. **`R-008` (Recommendation, Low — `pyproject.toml:L23-L30, L47-L53`, `scripts/prepare_release.py:L30`):** Reconcile `[tool.pytest.ini_options]` (`asyncio_*`, `timeout`, and `@pytest.mark.timeout`) with `[dependency-groups].dev` and pass explicit `encoding="utf-8"` to `Path.read_text()` calls in release scripts and tests.
     7. **`R-006` (Evidence gap, Low — `py7zr` / isolated-venv test suite):** After applying the above repairs, run `python -m mypy` and the full pytest suite (including `test_sevenzip.py`, `test_sevenzip_backpressure.py`, `test_sevenzip_stream.py`, `test_sevenzip_index_cli.py`, `test_full_format_lifecycle.py`, `test_installed_cli.py`, `test_installed_archives.py`, and `test_documentation_examples.py`) in an environment provisioned with `py7zr>=1.1.4,<1.2`.
 - **Stopping boundary:** All seven planned review units (`U-001` through `U-007`) are complete and recorded on `revision/001_7c8c72b-code-review`. Per the review-only campaign boundary, no production, test, packaging, or governing specification files have been modified; revision planning and source repair await explicit human authorization.
+
+## Revision recheck summary
+
+Selected repairs and current classifications are recorded in [REVISION-REPORT.md](REVISION-REPORT.md). Full source-boundary regression passes 705 tests at 95% production coverage on Linux/CPython 3.12.14 with py7zr 1.1.4, plus Ruff and strict src/scripts mypy. Native Windows/Python 3.14 execution is not claimed. All accepted repairs have observed regression/recheck evidence; R-003 remains deferred, R-006 retains native evidence limits and R-008 configuration allegations remain rejected. The four defect classifications, three recommendations (including reclassified R-002) and one environment evidence gap replace the original counts for current disposition. Integration/publication still require the campaign's explicit main merge.

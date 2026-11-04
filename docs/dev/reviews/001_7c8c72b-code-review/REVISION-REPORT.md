@@ -2,7 +2,7 @@
 
 ## Campaign and result
 
-Campaign: `001_7c8c72b`; [plan](REVISION-PLAN.md), [review and corrections](REVIEW-REPORT.md). Original baseline `7c8c72b0791be95f3b28bbf193bbc29f8432d0c2`; original opening `7eedb5efdb5e8ce1a6b8ef333a25c9f36c3fb70c`; revision entry `227774e18440c61041efcd91adb46be7fff95026`. Working branch `revision/001_7c8c72b-code-review`; creation parent/return target `main`. State: planned execution; no source repair yet.
+Campaign: `001_7c8c72b`; [plan](REVISION-PLAN.md), [review and corrections](REVIEW-REPORT.md). Original baseline `7c8c72b0791be95f3b28bbf193bbc29f8432d0c2`; original opening `7eedb5efdb5e8ce1a6b8ef333a25c9f36c3fb70c`; revision entry `227774e18440c61041efcd91adb46be7fff95026`. Working branch `revision/001_7c8c72b-code-review`; creation parent/return target `main`. State: V-001–V-006 complete and individually published/read back; V-007 source verification complete, main integration pending.
 
 The human authorized plan preparation and execution after the assessment. Existing Linux/CPython 3.12.14 with py7zr 1.1.4 is the actual execution runtime; previous Windows results remain attributed review evidence. No governing-document amendment or new TASKS is required. Preserve original observations and frozen prior phase/manual records.
 
@@ -16,7 +16,7 @@ The human authorized plan preparation and execution after the assessment. Existi
 | V-004 | Verified | R-004; see revision plan. |
 | V-005 | Verified | R-005; see revision plan. |
 | V-006 | Verified | R-008 encoding only; see revision plan. |
-| V-007 | Planned | All accepted actions; R-006 evidence; see revision plan. |
+| V-007 | Source verified; integration pending | All accepted actions; R-006 evidence; see revision plan. |
 
 ## Action evidence
 
@@ -26,7 +26,7 @@ Recorded selected corrections without rewriting original review observations, in
 
 ## Remaining work and limits
 
-V-002–V-007 remain. Actual target-native Windows and Python 3.14 execution are unavailable; simulations and existing Linux checks do not certify them. R-003 remains deferred by the selected scope. No version bump or release is selected. Final integration/closure waits for accepted repairs and feasible verification.
+All selected source/test/script repairs are verified. V-007 main integration/publication remains. Actual target-native Windows and Python 3.14 execution are unavailable; portable simulations and Linux checks do not certify them. R-003 remains deferred. No version bump or release is selected.
 
 ### V-002 — Fix Windows-compatible SQLite synchronization
 
@@ -57,3 +57,22 @@ The containing action commit records source/tests and this evidence together. Pu
 Revision source: `95fc30c35735a61b8b8e6cf69aaa55445de58125` plus this action’s owned diff. A new valid UTF-8 TOML case first failed with UnicodeDecodeError under a controlled cp1252-default boundary. Explicit UTF-8 now reads project metadata, shared JSON vectors and README examples independently of the host text locale. All 41 selected locale/release inventory/naming/bundle/installed-example checks pass, including actual native/source-rebuilt consumers; Ruff and strict src/scripts mypy pass. Existing pytest extras/configuration and py7zr>=1.1.4,<1.2 are unchanged. Temporary installed consumers are created only by the existing declared integration fixtures; the tool runtime is not reprovisioned.
 
 The containing action commit records source/tests and this evidence together. Publish/read back the checkpoint before the next action; the final action index retains observed commit identities.
+
+### V-007 — Whole-boundary review and verification
+
+Reviewed the complete diff separately from tests: writable non-truncating synchronization affects only the owned completed SQLite temporary file; explicit source buffering preserves acquisition/cleanup and legal short reads; ZIP size checks precede successful EOF/return without replacing dependency causes; parameter IDs preserve cases; UTF-8 reads preserve declared metadata and example text. No blocking composition finding remains. The public API, accepted contracts, runtime dependency, package version and task/tracking state are unchanged.
+
+Full pytest with strict configuration/markers and coverage passes 705 tests, 95% production statement/branch coverage (1291 statements, 352 branches). All 73 source/test/script files pass Ruff lint/format; strict src/scripts mypy passes all 26 files with --no-native-parser for the known container parser issue. The full suite builds actual wheel/sdist bytes, independently rebuilds the wheel from source, runs both installed variants outside the checkout, executes eight README examples and all supported archive/CLI workflows, and verifies complete native/stable bundle inventory, names, contents and checksums. These are revision validation candidates, not a new published release or artifacts rebuilt from the historical v0.4.0 tag.
+
+Real py7zr 1.1.4 codec/callback/lifecycle/full-format tests run in the provisioned Linux/CPython 3.12.14 environment. Portable Windows fsync-precondition, 128 KiB-default buffering and cp1252-locale regressions are explicitly simulations. Legacy pytest collection confirms short IDs below 108 characters; no native Windows setup/teardown or Python 3.14 execution is inferred. No tool runtime was reinstalled; existing package fixtures own temporary consumer environments.
+
+| Action | Published/read-back source checkpoint |
+| --- | --- |
+| V-001 | `58a05c80d0a08b190eeaf08df27f3a61326c3ede` |
+| V-002 | `e3110f88b6f411886279b4c3628ea17b7511b909` |
+| V-003 | `086fc84e8cf1d0b20bd763351d3c44bf7d69832a` |
+| V-004 | `0f21042ddca656194d2a43e4c9c6e0418d8e1d13` |
+| V-005 | `95fc30c35735a61b8b8e6cf69aaa55445de58125` |
+| V-006 | `797a6735da06783ac2a3624cebb9793e86b23f5c` |
+
+The complete diff is limited to accepted source/tests/scripts/README, this active campaign and HANDOFF. Frozen phase/manual reports, original TASKS/hosted closures, pyproject configuration/constraint and existing release/tag remain unchanged. Maintained links, Markdown structure, diff checks and action evidence composition pass. The containing V-007 verification checkpoint must be published/read back before the two-parent merge into refreshed main. Final merge/source publication facts are recorded in the integration boundary and Git; closure follows actual main publication, not this source-check result alone.
