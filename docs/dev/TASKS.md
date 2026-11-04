@@ -205,7 +205,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 ## Phase 3 — ZIP and TAR workflows
 
-- [ ] Phase 3 — ZIP and TAR workflows
+- [x] Phase 3 — ZIP and TAR workflows
     - [x] Milestone 3.1 — ZIP source integration
         - [x] T-029 — Implement ZIP metadata and member validation
             - Scope: backends/zip.py opening/selection and archive-factory/unit checks.
@@ -276,12 +276,13 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
             - Verified result: Separate TAR milestone code review and focused invalid-size/cleanup-retry checks found no unresolved runtime blocker. Corrected a stale unit version assertion; full regression passes 574 tests at 96% production coverage, strict src/scripts mypy and Ruff. Native/source-rebuilt installed ZIP/TAR commands, seven README examples, isolated builds and stable bundle/name/content/checksum checks pass. Report/HANDOFF retain acceptance, recovery, platform limits and exact release/Phase 4 boundaries.
             - Report: `docs/dev/reports/phases/3/3.2.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 3.3 — Phase review
-        - [ ] T-040 — Review test and report phase 3
+    - [x] Milestone 3.3 — Phase review
+        - [x] T-040 — Review test and report phase 3
             - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence.
             - Depends on: T-033, T-039. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
             - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.3.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
             - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Verified result: Cross-milestone review establishes ZIP/sequential plain-gzip-bzip2-xz TAR phase exits without changing scanner/persistence contracts. Delivery milestones #10/#11 are verified closed. Full boundary evidence is 574 tests at 96% coverage; fresh exact-scope candidates pass 159 installed/integration/example/naming checks, isolated source-wheel builds and independent complete bundle/checksum validation. Release notes, phase report and HANDOFF retain recovery, source/platform limits and pending integration/tag/hosted effects. Stop before Phase 4 after authorized 0.3.0 publication.
             - Report: `docs/dev/reports/phases/3/PHASE-REPORT.md`; include HANDOFF with this boundary.
 
 ## Phase 4 — 7z and complete-system delivery
