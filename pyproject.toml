@@ -9,7 +9,7 @@ description = "Sequential archive payload streaming and byte-line indexing."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "py7zr",
+    "py7zr>=1.1.4,<1.2",
 ]
 
 [project.optional-dependencies]

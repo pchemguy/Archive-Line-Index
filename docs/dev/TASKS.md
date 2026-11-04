@@ -301,11 +301,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Start one outer non-daemon worker, preserve FIFO data and terminal outcome, bound positive reads, retain failures, unblock package waits and join on successful close including startup failure ownership.
             - Contracts: STR-01–06; BackendReader/start_queue_reader contract.
             - Verified result: Worker-backed reader starts one non-daemon thread, returns bounded FIFO blocks before terminal failure, retains failed outcomes, validates settings before startup and joins on successful close. Full-queue and explicitly waiting-reader cancellation, startup failure after actual launch and failed-join retry are exercised. The lifecycle entry point was absent before implementation; all 56 producer/common-stream checks, strict src/scripts mypy and full Ruff pass.
-        - [ ] T-043 — Implement 7z member selection and callback extraction
+        - [x] T-043 — Implement 7z member selection and callback extraction
             - Scope: backends/sevenzip.py, actual dependency suitability checks and supported dependency constraint.
             - Depends on: T-042.
             - Acceptance/evidence: Inspect sole-member metadata, adapt the library writer callback without disk extraction, transfer archive ownership once and exercise real empty/normal payload plus codec/callback behavior on a recorded dependency version.
             - Contracts: ARC-01, ARC-03–04, ARC-06; public error boundary.
+            - Verified result: Actual py7zr 1.1.4 metadata/callback integration accepts empty/nested sole regular members, directories and LZMA2/COPY/deflate/bzip2 payloads without extraction paths; rejects extra/metadata/special/encrypted members with causes and full cleanup. A thread-safe nonseekable callback forwards to the bounded bridge; owned IOBase source disables dependency parallel extraction and max_extract_size=None avoids an unrelated cap. Allocation cleanup regression failed before repair. All 39 real-adapter/producer/native-metadata checks, strict mypy and Ruff pass; supported dependency is py7zr>=1.1.4,<1.2.
         - [ ] T-044 — Integrate 7z with selection and common stream limits
             - Scope: backends/sevenzip.py/registry.py and common-stream dependency integration checks.
             - Depends on: T-043.

@@ -26,7 +26,7 @@ def test_native_distribution_metadata_and_inventory(built_distributions: Path) -
     assert metadata["Name"] == "archive-line-index"
     assert metadata["Version"] == "0.3.0"
     assert metadata["Requires-Python"] == ">=3.11"
-    assert "py7zr" in metadata.get_all("Requires-Dist")
+    assert "py7zr<1.2,>=1.1.4" in metadata.get_all("Requires-Dist")
     with tarfile.open(source) as archive:
         names = archive.getnames()
     assert not any(
