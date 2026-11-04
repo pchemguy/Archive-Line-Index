@@ -1,19 +1,17 @@
 # Project handoff
 
-Checkpoint: Campaign `001_7c8c72b` is completing on receiving actual default `main`. Published incoming verification tip `ac4bdb13c972ab52a140669bce2d02d784d29d4d` is explicitly merging into original creation parent `7c8c72b0791be95f3b28bbf193bbc29f8432d0c2` with no conflicts. All selected repairs and source/merged-state verification pass. Commit and publish/read back this two-parent main merge, then stop at the completed campaign boundary.
+Checkpoint: Testing campaign `003_7c4dcef` is cancelled at the human’s request, before assessment, test execution or implementation. This documentation-only explicit main merge owns its closure. Publish/read back the merge, then stop on main.
 
-## Completed scope and provenance
+## Cancelled campaign and persistence
 
-Original campaign opening `7eedb5efdb5e8ce1a6b8ef333a25c9f36c3fb70c`; reviewed baseline/branch-off `7c8c72b0791be95f3b28bbf193bbc29f8432d0c2`; retained completed branch `revision/001_7c8c72b-code-review`. The human authorized revision plan preparation and execution. [Revision plan](reviews/001_7c8c72b-code-review/REVISION-PLAN.md), [revision report](reviews/001_7c8c72b-code-review/REVISION-REPORT.md) and [review/assessment](reviews/001_7c8c72b-code-review/REVIEW-REPORT.md) retain selected dispositions, original observations, regression evidence and actual action commit identities.
+Original opening `fa0ce76ef3094796fc122c17be7b3943818e320f`; published/read-back cancellation tip `d176e153e20a3801fc8a9fb71b38e538835118c7`; creation/receiving main parent `7c4dcef1c171572e7868d3a03c959ea1c2f87b32`. Retain `revision/003_7c4dcef-testing`. [Cancelled plan](reviews/003_7c4dcef-testing/REVISION-PLAN.md) and [closure report](reviews/003_7c4dcef-testing/REVISION-REPORT.md) record the original scope, stop/cancellation and actual no-work outcome. The merge history supplies the exact closing commit without a retrospective edit to closed records.
 
-Repairs implement writable non-truncating SQLite synchronization, a strict 512-byte raw inspection budget with short reads, explicit plain buffering, observable ZIP size checks, short archive parameter IDs and explicit UTF-8 metadata/example reads. False configuration allegations were rejected; pyproject/dependencies/tasks were unchanged. R-003 is deferred; R-006 retains unavailable native evidence. No further product decision or accepted repair is pending.
+The human said “stop”, then “Cancel/close opened review campaign”. All planned testing work in newly opened campaign 003 is cancelled. No assessment, test execution, finding, accepted repair or source/test/configuration change occurred. Only its records and HANDOFF are integrated; document links/structure and unchanged-product checks pass. The cancelled package becomes frozen after main publication/readback.
 
-## Verification and limits
+## Preserved main and independent work
 
-The source boundary passes 705 tests at 95% production coverage, Ruff lint/format over 73 files and strict src/scripts mypy over 26 files (--no-native-parser). Actual native/source-rebuilt installed packages, all eight README examples, all supported archive/CLI routes and complete inventory/naming/content/checksum gates pass. These are revision validation candidates, not newly published release assets. All 705 tests also pass on the prospective merged state; Ruff, strict mypy, maintained links/Markdown structure and protected-path checks pass. Product/test/script/configuration bytes match the reviewed incoming candidate.
+Main retains completed campaign 001 product source at `7c4dcef1c171572e7868d3a03c959ea1c2f87b32` and its historical 705-test/95% evidence. No tests were run for cancellation. Separate remote code-review campaign 002 remains unchanged and unselected; it was not cancelled, resumed or integrated. Original tasks/hosted closures, closed campaign/phase/manual records and v0.4.0 at `7ee4afc200c7fded93880397128b0a9e217f3c52` remain unchanged.
 
-Actual runtime is Linux/CPython 3.12.14, py7zr 1.1.4 and pytest 9.2.0. Controlled writable-fsync, 128 KiB buffering and cp1252 simulations do not certify native Windows or Python 3.14. Other unavailable native Windows/macOS/Python 3.11/Python 3.14/big-endian execution remains unverified. ZIP counting cannot inspect a decompressed tail hidden by the dependency. Existing v0.4.0/tag remains at `7ee4afc200c7fded93880397128b0a9e217f3c52`; all original task/hosted closures and frozen phase/manual records remain intact.
+## Stop
 
-## Completion and stop
-
-Prospective merged verification is complete. Commit the explicit two-parent campaign summary and publish/read back actual main before reporting closure. The resulting Git merge records its own exact identity without retrospective edits to closed campaign records. Retain the revision branch. After publication/readback, the selected campaign is closed; stop on clean main. No version bump, release, new feature or additional review is selected. Markdown prose/list items remain unwrapped.
+After actual main publication/readback, campaign 003 is closed as cancelled. Preserve the clean main state, retained branch and unwrapped Markdown. No review, test work, repair, other campaign continuation, version bump or release is selected. Await a new human instruction.
