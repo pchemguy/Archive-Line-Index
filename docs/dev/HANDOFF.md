@@ -1,19 +1,19 @@
 # Project handoff
 
-Checkpoint: Remaining open code-review campaign `002_7c4dcef` is cancelled before any of its seven units ran. Testing campaign 003 was already cancelled and closed. This documentation-only explicit main merge owns campaign 002 closure; publish/read back it, then stop on main.
+Checkpoint: New testing revision campaign `004_0c22eae` is open on `revision/004_0c22eae-testing`. Scope and initial report are prepared; no assessment, test execution or repair has started. Publish/read back this containing opening commit and stop.
 
-## Cancelled review campaign 002
+## Identity and authority
 
-Actual retained branch `revision/002_7c4dcef-code-review-5856224455108738895`; original source/branch-off `7c4dcef1c171572e7868d3a03c959ea1c2f87b32`; original opening `49c033a8ec123cf899c18dae9188d019109f227c`; published/read-back cancellation tip `277548bc435bd063b64b7644561ed6b58fb93ead`. Receiving actual main is `5f5c7dbe892b9961934a5df919077f2a6dc56f9b`. Preserve the existing branch/directory association without renaming.
+Full source/branch-off baseline `0c22eae396ed04b3d090e287f8c58af79c05f939`, matching fetched origin/main. Creation parent, eventual integration and return target: actual `main`. Package: `docs/dev/reviews/004_0c22eae-testing/`; [plan](reviews/004_0c22eae-testing/REVISION-PLAN.md), [report](reviews/004_0c22eae-testing/REVISION-REPORT.md). Branch and directory retain the same complete suffix.
 
-[Cancelled review plan](reviews/002_7c4dcef-code-review/REVIEW-PLAN.md) and [closure report](reviews/002_7c4dcef-code-review/REVIEW-REPORT.md) record the human cancellation and actual no-review outcome. All seven units are cancelled. No review, tests, findings, revisions or product/test/configuration changes occurred. Freeze this cancelled package after verified main publication and retain its branch. The containing merge records its own exact identity in Git.
+The human requested “open testing revision campaign.” Opening only is selected: reserve identity, record scope/context, commit and publish/read back. Focus is contract coverage, test quality/sensitivity and fixtures, failure/resource/concurrency scenarios, portability/tooling and installed-consumer/example/release-helper testing. No specific finding or repair action is accepted yet; production behavior and governing contracts are reference inputs rather than change targets.
 
-## Previously closed work
+## Preserved parent context
 
-Testing campaign `003_7c4dcef` was cancelled/closed through published main merge `5f5c7dbe892b9961934a5df919077f2a6dc56f9b`. Its [cancelled records](reviews/003_7c4dcef-testing/REVISION-REPORT.md) remain untouched. Campaign 001 completed at `7c4dcef1c171572e7868d3a03c959ea1c2f87b32`; its 705-test/95% evidence is historical baseline evidence, not testing in either cancelled campaign. Preserve all closed campaign/phase/manual records, original task/hosted closures and v0.4.0 at `7ee4afc200c7fded93880397128b0a9e217f3c52`.
+Main contains completed campaign 001 and cancelled campaigns 002/003, with all their published tips contained. Their records stay frozen. This is a new root campaign from current main, not a reopening, nested revision or resumption of cancelled testing work. Prior 705-test/95% and installed-package results are historical baseline evidence, not campaign 004 execution.
 
-## Closure checks and final stop
+Preserve all original tasks/hosted closures, prior phase/manual records and v0.4.0 at `7ee4afc200c7fded93880397128b0a9e217f3c52`. Actual available host is Linux/bash with existing Python 3.12/py7zr tooling; unavailable native platforms remain unverified and simulations do not certify them. Keep Markdown prose/list items unwrapped and publish/read back each owned commit before further work.
 
-Only campaign 002 plan/report and HANDOFF differ from receiving main. Product/protected-path and existing-tag checks, maintained links/Markdown structure and diff/conflict checks pass. No product tests were run. HANDOFF reconciliation preserves receiving context rather than restarting another campaign.
+## Next human boundary
 
-Publish/read back the explicit two-parent main merge, then campaign 002 is closed as cancelled. Both opened campaigns 002 and 003 are cancelled; no review/testing/repair scope remains selected. Preserve clean main, retained branches and unwrapped Markdown. Stop and await a new instruction; no version bump or release is selected.
+Stop after verified opening publication. A subsequent request selects testing assessment or concrete revision scope; derive actual evidence, bounded actions and objective checks before editing tests/tooling. No testing, product repair, environment provisioning, integration/closure, version bump or release is selected now.
