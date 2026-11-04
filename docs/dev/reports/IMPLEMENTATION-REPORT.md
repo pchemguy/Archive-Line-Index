@@ -88,3 +88,29 @@ No functional deferral requires another product decision. This report and [Phase
 ## Verified integration and release boundary
 
 Explicit two-parent integration `72a4e5f0c8766651a9921ccbaa259fe4d5b2397a` is published on actual default main with matching exact remote readback. Its receiving parent is `d1d233a179cb249ddff3cc510ad89974d0ca53c2` and incoming completed phase tip is `f890028d90794138ada64824b6af646903184642`. All 687 merged-state tests, Ruff and strict mypy pass; product/test source is unchanged from the reviewed phase. All 52 tasks, Phase 4 issues #50–61 and native milestones #13–15 are complete/closed. The next containing direct main release commit uses exact retained RELEASE-NOTES.md bytes as its body. Exact-source build/install/tag and actual hosted release/download verification remain pending.
+
+## Final integration and release outcome
+
+The complete accepted implementation is integrated and published on actual default main as `72a4e5f0c8766651a9921ccbaa259fe4d5b2397a`, with receiving parent `d1d233a179cb249ddff3cc510ad89974d0ca53c2` and incoming T-052 tip `f890028d90794138ada64824b6af646903184642`. All 687 merged-state tests, Ruff and strict src/scripts mypy pass; measured production coverage is 95%. All 52 implementation tasks and Phase 4 issues #50–61/milestones #13–15 are complete/closed. The final 12-task persistence audit verifies one substantive owned result/evidence and initial checkbox per closing commit. Frozen previous phase/manual records are preserved.
+
+Direct main release commit `7ee4afc200c7fded93880397128b0a9e217f3c52` has the integration merge as its parent. Its raw message is exactly Release v0.4.0 followed by retained root RELEASE-NOTES.md bytes. It was published/read back before lightweight tag v0.4.0 was created and independently published/read back at that exact source. The tag remains pinned there; this later outcome commit changes documentation only.
+
+[Archive Line Index 0.4.0](https://github.com/pchemguy/Archive-Line-Index/releases/tag/v0.4.0), release ID 433519868, is published stable and confirmed as latest. One protected publisher checked complete local/draft/hosted names, source/tag/body and asset digests. All three draft assets were verified before publication; actual published body, tag, latest pointer and complete hosted inventory were read back. No CI publisher/run or PyPI upload is claimed.
+
+## Exact-source artifacts and download verification
+
+Isolated Hatchling 1.33.0 builds use exact release source `7ee4afc200c7fded93880397128b0a9e217f3c52`. Complete native and stable bundle name/inventory/content/checksum gates pass before tagging/publication. Each safe stable ZIP contains exactly one valid native Python package, with consistent metadata and runtime dependency py7zr>=1.1.4,<1.2. All 120 packaged tracked source/configuration/test/script/document files match that exact Git source byte for byte. The actual bundled source distribution independently rebuilds the wheel; both native and source-rebuilt wheels have observed SHA-256 `e25756ba8c6d88bfbb44780a4592ef9580c4264e4607c997e64359e6d187fb6d`.
+
+Both actual bundle-derived variants install in clean runtimes outside the checkout without development tools or source-path injection. Each passes public streaming/index/persistence workflows, eight complete README Python examples, six plain CLI cases and 37 archive cases across console/module/imported routes. These include ZIP, every required TAR suffix, empty/late-invalid TAR, empty/normal/corrupt 7z, partial publication and real SIGINT cleanup. Actual installed dependency is py7zr 1.1.4. The earlier full-format suite separately verifies simultaneous streams, limits, consumer exceptions, real 7z progressive backpressure and worker cleanup.
+
+| Asset | Bytes | SHA-256 |
+| --- | ---: | --- |
+| [SHA256SUMS](https://github.com/pchemguy/Archive-Line-Index/releases/download/v0.4.0/SHA256SUMS) | 191 | `398d4723fbfb22d629e89724a2c6c6838c24468eeefc154b6b41ba64b3c4f754` |
+| [archive-line-index-source.zip](https://github.com/pchemguy/Archive-Line-Index/releases/download/v0.4.0/archive-line-index-source.zip) | 178918 | `34a82ded5edcaca25002b763761abb433a880c7754ff80186d84f4bc757f6ba2` |
+| [archive-line-index-wheel.zip](https://github.com/pchemguy/Archive-Line-Index/releases/download/v0.4.0/archive-line-index-wheel.zip) | 38097 | `3ca5579a8e6c39a232bd738e1af6648dee374787afa86a4e44cd494a01a815bc` |
+
+All three tag-specific assets were downloaded and their full bytes/hashes match the local inventory. Downloaded SHA256SUMS is byte-identical to the local manifest and covers both bundles. Every advertised latest/download URL was also fetched and matched the same asset bytes. Hosted identity, names and integrity are established independently of successful upload responses.
+
+Complete Git highlights coverage remains pinned to prior v0.3.0 at `2490b645891be7ae0ab7763d1aa7fe195b730b83` through exact release source `7ee4afc200c7fded93880397128b0a9e217f3c52`. Final notes contain no checkpoint metadata and the published body matches them exactly. Root RELEASE-NOTES.md is retained. Only the owned ignored highlights checkpoint is removed after this verified published-body consumption. No functional TODO or publication effect remains unresolved; intended Windows/macOS/Python 3.11/big-endian support retains its explicitly unverified native execution status. Actual verification is Linux/CPython 3.12.14 with py7zr 1.1.4; dependency allocations and overall close latency remain outside package buffer/wait guarantees.
+
+Phase 4 and the complete accepted implementation are finished. Publish/read back this documentation-only outcome commit, then stop; no new task/feature or external package publication is selected.
