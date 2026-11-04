@@ -1,4 +1,4 @@
-"""Explicit adapter selection without premature archive support claims."""
+"""Lazy adapter selection that preserves archive claims and dependency errors."""
 
 from pathlib import Path
 
@@ -20,6 +20,13 @@ def open_backend(path: Path, candidate: FormatCandidate) -> BackendReader:
         from .tar import open_tar_backend
 
         return open_tar_backend(path)
+    if candidate.kind == FormatKind.SEVEN_Z:
+        try:
+            from .sevenzip import open_7z_backend
+        except ImportError as error:
+            raise UnsupportedFormatError("7z dependency is unavailable") from error
+
+        return open_7z_backend(path)
     raise UnsupportedFormatError(
         f"{candidate.kind.value} delivery is not implemented yet"
     )

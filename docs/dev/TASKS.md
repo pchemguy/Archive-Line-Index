@@ -287,71 +287,83 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 ## Phase 4 — 7z and complete-system delivery
 
-- [ ] Phase 4 — 7z and complete-system delivery
-    - [ ] Milestone 4.1 — Bounded 7z streaming
-        - [ ] T-041 — Implement bounded producer messages and cancellation endpoint
+- [x] Phase 4 — 7z and complete-system delivery
+    - [x] Milestone 4.1 — Bounded 7z streaming
+        - [x] T-041 — Implement bounded producer messages and cancellation endpoint
             - Scope: backends/producer.py message/endpoint operations and controlled-producer unit checks.
             - Depends on: T-040.
             - Acceptance/evidence: Validate positive finite settings, subdivide callback buffers, enforce queue capacity and cancellation checks, and keep success/failure/data outcomes distinct without a full-queue close sentinel.
             - Contracts: STR-05–06; internal QueueProducer/message model.
-        - [ ] T-042 — Implement the worker-backed reader lifecycle
+            - Verified result: Bounded producer endpoint validates finite positive integer settings, snapshots/subdivides callback buffers, enforces finite capacity and preserves FIFO data before distinct success/failure outcomes. Cancellation independently wakes full-queue waits without a sentinel. New-module tests initially failed because the bridge was absent; 11 controlled endpoint checks, strict src/scripts mypy and full Ruff pass. Remaining Phase 4 (T-041–T-052), full integration and 0.4.0 release are authorized; parent d1d233a179cb249ddff3cc510ad89974d0ca53c2 and issue/milestone associations #50–61/#13–15 are verified.
+        - [x] T-042 — Implement the worker-backed reader lifecycle
             - Scope: backends/producer.py reader/startup/join operations and lifecycle checks.
             - Depends on: T-041.
             - Acceptance/evidence: Start one outer non-daemon worker, preserve FIFO data and terminal outcome, bound positive reads, retain failures, unblock package waits and join on successful close including startup failure ownership.
             - Contracts: STR-01–06; BackendReader/start_queue_reader contract.
-        - [ ] T-043 — Implement 7z member selection and callback extraction
+            - Verified result: Worker-backed reader starts one non-daemon thread, returns bounded FIFO blocks before terminal failure, retains failed outcomes, validates settings before startup and joins on successful close. Full-queue and explicitly waiting-reader cancellation, startup failure after actual launch and failed-join retry are exercised. The lifecycle entry point was absent before implementation; all 56 producer/common-stream checks, strict src/scripts mypy and full Ruff pass.
+        - [x] T-043 — Implement 7z member selection and callback extraction
             - Scope: backends/sevenzip.py, actual dependency suitability checks and supported dependency constraint.
             - Depends on: T-042.
             - Acceptance/evidence: Inspect sole-member metadata, adapt the library writer callback without disk extraction, transfer archive ownership once and exercise real empty/normal payload plus codec/callback behavior on a recorded dependency version.
             - Contracts: ARC-01, ARC-03–04, ARC-06; public error boundary.
-        - [ ] T-044 — Integrate 7z with selection and common stream limits
+            - Verified result: Actual py7zr 1.1.4 metadata/callback integration accepts empty/nested sole regular members, directories and LZMA2/COPY/deflate/bzip2 payloads without extraction paths; rejects extra/metadata/special/encrypted members with causes and full cleanup. A thread-safe nonseekable callback forwards to the bounded bridge; owned IOBase source disables dependency parallel extraction and max_extract_size=None avoids an unrelated cap. Allocation cleanup regression failed before repair. All 39 real-adapter/producer/native-metadata checks, strict mypy and Ruff pass; supported dependency is py7zr>=1.1.4,<1.2.
+        - [x] T-044 — Integrate 7z with selection and common stream limits
             - Scope: backends/sevenzip.py/registry.py and common-stream dependency integration checks.
             - Depends on: T-043.
             - Acceptance/evidence: Deliver exact bytes with declared/actual limits, transport extraction errors without false EOF and release worker/archive resources on opening/delivery/early-close paths.
             - Contracts: ARC-04–06; STR-01–06; SYS-04–06.
-        - [ ] T-045 — Verify real 7z backpressure and terminal failure cleanup
+            - Verified result: 7z is lazily selected through the public facade, preserving signature precedence and dependency import boundaries. Real streams cover empty/normal bytes, readinto tails, zero/exact/declared limits, actual-count enforcement despite understated metadata, retained CRC failures and no surviving worker after close. Public 7z initially failed as unsupported; a separate startup-category regression failed before transport-error translation was repaired. All 88 7z/producer/registry/common-stream checks, strict mypy and Ruff pass.
+        - [x] T-045 — Verify real 7z backpressure and terminal failure cleanup
             - Scope: Real-dependency streaming/resource checks and any localized adapter corrections.
             - Depends on: T-044.
             - Acceptance/evidence: Demonstrate progressive bounded delivery with a slow consumer, callback subdivisions, full-queue cancellation, empty content and CRC/truncation failure, with no surviving owned thread after successful close.
             - Contracts: ARC-06; STR-02–06; SYS-05–06.
-        - [ ] T-046 — Review test and report milestone 4.1
+            - Verified result: Actual py7zr 1.1.4 multi-block extraction demonstrates progressive delivery before producer completion, one queued block and bounded current-block storage with a slow consumer. Full-queue early close before/after first data joins the non-daemon worker and closes archive/source. Real late COPY CRC and truncated-header failures retain causes without false EOF or surviving threads. All 51 7z/transport checks, strict src/scripts mypy and full Ruff pass; these are integration characterization checks, not a fabricated new runtime RED cycle.
+        - [x] T-046 — Review test and report milestone 4.1
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-041, T-042, T-043, T-044, T-045.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Separate whole-milestone code/lifecycle review finds no blocking issue. Full source regression passes 630 tests at 94% coverage; all 56 focused real-7z/bridge checks pass after adding cleanup-retry and source read/seek/tell identity cases. Actual py7zr 1.1.4 metadata/codecs, bounded progressive delivery, startup/early-close/full-queue/CRC/truncation and primary-error ownership are evidenced. Ruff and strict mypy pass. Report/HANDOFF retain complete remaining-task/release authority, dependency/host limits and pending hosted closure.
             - Report: `docs/dev/reports/phases/4/4.1.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 4.2 — 7z indexing and complete distribution
-        - [ ] T-047 — Integrate 7z indexing and paired CLI failure ownership
+    - [x] Milestone 4.2 — 7z indexing and complete distribution
+        - [x] T-047 — Integrate 7z indexing and paired CLI failure ownership
             - Scope: 7z public indexing/CLI integration checks with localized adapter/facade corrections.
             - Depends on: T-046.
             - Acceptance/evidence: Use existing builder/scanner/writers for actual 7z corpora, verify LF/BOM offsets and pair equivalence, and ensure late source/producer failure returns no completed index or CLI output publication.
             - Contracts: CLI-01–06 for 7z; SYS-01, SYS-03–10, SYS-13; IDX-01–06.
-        - [ ] T-048 — Verify full-format lifecycle and independent instance behavior
+            - Verified result: Existing scanner/builder/writers compose actual 7z payloads into canonical BOM/LF/EOF arrays and matching SQLite/raw pairs, including empty and one-byte-buffer cases. Late CRC failure invokes neither writer; raw failure retains readable SQLite only after the worker has joined. Native and source-rebuilt installed console/module/imported 7z paths pass empty/normal/corrupt cases. All 106 selected indexing/installed/archive/plain-CLI checks, strict src/scripts mypy and Ruff pass; no unnecessary facade rewrite was introduced.
+        - [x] T-048 — Verify full-format lifecycle and independent instance behavior
             - Scope: Cross-format/resource integration checks and localized contract-completion fixes.
             - Depends on: T-047.
             - Acceptance/evidence: Compare all supported source families, independent concurrent instances, inclusive limits, terminal integrity and actual exceptional cleanup; retain measured dependency/host capability limits rather than claiming unavailable-native verification.
             - Contracts: SYS-01–10, SYS-12–13; ARC-01–06; STR-01–06; PER-01–07.
-        - [ ] T-049 — Finalize complete public guidance and agent orientation
+            - Verified result: All seven source families pass simultaneous independent-instance fidelity, exact/zero/below-size limits, zero-operation no-backend-progress, nonbyte readinto capacity and consumer-exception ownership. A real SIGINT during an actual 7z callback/consumer wait cancels extraction, closes resources and joins the worker without a surviving owned thread. All 57 selected full-format/7z lifecycle/index checks, strict src/scripts mypy and Ruff pass; native host/dependency limits remain explicitly recorded.
+        - [x] T-049 — Finalize complete public guidance and agent orientation
             - Scope: README, public module/API examples and root AGENTS temporary reference.
             - Depends on: T-047, T-048.
             - Acceptance/evidence: Run complete supported-format/CLI examples, verify delivered export/ownership documentation and remove the temporary legacy reference at reimplementation closure. Product documents contain no migration narrative.
             - Contracts: API-01–05; CLI-01–06; PLAN final closure and layout documentation owners.
-        - [ ] T-050 — Verify complete source and wheel release candidates
+            - Verified result: README now documents every delivered format, lazy constrained 7z dependency, bounded callback transport and cancellation/ownership limits, preserving the source-linked bytes.find excerpt. All eight complete README Python examples and installed public exports/ZIP/TAR/7z CLI checks pass for native and independently source-rebuilt wheels. Maintained local links, strict mypy and full Ruff pass. Removed the root AGENTS temporary legacy reference without adding migration history; public API/module docstrings now describe delivered behavior.
+        - [x] T-050 — Verify complete source and wheel release candidates
             - Scope: Version 0.4.0 build metadata, native inventory and installed distribution checks.
             - Depends on: T-048, T-049.
             - Acceptance/evidence: Build/install full artifacts, rebuild from source distribution, verify complete exports/entry points and runtime dependency constraints, reject development/log/credential entries and validate actual names/checksums against tag metadata.
             - Contracts: SYS-11–12; API-05; CLI-06; phase release gate.
-        - [ ] T-051 — Review test and report milestone 4.2
+            - Verified result: Version 0.4.0 metadata and active installation/check examples agree. All 134 selected native metadata, source-rebuilt installation, export/runtime-boundary, all-format CLI, eight README example, release inventory and adversarial naming/checksum checks pass. Isolated Hatchling 1.33.0 builds produce valid wheel/sdist; independent native and stable bundle gates pass with complete safe inventories and checksums. Supported runtime dependency remains py7zr>=1.1.4,<1.2, actual 1.1.4. Ruff and strict src/scripts mypy pass. Candidates are preparation artifacts; exact merged release source will be rebuilt and installed again before tagging.
+        - [x] T-051 — Review test and report milestone 4.2
             - Scope: Whole milestone capability and relevant dependencies; focused regressions, blocker repairs, milestone evidence and continuity checkpoint.
             - Depends on: T-047, T-048, T-049, T-050.
             - Acceptance/evidence: Perform code review separately from test execution; resolve contract/blocking findings, verify the milestone demonstration and commit its report/HANDOFF with completion. Close only after required task/hosted evidence is verified.
             - Contracts: PLAN milestone exits and the milestone’s applicable contracts.
+            - Verified result: Separate whole-milestone code/documentation review finds no blocking issue. Full complete-system regression passes 687 tests at 95% production coverage; all 134 selected native/source-rebuilt installed/package/release checks, eight README examples, isolated builds, complete inventory/naming/checksum gates, strict src/scripts mypy and Ruff pass. Actual py7zr 1.1.4 lifecycle, real SIGINT and partial CLI publication retain verified ownership. Report/HANDOFF preserve complete remaining authority, actual host/dependency limits and exact pending T-052/integration/release effects.
             - Report: `docs/dev/reports/phases/4/4.2.md`; include HANDOFF at this boundary.
-    - [ ] Milestone 4.3 — Phase and final review
-        - [ ] T-052 — Review test and report phase 4 and the complete implementation
+    - [x] Milestone 4.3 — Phase and final review
+        - [x] T-052 — Review test and report phase 4 and the complete implementation
             - Scope: All delivery milestones of this phase, current installed artifacts, release-note preparation and phase evidence. Include the final implementation report and cumulative TODO resolution/deferral evidence.
             - Depends on: T-046, T-051. Also require all delivery milestones of this phase complete and closed when tracking is enabled.
             - Acceptance/evidence: Require every delivery milestone complete/closed; review cross-milestone code, run phase-scoped regressions and installed wheel/sdist checks, repair blockers, and prepare release notes/candidates/checksums for 0.4.0. Commit phase report/HANDOFF and task completion together. Record integration/tag/release as pending until actually verified after the task.
             - Contracts: PLAN phase exits and release gate; all acceptance applicable to this phase.
+            - Verified result: Separate complete-system review finds no unresolved functional blocker; all 49 acceptance conditions map individually to executable evidence and cumulative TODO/options/owners/resolutions are recorded. Delivery milestones #13/#14 are verified closed. Full regression passes 687 tests at 95% coverage; 134 package/installed checks, eight examples, fresh isolated 0.4.0 candidates, complete native/stable name/content/checksum gates, strict mypy and Ruff pass. Initial task composition and frozen-record audits pass. Phase/final reports, notes and HANDOFF retain actual host/dependency limits and pending authorized main integration, exact-source rebuild/tag and hosted-byte verification.
             - Report: `docs/dev/reports/phases/4/PHASE-REPORT.md`; include HANDOFF with this boundary.
             - Final evidence: `docs/dev/reports/IMPLEMENTATION-REPORT.md` aggregates all unresolved/deferred TODOs, options, owners and resolution provenance; full-scope acceptance must be supported.

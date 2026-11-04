@@ -15,7 +15,7 @@ Library functions are imported from `archive_line_index`; the importable CLI cal
 | `read_sqlite_index`, `read_raw_index` | Stored index path | A newly owned, validated offset array; no payload source is needed. |
 | `cli.main` / console / module | One target and optional shared output stem/overwrite flag | Integer status and paired SQLite/raw files from one scan. |
 
-The current implementation requires Python 3.11 or later and supports plain payload files, single-payload ZIP and TAR archives, caller-supplied binary readers, both persistence formats and all three CLI invocation forms. 7z payload delivery remains planned and is rejected explicitly until its adapter is delivered.
+The library requires Python 3.11 or later and supports plain payload files, single-payload ZIP, TAR (plain/gzip/bzip2/xz) and 7z archives, caller-supplied binary readers, both persistence formats and all three CLI invocation forms.
 
 The library preserves payload bytes. LF is the only line terminator, CRLF retains both bytes, and the final offset is an EOF sentinel. An optional initial UTF-8 BOM policy changes the first line's start to 3 while retaining coordinates in the original bytes. No text decoding or line-ending normalization occurs.
 
@@ -25,12 +25,12 @@ GitHub releases provide a [wheel bundle](https://github.com/pchemguy/Archive-Lin
 
 ```bash
 python -m zipfile -e archive-line-index-wheel.zip .
-python -m pip install archive_line_index-0.3.0-py3-none-any.whl
+python -m pip install archive_line_index-0.4.0-py3-none-any.whl
 ```
 
-Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.3.0.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag. The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
+Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.4.0.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag. The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
 
-From a checkout, build private native package inputs with `python -m build`. The declared runtime dependency is py7zr; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library; 7z payload delivery remains planned.
+From a checkout, build private native package inputs with `python -m build`. The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library. The 7z dependency is loaded only when opening 7z content.
 
 ## Stream without indexing
 
@@ -109,7 +109,7 @@ with TemporaryDirectory() as directory:
     assert offsets.tolist() == [0, 7, 8, 13]
 ```
 
-Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. ZIP signatures/suffixes select the ZIP adapter. Recognized 7z candidates raise `UnsupportedFormatError` until its adapter is delivered; they are never silently treated as plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
+Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. Recognized archive signatures or suffixes select the corresponding adapter; archive claims never silently fall back to plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
 
 ## Index a ZIP payload
 
@@ -154,6 +154,27 @@ with TemporaryDirectory() as directory:
 ```
 
 TAR reads sequentially and validates entries after the selected payload before successful EOF. A later extra file or special entry invalidates the archive even after payload bytes were returned. Damaged later headers, incomplete end markers and non-padding trailing bytes fail validation. Compressed readers are drained through their available trailer/integrity checks; a corrupt footer cannot yield a completed index or CLI output pair. Early close releases resources without claiming terminal validation. For `records.tar.gz`, CLI defaults are `records.tar.sqlite3` and `records.tar.u64` beside the archive.
+
+## Index a 7z payload
+
+7z accepts exactly one regular file, including an empty or nested payload, and ignores directory entries. Extra files, links and special entries are rejected; encrypted archives and unavailable codecs raise `UnsupportedFormatError`. Extraction streams into a callback without creating member paths on disk. Metadata validation precedes delivery, and extraction, declared-size and available CRC checks must complete before an index or CLI outputs can be returned.
+
+```python
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from py7zr import SevenZipFile
+
+from archive_line_index import build_line_index
+
+with TemporaryDirectory() as directory:
+    target = Path(directory) / "records.7z"
+    with SevenZipFile(target, "w") as archive:
+        archive.writestr(b"alpha\nbeta", "nested/records.txt")
+    assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
+```
+
+The [`7z adapter`](src/archive_line_index/backends/sevenzip.py) forwards callback data through a [`bounded producer bridge`](src/archive_line_index/backends/producer.py): one non-daemon worker, one queued block and one current consumer block, each at most 1 MiB. Callback buffers are subdivided before queueing. Dependency decompressor/callback allocations are outside those package buffer bounds. Closing cancels package waits and joins the worker; checks during package waits occur at most 0.05 seconds apart, but dependency operations can delay cancellation, so this is not a total close-latency guarantee. Early close does not assert integrity. For `records.7z`, CLI defaults are `records.sqlite3` and `records.u64` beside the archive.
 
 ## Store and reload an index independently
 
@@ -237,10 +258,10 @@ python -m ruff format --check src tests scripts
 python -m mypy
 python -m pytest --cov=archive_line_index --cov-report=term-missing
 python -m build
-python scripts/check_release_artifacts.py --dist dist --tag v0.3.0 --write-checksums
-python scripts/check_release_artifacts.py --dist dist --tag v0.3.0
-python -m scripts.prepare_release --native-dist dist --output release --tag v0.3.0
-python -m scripts.prepare_release --output release --tag v0.3.0 --check
+python scripts/check_release_artifacts.py --dist dist --tag v0.4.0 --write-checksums
+python scripts/check_release_artifacts.py --dist dist --tag v0.4.0
+python -m scripts.prepare_release --native-dist dist --output release --tag v0.4.0
+python -m scripts.prepare_release --output release --tag v0.4.0 --check
 ```
 
 Use clean `dist` and `release` directories: `dist` contains private native build inputs, while `release` is the complete hosted inventory of wheel/source ZIP bundles and SHA256SUMS. The native checker verifies package/tag/metadata agreement, safe contents and source/wheel equality. The release checker independently rejects versions in every hosted filename, validates the bundled native pair and verifies outer checksums; neither command publishes a release. The actual naming gate is tested against the shared notation vectors, including historical and single-component versions with matching faulty expected names. Installed integration tests build both artifacts, independently rebuild from the source distribution, and exercise clean runtimes outside the checkout. If mypy's native parser fails during container process discovery, `python -m mypy --no-native-parser` retains strict checking with its supported Python parser.

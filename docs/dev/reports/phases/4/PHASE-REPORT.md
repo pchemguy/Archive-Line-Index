@@ -1,0 +1,39 @@
+# Phase 4 — 7z and complete-system delivery
+
+## Result and separate phase review
+
+T-041–T-052 complete the accepted implementation with actual single-payload 7z streaming/indexing and all-format library/SQLite/raw/CLI workflows. Reviewed source through `b5e850e25885bb48db0aef9689d748a5f77a18c9`; this containing T-052 commit adds final reports, notes and initial task/phase completion. Branch `phase/4-sevenzip-completion` was created from main `d1d233a179cb249ddff3cc510ad89974d0ca53c2`. The human authorized all remaining tasks, full verification, integration and v0.4.0 release, then stop.
+
+Reviewed the complete adapter/producer/registry/common-stream/facade/scanner/persistence/CLI interaction separately from test execution, using accepted contracts and actual installed dependency source. One non-daemon 7z worker forwards bounded immutable blocks with independent cancellation/terminal outcomes. Metadata validation precedes startup; producer success follows extraction, callback size agreement and owner cleanup. FIFO data may precede failure on bounded reads, but validated EOF/completed arrays and CLI publication cannot precede terminal success. No filesystem member extraction or whole-payload bridge exists.
+
+Reviewed source-I/O identity, dependency parsing/codec causes, allocation/startup failures, primary-versus-cleanup errors, failed join/archive-close retry, actual SIGINT, full-queue cancellation and simultaneous independent instances. Generic scanner/persistence remain independently usable; the CLI scans once and publishes SQLite then raw with accurate partial-output diagnostics. No unresolved cross-milestone or in-scope functional blocker remains. The review was performed by the implementing agent; no independent-agent or native-platform audit is claimed.
+
+## Complete acceptance and TODO disposition
+
+[Milestone 4.1](4.1.md) records actual py7zr 1.1.4 suitability, supported constraint >=1.1.4,<1.2, codecs, callback/backpressure and cleanup evidence. [Milestone 4.2](4.2.md) records integrated indexing/CLI, lifecycle, guidance and distribution evidence. The [complete implementation report](../../IMPLEMENTATION-REPORT.md) maps all 49 objective conditions individually to executable tests and retains resolved findings, excluded options, owners and actual verification limits. There is no hidden deferred accepted feature.
+
+README covers all supported formats and eight complete Python examples, preserves the exact source-linked bytes.find excerpt and documents package/dependency buffer and close-latency limits. Root AGENTS temporary legacy reference is removed without introducing product migration history. Prior published phase/manual records remain unchanged.
+
+## Verification
+
+Full regression passes 687 tests with 95% production statement/branch coverage. The source is unchanged after that full run; final task edits are reports/notes only. All 134 selected package/installed/release checks pass, including exact root exports, native and independently source-rebuilt clean installations, every supported archive, all three CLI forms, protected/partial publication and eight executable README examples. Ruff lint/format over src/tests/scripts and strict src/scripts mypy pass with --no-native-parser for the known container issue.
+
+Isolated Hatchling 1.33.0 native wheel/source builds and independent complete stable bundle name/content/checksum validation pass. Naming tests include all shared notation vectors and matching faulty expected lists; version numbers remain prohibited in every hosted asset name. Native package names inside stable bundles retain valid Python packaging identity. Actual runtime is Linux/CPython 3.12.14 with py7zr 1.1.4; native Windows/macOS/Python 3.11/big-endian checks remain unverified. No CI execution is claimed. Preparation candidates will be rebuilt from the exact eligible main release commit before tagging.
+
+## Tracking, task composition and release coverage
+
+Native delivery milestones #13/#14 are verified closed with exact issue sets #50–55/#56–60. T-041–T-051 are individually published/read back, with their issues closed. Each initial task completion was audited against its actual parent diff: one owning subject, substantive owned result/evidence and exactly one initial task checkbox in the same commit. T-052 adds its own reports, notes, HANDOFF and initial completion together; inspect its actual composition before integration and close issue #61 then review milestone #15 after publication/readback.
+
+Release baseline is v0.3.0 at `2490b645891be7ae0ab7763d1aa7fe195b730b83`, selected from complete nonshallow first-parent release history before pending tag creation. Complete identities, parents, subjects and uncovered full messages through the current checkpoint were inspected; no campaign merge or revert is omitted. T-040 outcome bookkeeping adds no new product highlight. T-041–T-051 consolidate into delivered 7z behavior, constrained dependency and complete public/installed evidence. Root RELEASE-NOTES.md contains finalized body-only 0.4.0 notes; the owned ignored highlights checkpoint retains the pinned baseline/watermark until verified consumption. Refresh only pending increments through the exact final source, including the eventual two-parent integration and release commit.
+
+## Pending authorized integration and release
+
+After T-052 source publication/readback and issue #61/milestone #15 closure, explicitly merge the complete phase into refreshed main with two pinned parents and preserve receiving context in HANDOFF. Run the merged-state suite, commit/publish/read back the merge, then create the direct main release commit with exact root RELEASE-NOTES.md body and publish/read back it. Build, inspect, independently source-rebuild and clean-install that exact source; pass full name/inventory/content/checksum gates before tagging v0.4.0 at that source.
+
+Use one protected release publisher. Complete hosted inventory is `archive-line-index-wheel.zip`, `archive-line-index-source.zip` and `SHA256SUMS`. Verify draft and hosted body/tag/latest/names/digests, download tag-specific assets and every advertised latest/download URL, and compare all bytes/hashes with the local inventory. Retain root notes; remove only the owned ignored highlights checkpoint after actual published body readback. Record observed merge/release identities, asset URLs/hashes and installed results here and in the implementation report/HANDOFF, publish the final outcome and stop after the complete accepted task list. Existing tags/releases and frozen records remain intact; no PyPI publication is authorized.
+
+## Integration boundary
+
+All 12 Phase 4 issues #50–61 and milestones #13–15 are closed after exact source publication/readback. All 12 initial task commits pass parent-diff composition audit; all 52 tasks are complete. The full branch difference contains only authorized Phase 4 work. The complete phase is merging into refreshed actual default main with receiving parent `d1d233a179cb249ddff3cc510ad89974d0ca53c2` and incoming tip `f890028d90794138ada64824b6af646903184642`, matching its recorded creation parent. No conflicts occurred. HANDOFF restores receiving main context and retains the authorized release/final stop.
+
+Prospective merged-state verification passes all 687 tests, Ruff lint/format and strict src/scripts mypy. Maintained Markdown structure/local links and complete task audit pass. Product source matches the reviewed phase tip. The explicit merge commit and its main publication require subsequent observation.

@@ -1,19 +1,18 @@
-"""Recognized undelivered adapters must never fall back to plain bytes."""
+"""Delivered adapter selection preserves ordinary source-opening failures."""
 
 from pathlib import Path
 
 import pytest
 
 from archive_line_index.backends.registry import open_backend
-from archive_line_index.errors import UnsupportedFormatError
 from archive_line_index.formats import FormatCandidate, FormatKind
 
 
-@pytest.mark.parametrize("kind", [FormatKind.SEVEN_Z])
-def test_undelivered_family_is_explicitly_unsupported(
+@pytest.mark.parametrize("kind", list(FormatKind))
+def test_missing_source_retains_filesystem_category(
     tmp_path: Path, kind: FormatKind
 ) -> None:
-    with pytest.raises(UnsupportedFormatError):
+    with pytest.raises(FileNotFoundError):
         open_backend(tmp_path / "missing", FormatCandidate(kind, None, kind))
 
 
