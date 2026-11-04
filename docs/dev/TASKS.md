@@ -307,11 +307,12 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Acceptance/evidence: Inspect sole-member metadata, adapt the library writer callback without disk extraction, transfer archive ownership once and exercise real empty/normal payload plus codec/callback behavior on a recorded dependency version.
             - Contracts: ARC-01, ARC-03–04, ARC-06; public error boundary.
             - Verified result: Actual py7zr 1.1.4 metadata/callback integration accepts empty/nested sole regular members, directories and LZMA2/COPY/deflate/bzip2 payloads without extraction paths; rejects extra/metadata/special/encrypted members with causes and full cleanup. A thread-safe nonseekable callback forwards to the bounded bridge; owned IOBase source disables dependency parallel extraction and max_extract_size=None avoids an unrelated cap. Allocation cleanup regression failed before repair. All 39 real-adapter/producer/native-metadata checks, strict mypy and Ruff pass; supported dependency is py7zr>=1.1.4,<1.2.
-        - [ ] T-044 — Integrate 7z with selection and common stream limits
+        - [x] T-044 — Integrate 7z with selection and common stream limits
             - Scope: backends/sevenzip.py/registry.py and common-stream dependency integration checks.
             - Depends on: T-043.
             - Acceptance/evidence: Deliver exact bytes with declared/actual limits, transport extraction errors without false EOF and release worker/archive resources on opening/delivery/early-close paths.
             - Contracts: ARC-04–06; STR-01–06; SYS-04–06.
+            - Verified result: 7z is lazily selected through the public facade, preserving signature precedence and dependency import boundaries. Real streams cover empty/normal bytes, readinto tails, zero/exact/declared limits, actual-count enforcement despite understated metadata, retained CRC failures and no surviving worker after close. Public 7z initially failed as unsupported; a separate startup-category regression failed before transport-error translation was repaired. All 88 7z/producer/registry/common-stream checks, strict mypy and Ruff pass.
         - [ ] T-045 — Verify real 7z backpressure and terminal failure cleanup
             - Scope: Real-dependency streaming/resource checks and any localized adapter corrections.
             - Depends on: T-044.

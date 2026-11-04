@@ -279,12 +279,17 @@ def open_7z_backend(path: Path) -> BackendReader:
             else:
                 owner.close()
 
-        reader._reader = start_queue_reader(
-            produce,
-            declared_size=info.uncompressed,
-            queue_capacity=1,
-            block_size=_BLOCK_SIZE,
-        )
+        try:
+            reader._reader = start_queue_reader(
+                produce,
+                declared_size=info.uncompressed,
+                queue_capacity=1,
+                block_size=_BLOCK_SIZE,
+            )
+        except (MemoryError, OSError):
+            raise
+        except Exception as error:
+            raise ExtractionError("Cannot start 7z extraction worker") from error
         return reader
     except BaseException as error:
         try:

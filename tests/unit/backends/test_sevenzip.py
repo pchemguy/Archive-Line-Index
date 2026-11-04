@@ -5,32 +5,13 @@ from unittest.mock import patch
 
 import py7zr
 import pytest
+from tests.helpers.sevenzip import make_7z
 
 from archive_line_index.errors import (
     ArchiveStructureError,
     InvalidArchiveError,
     UnsupportedFormatError,
 )
-
-
-def make_7z(
-    path: Path,
-    entries: list[tuple[str, bytes]],
-    *,
-    password: str | None = None,
-    header_encryption: bool = False,
-    filters: list[dict[str, int]] | None = None,
-) -> Path:
-    with py7zr.SevenZipFile(
-        path,
-        "w",
-        password=password,
-        header_encryption=header_encryption,
-        filters=filters,
-    ) as archive:
-        for name, data in entries:
-            archive.writestr(data, name)
-    return path
 
 
 @pytest.mark.parametrize(
