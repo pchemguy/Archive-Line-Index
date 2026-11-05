@@ -4,17 +4,6 @@ Archive Line Index is a Python library and minimal CLI for building compact byte
 
 Payload inputs are filesystem paths or caller-supplied blocking binary readers. Python index construction returns an in-memory `array("Q")` of unsigned eight-byte offsets: one start per line, followed by an end-of-file sentinel. For example, `b"a\nb"` produces `[0, 2, 3]`, describing the byte ranges `[0, 2)` and `[2, 3)`. Streaming returns original payload bytes through `read` or `readinto`. Persistence stores the completed array at an explicit path; the CLI indexes one target once and writes both `.sqlite3` and `.u64` files.
 
-Library functions are imported from `archive_line_index`; the importable CLI callable is `archive_line_index.cli.main`.
-
-| Interface | Input | Output and ownership |
-| --- | --- | --- |
-| `open_content_stream` | Filesystem path (`str` or text path-like object) | Owned `ContentStream` for sequential binary reads; the caller closes it. |
-| `scan_line_offsets` | Blocking binary reader with `read(size) -> bytes` | Completed offset array; the reader is borrowed and remains open. |
-| `build_line_index` | Filesystem path | Completed offset array; source opening and closure are managed by the library. |
-| `write_sqlite_index`, `write_raw_index` | Completed offset array and explicit destination path | One complete index file; the input array is borrowed and unchanged. |
-| `read_sqlite_index`, `read_raw_index` | Stored index path | A newly owned, validated offset array; no payload source is needed. |
-| `cli.main` / console / module | One target and optional shared output stem/overwrite flag | Integer status and paired SQLite/raw files from one scan. |
-
 The library requires Python 3.11 or later and supports plain payload files, single-payload ZIP, TAR (plain/gzip/bzip2/xz) and 7z archives, caller-supplied binary readers, both persistence formats and all three CLI invocation forms.
 
 The library preserves payload bytes. LF is the only line terminator, CRLF retains both bytes, and the final offset is an EOF sentinel. An optional initial UTF-8 BOM policy changes the first line's start to 3 while retaining coordinates in the original bytes. No text decoding or line-ending normalization occurs.
@@ -28,71 +17,35 @@ python -m zipfile -e archive-line-index-wheel.zip .
 python -m pip install archive_line_index-0.5.0-py3-none-any.whl
 ```
 
-Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.5.0.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag. The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
+The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
 
-From a checkout, build private native package inputs with `python -m build`. The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library. The 7z dependency is loaded only when opening 7z content.
+The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library. The 7z dependency is loaded only when opening 7z content.
 
-## Stream without indexing
+## Integration contract
 
-`open_content_stream` returns an owned, readable, nonseekable `ContentStream`. Use a context manager or call `close`. Short nonempty reads are legal; zero-length reads do not establish EOF. `readinto` measures capacity in bytes and leaves unused storage unchanged.
+For software consuming `archive-line-index`, this section summarizes the public integration boundary; the linked specifications define exact behavior. Both library and CLI accept a filesystem path and automatically select plain-file, ZIP, TAR or 7z handling. No archive-backend imports or explicit format selection are required. Supported archives contain exactly one regular-file payload.
 
-```python
-from pathlib import Path
-from tempfile import TemporaryDirectory
+| Interface | Entry point | Result |
+| --- | --- | --- |
+| Python library | `from archive_line_index import build_line_index`; `build_line_index(source)` | A completed offset array. Persistence is explicit through package-root writer/reader functions. |
+| CLI | `archive-line-index SOURCE` | Both SQLite and raw index files from one scan; exit status reports success or failure. |
 
-from archive_line_index import open_content_stream
+The CLI also runs as `python -m archive_line_index SOURCE` or through the importable `archive_line_index.cli.main([source])`, which returns an integer status. Library calls raise exceptions; index construction creates no output files. Each persistence output is published independently.
 
-with TemporaryDirectory() as directory:
-    target = Path(directory) / "payload.bin"
-    target.write_bytes(b"a\nb")
-    with open_content_stream(target, max_uncompressed_size=3) as stream:
-        assert stream.read(2) == b"a\n"
-        buffer = bytearray(b"????")
-        assert stream.readinto(buffer) == 1
-        assert buffer == b"b???"
-        assert stream.read() == b""
-    assert stream.closed
-```
+Offsets refer to the original uncompressed payload bytes, not archive positions or decoded characters. LF ends a line; the EOF sentinel is included in both stored formats. Output naming, overwrite rules, BOM handling, validation and failure outcomes are defined by the linked contracts. A later persistence failure can leave an earlier output published; scan-complete logging alone does not certify output publication.
 
-The inclusive size limit counts all payload bytes, including a BOM. Exactly-at-limit content still requires terminal validation. A read failure is retained until explicit closure; later otherwise-valid reads raise it rather than reporting EOF. Filesystem errors retain their ordinary Python types, and package-domain failures derive from `ArchiveLineIndexError`.
+| Integration concern | Authoritative reference |
+| --- | --- |
+| Public Python imports, signatures and types; operation outcomes and exceptions | [API signatures](docs/dev/decomposition/public-api.md) and [operation/error contract](docs/dev/spec/public-api.md) |
+| CLI arguments, default paths, stdout/stderr and status codes | [CLI contract](docs/dev/spec/cli.md) |
+| Offset representation, line ranges, BOM, EOF and bounds | [Line-index contract](docs/dev/spec/line-index.md) |
+| SQLite schema, raw binary encoding, readers/writers and publication guarantees | [Persistence contract](docs/dev/spec/persistence.md) |
+| Accepted source formats, automatic detection and archive restrictions | [Source/archive contract](docs/dev/spec/archive-handling.md) |
+| Progress records, verbosity and application logging configuration | [Progress-logging contract](docs/dev/spec/progress-logging.md) |
 
-## Scan a borrowed binary reader
+## Index a source through the library
 
-`scan_line_offsets` consumes from the reader's current position, defines that position as local offset zero and neither closes nor restores the reader. It needs only a blocking `read(size) -> bytes` operation; nonempty short reads are supported.
-
-```python
-import logging
-from io import BytesIO
-
-from archive_line_index import scan_line_offsets
-
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-payload = b"\xef\xbb\xbfalpha\r\n\nomega"
-source = BytesIO(payload)
-offsets = scan_line_offsets(source, buffer_size=2)
-assert offsets.typecode == "Q" and offsets.itemsize == 8
-assert offsets.tolist() == [3, 10, 11, 16]
-assert len(offsets) - 1 == 3
-assert payload[offsets[0]:offsets[1]] == b"alpha\r\n"
-assert not source.closed
-```
-
-Set `skip_utf8_bom=False` to include the initial BOM in first-line content. Later or incomplete BOMs remain ordinary bytes. Empty input yields `[0]`, skipped BOM-only input yields `[3]`, and a trailing LF adds no extra empty line. Line i spans `[offsets[i], offsets[i + 1])`.
-
-## Line-boundary scanning
-
-`scan_line_offsets` reads bounded byte blocks (1 MiB by default) and searches each block with repeated `bytes.find` calls. The core loop in [`scanner.py`](src/archive_line_index/scanner.py), shown below as an implementation excerpt, records the byte immediately after each LF; `position` is the block’s starting offset:
-
-```py
-start = 0
-while (newline := block.find(b"\n", start)) >= 0:
-    append_offset(offsets, position + newline + 1)
-    start = newline + 1
-```
-
-This keeps byte searching in the runtime’s native `bytes` implementation, with Python work per match rather than per byte, and never assembles a complete line. A one-byte LF needs no overlap between blocks; BOM handling and the final EOF sentinel are managed outside this loop. Python byte-by-byte iteration adds interpreter work, `readline()`/`split()` materialize lines or fragments, and `mmap` requires a suitable file rather than the generic binary-reader interface. Blockwise `bytes.find` fits the bounded-memory streaming contract without an extra scanning dependency.
-
-## Build from a filesystem source
+For an existing source, call `build_line_index(source)`; the same call handles a plain file or supported archive. Persist its result with the package-root writers when files are needed. The self-contained example below creates a small plain source, builds its index and writes/reloads both outputs.
 
 `build_line_index` opens and owns the content stream, scans through validated EOF and closes it on success or failure. It returns only the completed array; it creates no output files.
 
@@ -100,7 +53,13 @@ This keeps byte searching in the runtime’s native `bytes` implementation, with
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from archive_line_index import build_line_index
+from archive_line_index import (
+    build_line_index,
+    read_raw_index,
+    read_sqlite_index,
+    write_raw_index,
+    write_sqlite_index,
+)
 
 with TemporaryDirectory() as directory:
     target = Path(directory) / "records.txt"
@@ -109,76 +68,15 @@ with TemporaryDirectory() as directory:
         target, buffer_size=4, max_uncompressed_size=13
     )
     assert offsets.tolist() == [0, 7, 8, 13]
+    write_sqlite_index(offsets, Path(directory) / "records.sqlite3")
+    write_raw_index(offsets, Path(directory) / "records.u64")
+    assert read_sqlite_index(Path(directory) / "records.sqlite3") == offsets
+    assert read_raw_index(Path(directory) / "records.u64") == offsets
 ```
 
-Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. Recognized archive signatures or suffixes select the corresponding adapter; archive claims never silently fall back to plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
+The library owns source validation and closure and returns no partial array on failure. Writer destinations are explicit; existing files are protected unless `overwrite=True`. Each file is published independently, so a later failure can leave an earlier output complete.
 
-## Index a ZIP payload
-
-ZIP archives must contain exactly one regular file, optionally nested under directories. Empty payloads are valid; directory entries are ignored, while extra files (including metadata files), links and other special entries are rejected. Member names are never extracted to filesystem paths. Detected encryption and unavailable codecs are unsupported; malformed archives and payload integrity failures retain distinct error categories. Member CRC validation and agreement between delivered bytes and the declared member size must complete before indexing succeeds. These checks use the member stream exposed by the standard library.
-
-```python
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from zipfile import ZIP_DEFLATED, ZipFile
-
-from archive_line_index import build_line_index
-
-with TemporaryDirectory() as directory:
-    target = Path(directory) / "records.zip"
-    with ZipFile(target, "w", compression=ZIP_DEFLATED) as archive:
-        archive.writestr("nested/records.txt", b"alpha\nbeta")
-    assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
-```
-
-The CLI accepts the same archive target and persists offsets in the uncompressed payload's byte coordinates. For `records.zip`, its default outputs are `records.sqlite3` and `records.u64` beside the archive. Signature evidence takes precedence over a conflicting suffix, and invalid suffix-claimed ZIP input cannot fall back to plain bytes.
-
-## Index a TAR payload
-
-Plain TAR and gzip/bzip2/xz-compressed TAR follow the same sole-regular-file policy as ZIP. Accepted suffixes are `.tar`, `.tar.gz`, `.tgz`, `.tar.bz2`, `.tbz`, `.tbz2`, `.tar.xz` and `.txz`; supported signatures also identify unconventional filenames. Compressed data that is not TAR is rejected. Standard TAR extension headers are interpreted by the library rather than counted as payload files.
-
-```python
-import tarfile
-from io import BytesIO
-from pathlib import Path
-from tempfile import TemporaryDirectory
-
-from archive_line_index import build_line_index
-
-with TemporaryDirectory() as directory:
-    target = Path(directory) / "records.tar.gz"
-    payload = b"alpha\nbeta"
-    with tarfile.open(target, "w:gz") as archive:
-        member = tarfile.TarInfo("nested/records.txt")
-        member.size = len(payload)
-        archive.addfile(member, BytesIO(payload))
-    assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
-```
-
-TAR reads sequentially and validates entries after the selected payload before successful EOF. A later extra file or special entry invalidates the archive even after payload bytes were returned. Damaged later headers, incomplete end markers and non-padding trailing bytes fail validation. Compressed readers are drained through their available trailer/integrity checks; a corrupt footer cannot yield a completed index or CLI output pair. Early close releases resources without claiming terminal validation. For `records.tar.gz`, CLI defaults are `records.tar.sqlite3` and `records.tar.u64` beside the archive.
-
-## Index a 7z payload
-
-7z accepts exactly one regular file, including an empty or nested payload, and ignores directory entries. Extra files, links and special entries are rejected; encrypted archives and unavailable codecs raise `UnsupportedFormatError`. Extraction streams into a callback without creating member paths on disk. Metadata validation precedes delivery, and extraction, declared-size and available CRC checks must complete before an index or CLI outputs can be returned.
-
-```python
-from pathlib import Path
-from tempfile import TemporaryDirectory
-
-from py7zr import SevenZipFile
-
-from archive_line_index import build_line_index
-
-with TemporaryDirectory() as directory:
-    target = Path(directory) / "records.7z"
-    with SevenZipFile(target, "w") as archive:
-        archive.writestr(b"alpha\nbeta", "nested/records.txt")
-    assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
-```
-
-The [`7z adapter`](src/archive_line_index/backends/sevenzip.py) forwards callback data through a [`bounded producer bridge`](src/archive_line_index/backends/producer.py): one non-daemon worker, one queued block and one current consumer block, each at most 1 MiB. Callback buffers are subdivided before queueing. Dependency decompressor/callback allocations are outside those package buffer bounds. Closing cancels package waits and joins the worker; checks during package waits occur at most 0.05 seconds apart, but dependency operations can delay cancellation, so this is not a total close-latency guarantee. Early close does not assert integrity. For `records.7z`, CLI defaults are `records.sqlite3` and `records.u64` beside the archive.
-
-## Store and reload an index independently
+### Store and reload an index independently
 
 SQLite uses a dedicated rowid table `line_index(offset INTEGER PRIMARY KEY)`, with one row per offset including EOF. Raw files contain only consecutive little-endian unsigned 64-bit values, with no header. Both readers validate the complete representation before returning an array; neither requires the payload source.
 
@@ -244,11 +142,159 @@ with TemporaryDirectory() as directory:
 
 Importing the package, CLI or module runner performs no command execution. An explicit argv must be a sequence of strings; `None` uses process arguments. Library APIs continue to raise exceptions directly and do not acquire CLI printing or process-exit behavior.
 
+## Source backends
+
+Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. Recognized archive signatures or suffixes select the corresponding adapter; archive claims never silently fall back to plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
+
+Archives contain exactly one regular-file payload, which may be empty or nested under directories. Directory entries are ignored; additional files (including metadata files), links and special entries are rejected. Member names are never extracted to filesystem paths. Early close releases resources without claiming terminal integrity validation.
+
+The archive examples below create small fixtures only to make each example self-contained. Their zipfile, tarfile and py7zr imports create test inputs; consuming an existing archive requires only the same package-level `build_line_index(source)` call shown in the library workflow.
+
+### Plain files
+
+Plain files expose their original bytes. The [library workflow](#index-a-source-through-the-library) shows indexing and persistence without archive setup.
+
+### ZIP
+
+ZIP rejects detected encryption and unavailable codecs; malformed archives and payload integrity failures retain distinct error categories. Member CRC validation and agreement between delivered bytes and the declared member size must complete before indexing succeeds. These checks use the member stream exposed by the standard library.
+
+```python
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from zipfile import ZIP_DEFLATED, ZipFile
+
+from archive_line_index import build_line_index
+
+with TemporaryDirectory() as directory:
+    # Fixture setup: create an archive for this self-contained example.
+    target = Path(directory) / "records.zip"
+    with ZipFile(target, "w", compression=ZIP_DEFLATED) as archive:
+        archive.writestr("nested/records.txt", b"alpha\nbeta")
+    # Consumer: use the same public call for every supported source.
+    assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
+```
+
+The CLI accepts the same archive target and persists offsets in the uncompressed payload's byte coordinates. For `records.zip`, its default outputs are `records.sqlite3` and `records.u64` beside the archive. Signature evidence takes precedence over a conflicting suffix, and invalid suffix-claimed ZIP input cannot fall back to plain bytes.
+
+### TAR
+
+Plain TAR and gzip/bzip2/xz-compressed TAR follow the same sole-regular-file policy as ZIP. Accepted suffixes are `.tar`, `.tar.gz`, `.tgz`, `.tar.bz2`, `.tbz`, `.tbz2`, `.tar.xz` and `.txz`; supported signatures also identify unconventional filenames. Compressed data that is not TAR is rejected. Standard TAR extension headers are interpreted by the library rather than counted as payload files.
+
+```python
+import tarfile
+from io import BytesIO
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from archive_line_index import build_line_index
+
+with TemporaryDirectory() as directory:
+    # Fixture setup: create an archive for this self-contained example.
+    target = Path(directory) / "records.tar.gz"
+    payload = b"alpha\nbeta"
+    with tarfile.open(target, "w:gz") as archive:
+        member = tarfile.TarInfo("nested/records.txt")
+        member.size = len(payload)
+        archive.addfile(member, BytesIO(payload))
+    # Consumer: use the same public call for every supported source.
+    assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
+```
+
+TAR reads sequentially and validates entries after the selected payload before successful EOF. A later extra file or special entry invalidates the archive even after payload bytes were returned. Damaged later headers, incomplete end markers and non-padding trailing bytes fail validation. Compressed readers are drained through their available trailer/integrity checks; a corrupt footer cannot yield a completed index or CLI output pair. Early close releases resources without claiming terminal validation. For `records.tar.gz`, CLI defaults are `records.tar.sqlite3` and `records.tar.u64` beside the archive.
+
+### 7z
+
+7z rejects encrypted archives and unavailable codecs with `UnsupportedFormatError`. Extraction streams into a callback without creating member paths on disk. Metadata validation precedes delivery, and extraction, declared-size and available CRC checks must complete before an index or CLI outputs can be returned.
+
+```python
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from py7zr import SevenZipFile
+
+from archive_line_index import build_line_index
+
+with TemporaryDirectory() as directory:
+    # Fixture setup: create an archive for this self-contained example.
+    target = Path(directory) / "records.7z"
+    with SevenZipFile(target, "w") as archive:
+        archive.writestr(b"alpha\nbeta", "nested/records.txt")
+    # Consumer: use the same public call for every supported source.
+    assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
+```
+
+The [`7z adapter`](src/archive_line_index/backends/sevenzip.py) forwards callback data through a [`bounded producer bridge`](src/archive_line_index/backends/producer.py): one non-daemon worker, one queued block and one current consumer block, each at most 1 MiB. Callback buffers are subdivided before queueing. Dependency decompressor/callback allocations are outside those package buffer bounds.
+
+Closing cancels package waits and joins the worker; checks during package waits occur at most 0.05 seconds apart, but dependency operations can delay cancellation, so this is not a total close-latency guarantee. Early close does not assert integrity.
+
+For `records.7z`, CLI defaults are `records.sqlite3` and `records.u64` beside the archive.
+
+## Stream without indexing
+
+`open_content_stream` returns an owned, readable, nonseekable `ContentStream`. Use a context manager or call `close`. Short nonempty reads are legal; zero-length reads do not establish EOF. `readinto` measures capacity in bytes and leaves unused storage unchanged.
+
+```python
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from archive_line_index import open_content_stream
+
+with TemporaryDirectory() as directory:
+    target = Path(directory) / "payload.bin"
+    target.write_bytes(b"a\nb")
+    with open_content_stream(target, max_uncompressed_size=3) as stream:
+        assert stream.read(2) == b"a\n"
+        buffer = bytearray(b"????")
+        assert stream.readinto(buffer) == 1
+        assert buffer == b"b???"
+        assert stream.read() == b""
+    assert stream.closed
+```
+
+The inclusive size limit counts all payload bytes, including a BOM. Exactly-at-limit content still requires terminal validation. A read failure is retained until explicit closure; later otherwise-valid reads raise it rather than reporting EOF. Filesystem errors retain their ordinary Python types, and package-domain failures derive from `ArchiveLineIndexError`.
+
+## Scan a borrowed binary reader
+
+`scan_line_offsets` consumes from the reader's current position, defines that position as local offset zero and neither closes nor restores the reader. It needs only a blocking `read(size) -> bytes` operation; nonempty short reads are supported.
+
+```python
+from io import BytesIO
+
+from archive_line_index import scan_line_offsets
+
+payload = b"\xef\xbb\xbfalpha\r\n\nomega"
+source = BytesIO(payload)
+offsets = scan_line_offsets(source, buffer_size=2)
+assert offsets.typecode == "Q" and offsets.itemsize == 8
+assert offsets.tolist() == [3, 10, 11, 16]
+assert len(offsets) - 1 == 3
+assert payload[offsets[0]:offsets[1]] == b"alpha\r\n"
+assert not source.closed
+```
+
+Set `skip_utf8_bom=False` to include the initial BOM in first-line content. Later or incomplete BOMs remain ordinary bytes. Empty input yields `[0]`, skipped BOM-only input yields `[3]`, and a trailing LF adds no extra empty line. Line i spans `[offsets[i], offsets[i + 1])`.
+
 ## Progress logging
 
 Indexing emits standard INFO records from `archive_line_index.scanner`, reporting cumulative uncompressed bytes in the original indexed byte space, including a skipped BOM. The scanner checks at chunk boundaries and emits periodic updates only after five seconds have elapsed; it adds an exact final count after validated EOF and offset checks. It performs no per-line logging. Short or empty scans may emit only the final count, and a blocked read does not produce a timer heartbeat. A scan-complete message does not mean SQLite/raw publication has succeeded.
 
-Library use stays quiet unless the application enables INFO logging; configure logging in the application, as in the borrowed-reader example above. No root logger or console/file handler is configured by library import or scanning. Disabled progress performs no clock reads or record formatting. There are no extra payload reads, copies or extraction workers.
+Library use stays quiet unless the application enables INFO logging. Configure it in the application before indexing, for example:
+
+```python
+import logging
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from archive_line_index import build_line_index
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+with TemporaryDirectory() as directory:
+    source = Path(directory) / "events.txt"
+    source.write_bytes(b"a\nb")
+    assert build_line_index(source).tolist() == [0, 2, 3]
+```
+
+No root logger or console/file handler is configured by library import or scanning. Disabled progress performs no clock reads or record formatting. There are no extra payload reads, copies or extraction workers.
 
 The CLI defaults to `--log-level INFO`. With no effective application handlers, it temporarily sends concise progress to stderr; an embedding application can instead route it through its existing handlers. `--log-level WARNING` (or ERROR/CRITICAL) suppresses progress while retaining ordinary error diagnostics. Levels are case-insensitive; DEBUG adds no per-line output. The previous scanner level is restored and only CLI-owned handlers are removed, so repeated serialized calls do not accumulate logging setup. Existing root/parent/handler settings remain application-owned. Standalone stream-only reads and row-by-row persistence do not report progress.
 
@@ -257,6 +303,19 @@ The CLI defaults to `--log-level INFO`. With no effective application handlers, 
 The default scanner buffer is 1 MiB. Working payload storage is bounded by the current block and at most three BOM-probe bytes; no complete line is assembled. The offset array grows by eight bytes per line start plus the EOF sentinel, excluding object/allocation overhead. Offsets lie in `0..2^63 - 1`. Streaming alone has no indexing-range restriction.
 
 Calling `read()` with a negative size explicitly materializes all remaining content. Use bounded reads or `readinto` for incremental consumption. Allocation, source-read and terminal-validation failures return no partial index; an unbounded read that fails late returns no partial result from that call. Owned cleanup preserves a primary exception and attaches cleanup failures; close can be retried after failed resource release.
+
+## Line-boundary scanning
+
+`scan_line_offsets` reads bounded byte blocks (1 MiB by default) and searches each block with repeated `bytes.find` calls. The core loop in [`scanner.py`](src/archive_line_index/scanner.py), shown below as an implementation excerpt, records the byte immediately after each LF; `position` is the block’s starting offset:
+
+```py
+start = 0
+while (newline := block.find(b"\n", start)) >= 0:
+    append_offset(offsets, position + newline + 1)
+    start = newline + 1
+```
+
+This keeps byte searching in the runtime’s native `bytes` implementation, with Python work per match rather than per byte, and never assembles a complete line. A one-byte LF needs no overlap between blocks; BOM handling and the final EOF sentinel are managed outside this loop. Python byte-by-byte iteration adds interpreter work, `readline()`/`split()` materialize lines or fragments, and `mmap` requires a suitable file rather than the generic binary-reader interface. Blockwise `bytes.find` fits the bounded-memory streaming contract without an extra scanning dependency.
 
 ## Development and artifact verification
 
@@ -274,6 +333,10 @@ python scripts/check_release_artifacts.py --dist dist --tag v0.5.0
 python -m scripts.prepare_release --native-dist dist --output release --tag v0.5.0
 python -m scripts.prepare_release --output release --tag v0.5.0 --check
 ```
+
+From a checkout, build private native package inputs with `python -m build`.
+
+Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.5.0.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag.
 
 Use clean `dist` and `release` directories: `dist` contains private native build inputs, while `release` is the complete hosted inventory of wheel/source ZIP bundles and SHA256SUMS. The native checker verifies package/tag/metadata agreement, safe contents and source/wheel equality. The release checker independently rejects versions in every hosted filename, validates the bundled native pair and verifies outer checksums; neither command publishes a release. The actual naming gate is tested against the shared notation vectors, including historical and single-component versions with matching faulty expected names. Installed integration tests build both artifacts, independently rebuild from the source distribution, and exercise clean runtimes outside the checkout. If mypy's native parser fails during container process discovery, `python -m mypy --no-native-parser` retains strict checking with its supported Python parser.
 

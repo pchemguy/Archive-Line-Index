@@ -1,0 +1,79 @@
+# README and documentation revision report
+
+## Opening checkpoint
+
+Campaign 008_af8ae75-readme-docs is Open on revision/008_af8ae75-readme-docs, created from main at af8ae75219275e0142f4abdcb09bb10443f1fda6. [Revision plan](REVISION-PLAN.md) records scope and stopping boundary. The user authorized opening the campaign; no review, documentation amendment or execution was requested at this checkpoint.
+
+Before opening, the main worktree was clean, remote main was refreshed and matched the baseline, and repository-wide campaign path/ref discovery found 007 as the highest allocated sequence. Previous revision 007 was already integrated and published. This checkpoint adds only the new campaign records and the active HANDOFF; README, product documentation, source/tests, versions and releases remain unchanged.
+
+Verification is limited to opening-record links, whitespace, branch/baseline association and changed-path ownership. No test run or documentation-quality assessment is claimed. The containing opening commit requires publication/readback; subsequent review or concrete revisions await user direction.
+
+## V-001 — Group source backends
+
+Implemented the user-selected heading reorganization: Source backends now contains Plain files, ZIP, TAR and 7z subsections. All prose, examples and code blocks are unchanged. The parent section ends before independent persistence, keeping the four source backends together.
+
+Verification: exact comparison confirms non-heading content and all fenced code blocks are unchanged; the four backend headings are level three under one level-two parent; local README links resolve and git diff --check passes. No maintained reference to the replaced backend heading anchors was found. Tests were not rerun for this heading-only change. This containing action/evidence commit requires publication/readback. Campaign remains Open; no review, closure, merge, version bump or release is claimed.
+
+## V-002 — Consumer contract and automatic backend selection
+
+Confirmed from package exports, api.py, formats.py and backends/registry.py that build_line_index(source) normalizes a path, detects its format, opens the selected backend internally, completes scanning and closes its owned stream. Backend classes and format enums need not be imported by consumers. Both this library facade and CLI already satisfy automatic selection; library building returns an array and does not implicitly persist, whereas CLI main owns the paired file workflow.
+
+Added a Consumer contract section to README with separate Library and CLI subsections, explicit input/output and failure boundaries, and a question-to-contract table. Distinguishes API signatures in decomposition/public-api.md from operational/error semantics in spec/public-api.md; links CLI, line-index, persistence and archive acceptance/detection contracts. Clarifies single-payload archives, explicit library destinations, independent publication and informational progress versus completed output.
+
+Verification: inspected actual public implementation and linked authoritative contracts; all local README links resolve; existing fenced code blocks/examples are byte-for-byte unchanged, and git diff --check passes. No runtime, contract, version or test change is made; no test execution is claimed for this documentation-only amendment. The containing commit requires publication/readback. Campaign stays Open for further instructions.
+
+## V-003 — Consumer integration reference
+
+Applied the user's clarification: the section is now a compact entry-point/input-output table plus a core contract map for implementing consumers. It identifies automatic format selection, in-memory library results, explicit public persistence and CLI paired-output execution, then links signatures/exports, API outcomes/errors, CLI, index model, persistence, source acceptance and logging. It summarizes original uncompressed byte coordinates and independent publication without repeating backend implementation details or a usage tutorial.
+
+Verification: existing fenced examples are unchanged, all local README links resolve and git diff --check passes. The section is explanatory navigation to existing contracts; no normative requirement, public interface, production code or tests changed. No test rerun is needed for this prose/table amendment. Commit publication/readback remains required; campaign stays Open.
+
+### V-003 wording clarification
+
+The user clarified the audience as software using archive-line-index. The opening sentence now says exactly that; consumer contracts concern the software's dependency on this package. This is a wording-only follow-up, with no change to the documented interfaces or contract links. Diff whitespace passes; publication/readback is required for this checkpoint.
+
+The subsequent terminology clarification selects “software consuming archive-line-index” for that opening sentence. The software is the consumer; humans and agents implementing it use the interface summary and linked specifications. No interface or scope changes; whitespace check passes.
+
+## Critical composition review checkpoint
+
+A findings-only full-README composition review of af226cae5896df44054c60c313f6d85cd64ced0c is complete in [REVIEW-REPORT.md](REVIEW-REPORT.md): four Moderate findings and two Minor findings, all Open. The review examines task sequence, duplication, backend hierarchy, archive example framing, table density and logging-example placement. README and all product artifacts remain unchanged. Proposed repair order is advisory; no repair/closure/integration authority is inferred.
+
+## Composition revision planning checkpoint
+
+The user requested a revision plan, including assessment of Consumer contract as the section title. Proposed V-004–V-008 address all six open findings; D-001 compares Consumer contract, Integration contract and Public interfaces and contracts, recommending Integration contract with explicit specification authority. The plan retains user-approved backend grouping, source-to-output scope, contract links and technical qualifications. Planning only: no title was changed, no finding is marked resolved and no README/test edit was performed. The containing plan checkpoint requires publication/readback; stop before execution.
+
+## V-004 — Execution checkpoint
+
+Consolidate the integration interface summary. Selected Integration contract for D-001, removed the competing opening function inventory and reduced the main table to Python library and CLI. Invocation variants and exception/publication distinctions are adjacent prose; exact details remain in authoritative links. Static comparison verifies unchanged executable examples, retained overview/input/output semantics and valid links; no tests rerun for this heading/table change.
+
+The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.
+
+## V-005 — Execution checkpoint
+
+Prioritize complete library and CLI workflows. Moved library construction and independent persistence together, followed immediately by CLI console/module/imported use; backend detail, streaming and scanner implementation now follow the primary workflows. Expanded the existing build example to write and reload both index formats without adding another example. All eight README Python examples passed in both installed wheel/source-rebuilt variants (2 parameterized tests, 11.40 seconds). Heading order and current links pass; exact publication warnings and scanner rationale remain.
+
+The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.
+
+## V-006 — Execution checkpoint
+
+Separate shared source rules from format-specific backend details. Lifted text-path, automatic-detection, stability and sole-payload rules to the Source backends parent; Plain files, ZIP, TAR and 7z remain its subsections. Archive-creation imports and steps are explicitly labeled fixture setup, separate from the identical public consumer call. Retained CRC/size/codec, trailing TAR checks and bounded 7z cancellation qualifications. All eight Python example ASTs are unchanged from the installed-tested V-005 source; links and scope checks pass.
+
+The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.
+
+## V-007 — Execution checkpoint
+
+Colocate application logging configuration and clarify local paragraph roles. Removed logging setup from borrowed-reader scanning and added a complete source-based example under Progress logging. Updated the installed-example inventory from eight to nine; all nine examples passed for installed wheel and source-rebuilt variants (2 parameterized tests, 6.58 seconds), with Ruff lint/format passing for the changed test. Separated 7z buffer, cancellation and output naming paragraphs without dropping qualifications; moved packaging rationale and checkout build detail to Development while retaining installation and pinned-release guidance.
+
+The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.
+
+## V-008 — Execution checkpoint
+
+Verify the completed README composition revisions. All six findings are Verified with located after-state evidence in REVIEW-REPORT; D-001 resolves to Integration contract. Final focused verification passed 27 documentation/installed CLI/progress cases in 11.99 seconds, including all nine examples in wheel and source-rebuilt consumers; Ruff lint/format passes over 77 files. Verified current links/anchors, retained technical qualifications, six unchanged example ASTs plus two authorized changes/one new example, unchanged scanner excerpt and protected-source/frozen-record scope. Full runtime suite and native/visual execution were not repeated. V-004–V-007 are published; this final evidence checkpoint completes the requested execution range while leaving the campaign Open.
+
+The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.
+
+## Campaign finalization
+
+The user requested closure after verified V-001–V-008 delivery. Final verification checkpoint 1b536113ab67a8244e5671bfe434b2347c93f6c5 is published/read back. All six findings are Verified and D-001 is resolved; there are no pending selected revisions. Main was refreshed and remains at the original creation-parent baseline af8ae75219275e0142f4abdcb09bb10443f1fda6. The complete branch delta contains only README, the example-inventory test, this campaign's records and HANDOFF; runtime source, governing contracts, versions/releases and prior closed packages are unchanged.
+
+Finalization prepares an explicit two-parent merge into main after publication/readback of this containing checkpoint. Reuse the 27 passing integration checks and Ruff/format evidence when merged executable/documentation content matches the verified tip; any conflicting or changed content requires affected rechecks. Reconcile HANDOFF to main, publish/read back the merge, confirm clean main and close. Exact finalization/merge identities and subsequent publication facts are recorded by Git and remote readback rather than retroactively editing this frozen report. No version bump or release is selected. Native Windows and visual browser rendering remain unverified.
