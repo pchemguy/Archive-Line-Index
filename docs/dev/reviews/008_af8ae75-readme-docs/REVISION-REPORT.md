@@ -33,3 +33,7 @@ Verification: existing fenced examples are unchanged, all local README links res
 The user clarified the audience as software using archive-line-index. The opening sentence now says exactly that; consumer contracts concern the software's dependency on this package. This is a wording-only follow-up, with no change to the documented interfaces or contract links. Diff whitespace passes; publication/readback is required for this checkpoint.
 
 The subsequent terminology clarification selects “software consuming archive-line-index” for that opening sentence. The software is the consumer; humans and agents implementing it use the interface summary and linked specifications. No interface or scope changes; whitespace check passes.
+
+## Critical composition review checkpoint
+
+A findings-only full-README composition review of af226cae5896df44054c60c313f6d85cd64ced0c is complete in [REVIEW-REPORT.md](REVIEW-REPORT.md): four Moderate findings and two Minor findings, all Open. The review examines task sequence, duplication, backend hierarchy, archive example framing, table density and logging-example placement. README and all product artifacts remain unchanged. Proposed repair order is advisory; no repair/closure/integration authority is inferred.

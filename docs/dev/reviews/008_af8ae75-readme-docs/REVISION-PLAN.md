@@ -25,3 +25,7 @@ The user requested consumer-oriented source-to-output guidance and confirmation 
 ## Accepted clarification — V-003
 
 Refine Consumer contract into a concise integration reference usable by people and agents implementing consumer software. Summarize public source-to-output interfaces and guarantees, then map integration concerns to authoritative specifications. Keep implementation detail and tutorial repetition outside this section; retain explicit distinction between library array/persistence and CLI paired output. Verify linked contract coverage, unchanged executable examples and Markdown/link structure. Publish and pause within the open campaign.
+
+## Critical composition review authorization
+
+The user subsequently requested critical composition review. Scope is the complete current README and its consumer-contract navigation, assessed against the stated audience and source-to-output intent. The review is findings-only; [REVIEW-REPORT.md](REVIEW-REPORT.md) owns its coverage, located findings, priorities, recommended sequence and evidence limits. This does not preauthorize the proposed repairs, closure, integration or release.
