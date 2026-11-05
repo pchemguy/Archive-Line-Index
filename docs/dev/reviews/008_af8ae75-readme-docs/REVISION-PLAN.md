@@ -1,0 +1,15 @@
+# README and documentation revision plan
+
+## Campaign and authority
+
+Campaign 008_af8ae75; working branch revision/008_af8ae75-readme-docs; creation parent and intended integration target main; full branch-off baseline af8ae75219275e0142f4abdcb09bb10443f1fda6. The user requested opening a README/docs revision campaign. State: Open, awaiting the requested review or concrete documentation amendments.
+
+## Scope and boundaries
+
+The campaign concerns README.md and maintained project documentation: overview, inputs/outputs, public interfaces, usage examples, installation, progress logging, navigation and consistency with supported behavior. Specific revision actions and their verification will be recorded when selected. No defect, review result, accepted amendment or completed change is implied by campaign opening.
+
+Current authorization covers this campaign's branch, opening records, HANDOFF and their publication. Stop after opening; do not review or edit README, documentation or code yet. Preserve all closed campaign/feature records and existing tags/releases. Runtime changes, governing requirement amendments, version bumps, release publication and integration are not selected by this opening request. Retain Markdown paragraphs and list items on single source lines.
+
+## Evidence and continuation
+
+[REVISION-REPORT.md](REVISION-REPORT.md) records actual campaign work. Future accepted revisions will receive stable action IDs, affected owners and objective checks. Preserve evidence and publish/read back each owned checkpoint before dependent work. No executable revision action or product task is allocated at opening.
