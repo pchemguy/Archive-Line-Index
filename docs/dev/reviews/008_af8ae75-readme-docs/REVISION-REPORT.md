@@ -41,3 +41,9 @@ A findings-only full-README composition review of af226cae5896df44054c60c313f6d8
 ## Composition revision planning checkpoint
 
 The user requested a revision plan, including assessment of Consumer contract as the section title. Proposed V-004–V-008 address all six open findings; D-001 compares Consumer contract, Integration contract and Public interfaces and contracts, recommending Integration contract with explicit specification authority. The plan retains user-approved backend grouping, source-to-output scope, contract links and technical qualifications. Planning only: no title was changed, no finding is marked resolved and no README/test edit was performed. The containing plan checkpoint requires publication/readback; stop before execution.
+
+## V-004 — Execution checkpoint
+
+Consolidate the integration interface summary. Selected Integration contract for D-001, removed the competing opening function inventory and reduced the main table to Python library and CLI. Invocation variants and exception/publication distinctions are adjacent prose; exact details remain in authoritative links. Static comparison verifies unchanged executable examples, retained overview/input/output semantics and valid links; no tests rerun for this heading/table change.
+
+The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.

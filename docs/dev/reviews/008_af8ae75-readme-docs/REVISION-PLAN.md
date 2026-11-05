@@ -92,3 +92,7 @@ No new guide/file is needed by default: first clarify and group existing example
 During execution, compare the final README with the pinned review source and map retained technical content to its new home, so consolidation does not silently lose constraints. Review the document at sentence/table, paragraph, section and overall journey levels. Check current active links, including renamed heading anchors, without auditing or changing frozen campaign packages. Run the installed README-example tests for wheel and source-rebuilt variants after executable-example edits; run relevant formatting/lint checks if the test inventory changes. A full runtime suite is not automatically required for prose movement; broaden checks only for actual changed behavior or unresolved coupling.
 
 Current deliverable: publish this proposed plan, present D-001 and the ordered actions, then stop. README and tests remain unchanged. No repair execution, closure, integration, version bump or release is selected by this planning request.
+
+## Execution authorization
+
+The user accepted execution of the proposed plan. D-001 is resolved by the plan's recommended Integration contract title. V-004–V-008 may proceed with per-action verification/publication; stop after V-008 while the campaign remains Open. Earlier planning-only limits are superseded only for these actions; closure, integration and release remain unselected.

@@ -4,17 +4,6 @@ Archive Line Index is a Python library and minimal CLI for building compact byte
 
 Payload inputs are filesystem paths or caller-supplied blocking binary readers. Python index construction returns an in-memory `array("Q")` of unsigned eight-byte offsets: one start per line, followed by an end-of-file sentinel. For example, `b"a\nb"` produces `[0, 2, 3]`, describing the byte ranges `[0, 2)` and `[2, 3)`. Streaming returns original payload bytes through `read` or `readinto`. Persistence stores the completed array at an explicit path; the CLI indexes one target once and writes both `.sqlite3` and `.u64` files.
 
-Library functions are imported from `archive_line_index`; the importable CLI callable is `archive_line_index.cli.main`.
-
-| Interface | Input | Output and ownership |
-| --- | --- | --- |
-| `open_content_stream` | Filesystem path (`str` or text path-like object) | Owned `ContentStream` for sequential binary reads; the caller closes it. |
-| `scan_line_offsets` | Blocking binary reader with `read(size) -> bytes` | Completed offset array; the reader is borrowed and remains open. |
-| `build_line_index` | Filesystem path | Completed offset array; source opening and closure are managed by the library. |
-| `write_sqlite_index`, `write_raw_index` | Completed offset array and explicit destination path | One complete index file; the input array is borrowed and unchanged. |
-| `read_sqlite_index`, `read_raw_index` | Stored index path | A newly owned, validated offset array; no payload source is needed. |
-| `cli.main` / console / module | One target and optional shared output stem/overwrite flag | Integer status and paired SQLite/raw files from one scan. |
-
 The library requires Python 3.11 or later and supports plain payload files, single-payload ZIP, TAR (plain/gzip/bzip2/xz) and 7z archives, caller-supplied binary readers, both persistence formats and all three CLI invocation forms.
 
 The library preserves payload bytes. LF is the only line terminator, CRLF retains both bytes, and the final offset is an EOF sentinel. An optional initial UTF-8 BOM policy changes the first line's start to 3 while retaining coordinates in the original bytes. No text decoding or line-ending normalization occurs.
@@ -32,15 +21,16 @@ Each hosted bundle has a stable version-free name. The wheel bundle contains one
 
 From a checkout, build private native package inputs with `python -m build`. The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library. The 7z dependency is loaded only when opening 7z content.
 
-## Consumer contract
+## Integration contract
 
-For software consuming `archive-line-index`, the public entry points and contracts below define the source-to-output boundary. Both library and CLI accept a filesystem path and automatically select plain-file, ZIP, TAR or 7z handling. No archive-backend imports or explicit format selection are required. Supported archives contain exactly one regular-file payload.
+For software consuming `archive-line-index`, this section summarizes the public integration boundary; the linked specifications define exact behavior. Both library and CLI accept a filesystem path and automatically select plain-file, ZIP, TAR or 7z handling. No archive-backend imports or explicit format selection are required. Supported archives contain exactly one regular-file payload.
 
 | Interface | Entry point | Result |
 | --- | --- | --- |
-| Python library | `from archive_line_index import build_line_index`; call `build_line_index(source)` | Completed `array("Q")` of line-start offsets followed by an EOF sentinel; source validation and closure are library-owned. Failures raise exceptions; no files are written. |
-| Library persistence | `write_sqlite_index(offsets, destination)` and `write_raw_index(offsets, destination)`, imported from `archive_line_index` | Store the completed array at explicit paths without rescanning. Each output is published independently. |
-| CLI | `archive-line-index SOURCE` or `python -m archive_line_index SOURCE`; in Python, `archive_line_index.cli.main([source])` | Scan once and write both `.sqlite3` and `.u64` files. Defaults use the source directory and stem; `--output` selects a shared stem. Process exit status or the callable's integer result indicates success/failure. |
+| Python library | `from archive_line_index import build_line_index`; `build_line_index(source)` | A completed offset array. Persistence is explicit through package-root writer/reader functions. |
+| CLI | `archive-line-index SOURCE` | Both SQLite and raw index files from one scan; exit status reports success or failure. |
+
+The CLI also runs as `python -m archive_line_index SOURCE` or through the importable `archive_line_index.cli.main([source])`, which returns an integer status. Library calls raise exceptions; index construction creates no output files. Each persistence output is published independently.
 
 Offsets refer to the original uncompressed payload bytes, not archive positions or decoded characters. LF ends a line; the EOF sentinel is included in both stored formats. Output naming, overwrite rules, BOM handling, validation and failure outcomes are defined by the linked contracts. A later persistence failure can leave an earlier output published; scan-complete logging alone does not certify output publication.
 
