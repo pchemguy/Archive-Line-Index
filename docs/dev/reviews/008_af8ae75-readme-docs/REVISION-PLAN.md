@@ -17,3 +17,7 @@ Current authorization covers this campaign's branch, opening records, HANDOFF an
 ## Accepted amendment — V-001
 
 The user requested grouping different backends into one README section with subsections. V-001 introduces Source backends with Plain files, ZIP, TAR and 7z subsections, retaining all existing descriptions and examples. This later instruction authorizes this focused README edit and its campaign evidence/publication beyond the opening-only checkpoint; campaign closure, integration and release remain unselected. Verify heading hierarchy, unchanged non-heading content/code blocks, local links and diff whitespace; no production behavior or test changes are needed.
+
+## Accepted amendment — V-002
+
+The user requested consumer-oriented source-to-output guidance and confirmation that library/CLI consumers need no backend imports or explicit format selection. Add a README Consumer contract section covering the existing automatic source selection, library array/persistence workflow, CLI paired output and direct links to public API, CLI, index, persistence and input acceptance contracts. This documents delivered interfaces; it does not add a combined library operation or change requirements. Verify against public exports, API composition, detector/registry and current contracts; preserve all executable examples and validate local links. Campaign remains open after publication.

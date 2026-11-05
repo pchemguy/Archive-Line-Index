@@ -13,3 +13,11 @@ Verification is limited to opening-record links, whitespace, branch/baseline ass
 Implemented the user-selected heading reorganization: Source backends now contains Plain files, ZIP, TAR and 7z subsections. All prose, examples and code blocks are unchanged. The parent section ends before independent persistence, keeping the four source backends together.
 
 Verification: exact comparison confirms non-heading content and all fenced code blocks are unchanged; the four backend headings are level three under one level-two parent; local README links resolve and git diff --check passes. No maintained reference to the replaced backend heading anchors was found. Tests were not rerun for this heading-only change. This containing action/evidence commit requires publication/readback. Campaign remains Open; no review, closure, merge, version bump or release is claimed.
+
+## V-002 — Consumer contract and automatic backend selection
+
+Confirmed from package exports, api.py, formats.py and backends/registry.py that build_line_index(source) normalizes a path, detects its format, opens the selected backend internally, completes scanning and closes its owned stream. Backend classes and format enums need not be imported by consumers. Both this library facade and CLI already satisfy automatic selection; library building returns an array and does not implicitly persist, whereas CLI main owns the paired file workflow.
+
+Added a Consumer contract section to README with separate Library and CLI subsections, explicit input/output and failure boundaries, and a question-to-contract table. Distinguishes API signatures in decomposition/public-api.md from operational/error semantics in spec/public-api.md; links CLI, line-index, persistence and archive acceptance/detection contracts. Clarifies single-payload archives, explicit library destinations, independent publication and informational progress versus completed output.
+
+Verification: inspected actual public implementation and linked authoritative contracts; all local README links resolve; existing fenced code blocks/examples are byte-for-byte unchanged, and git diff --check passes. No runtime, contract, version or test change is made; no test execution is claimed for this documentation-only amendment. The containing commit requires publication/readback. Campaign stays Open for further instructions.
