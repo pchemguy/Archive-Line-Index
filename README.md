@@ -43,69 +43,9 @@ Offsets refer to the original uncompressed payload bytes, not archive positions 
 | Accepted source formats, automatic detection and archive restrictions | [Source/archive contract](docs/dev/spec/archive-handling.md) |
 | Progress records, verbosity and application logging configuration | [Progress-logging contract](docs/dev/spec/progress-logging.md) |
 
-## Stream without indexing
+## Index a source through the library
 
-`open_content_stream` returns an owned, readable, nonseekable `ContentStream`. Use a context manager or call `close`. Short nonempty reads are legal; zero-length reads do not establish EOF. `readinto` measures capacity in bytes and leaves unused storage unchanged.
-
-```python
-from pathlib import Path
-from tempfile import TemporaryDirectory
-
-from archive_line_index import open_content_stream
-
-with TemporaryDirectory() as directory:
-    target = Path(directory) / "payload.bin"
-    target.write_bytes(b"a\nb")
-    with open_content_stream(target, max_uncompressed_size=3) as stream:
-        assert stream.read(2) == b"a\n"
-        buffer = bytearray(b"????")
-        assert stream.readinto(buffer) == 1
-        assert buffer == b"b???"
-        assert stream.read() == b""
-    assert stream.closed
-```
-
-The inclusive size limit counts all payload bytes, including a BOM. Exactly-at-limit content still requires terminal validation. A read failure is retained until explicit closure; later otherwise-valid reads raise it rather than reporting EOF. Filesystem errors retain their ordinary Python types, and package-domain failures derive from `ArchiveLineIndexError`.
-
-## Scan a borrowed binary reader
-
-`scan_line_offsets` consumes from the reader's current position, defines that position as local offset zero and neither closes nor restores the reader. It needs only a blocking `read(size) -> bytes` operation; nonempty short reads are supported.
-
-```python
-import logging
-from io import BytesIO
-
-from archive_line_index import scan_line_offsets
-
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
-payload = b"\xef\xbb\xbfalpha\r\n\nomega"
-source = BytesIO(payload)
-offsets = scan_line_offsets(source, buffer_size=2)
-assert offsets.typecode == "Q" and offsets.itemsize == 8
-assert offsets.tolist() == [3, 10, 11, 16]
-assert len(offsets) - 1 == 3
-assert payload[offsets[0]:offsets[1]] == b"alpha\r\n"
-assert not source.closed
-```
-
-Set `skip_utf8_bom=False` to include the initial BOM in first-line content. Later or incomplete BOMs remain ordinary bytes. Empty input yields `[0]`, skipped BOM-only input yields `[3]`, and a trailing LF adds no extra empty line. Line i spans `[offsets[i], offsets[i + 1])`.
-
-## Line-boundary scanning
-
-`scan_line_offsets` reads bounded byte blocks (1 MiB by default) and searches each block with repeated `bytes.find` calls. The core loop in [`scanner.py`](src/archive_line_index/scanner.py), shown below as an implementation excerpt, records the byte immediately after each LF; `position` is the block’s starting offset:
-
-```py
-start = 0
-while (newline := block.find(b"\n", start)) >= 0:
-    append_offset(offsets, position + newline + 1)
-    start = newline + 1
-```
-
-This keeps byte searching in the runtime’s native `bytes` implementation, with Python work per match rather than per byte, and never assembles a complete line. A one-byte LF needs no overlap between blocks; BOM handling and the final EOF sentinel are managed outside this loop. Python byte-by-byte iteration adds interpreter work, `readline()`/`split()` materialize lines or fragments, and `mmap` requires a suitable file rather than the generic binary-reader interface. Blockwise `bytes.find` fits the bounded-memory streaming contract without an extra scanning dependency.
-
-## Source backends
-
-### Plain files
+For an existing source, call `build_line_index(source)`; the same call handles a plain file or supported archive. Persist its result with the package-root writers when files are needed. The self-contained example below creates a small plain source, builds its index and writes/reloads both outputs.
 
 `build_line_index` opens and owns the content stream, scans through validated EOF and closes it on success or failure. It returns only the completed array; it creates no output files.
 
@@ -113,7 +53,13 @@ This keeps byte searching in the runtime’s native `bytes` implementation, with
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from archive_line_index import build_line_index
+from archive_line_index import (
+    build_line_index,
+    read_raw_index,
+    read_sqlite_index,
+    write_raw_index,
+    write_sqlite_index,
+)
 
 with TemporaryDirectory() as directory:
     target = Path(directory) / "records.txt"
@@ -122,7 +68,85 @@ with TemporaryDirectory() as directory:
         target, buffer_size=4, max_uncompressed_size=13
     )
     assert offsets.tolist() == [0, 7, 8, 13]
+    write_sqlite_index(offsets, Path(directory) / "records.sqlite3")
+    write_raw_index(offsets, Path(directory) / "records.u64")
+    assert read_sqlite_index(Path(directory) / "records.sqlite3") == offsets
+    assert read_raw_index(Path(directory) / "records.u64") == offsets
 ```
+
+The library owns source validation and closure and returns no partial array on failure. Writer destinations are explicit; existing files are protected unless `overwrite=True`. Each file is published independently, so a later failure can leave an earlier output complete.
+
+### Store and reload an index independently
+
+SQLite uses a dedicated rowid table `line_index(offset INTEGER PRIMARY KEY)`, with one row per offset including EOF. Raw files contain only consecutive little-endian unsigned 64-bit values, with no header. Both readers validate the complete representation before returning an array; neither requires the payload source.
+
+```python
+from array import array
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from archive_line_index import (
+    read_raw_index,
+    read_sqlite_index,
+    write_raw_index,
+    write_sqlite_index,
+)
+
+with TemporaryDirectory() as directory:
+    root = Path(directory)
+    offsets = array("Q", [0, 2, 3])
+    write_sqlite_index(offsets, root / "index.sqlite3")
+    write_raw_index(offsets, root / "index.u64")
+    assert read_sqlite_index(root / "index.sqlite3") == offsets
+    assert read_raw_index(root / "index.u64") == offsets
+```
+
+Writers protect existing destinations by default, including dangling symlinks and names created at publication time. `overwrite=True` authorizes atomic replacement of the whole file; SQLite replacement also replaces any old unrelated tables. Each file is built and validated in an owned temporary sibling, closed and independently published. A failure before publication preserves the previous destination. A cleanup failure after publication retains the complete new file and reports that fact in an exception note. There is no cross-file transaction or rollback of an earlier completed publication.
+
+## Index one target through the CLI
+
+Given an existing `data/events.txt` and an existing `results` directory:
+
+```bash
+archive-line-index data/events.txt
+python -m archive_line_index data/events.txt --output results/custom
+archive-line-index data/events.txt --overwrite
+archive-line-index data/events.txt --overwrite --log-level WARNING
+archive-line-index -- -events.txt
+```
+
+The first command creates `data/events.sqlite3` and `data/events.u64`. Defaults use the input directory and remove only the final suffix: `events.tar.gz` would use stem `events.tar`, while an extensionless name or dotfile keeps its normal path stem. `--output results/custom` appends both extensions to that shared stem. Parent directories are not created automatically. Quote paths containing spaces; `--` permits a target beginning with a hyphen.
+
+Both destinations are checked before scanning. An existing output requires `--overwrite`; any output alias of the input is rejected even with overwrite. The command scans once, writes SQLite first and raw second, and reports both paths and the line count only after both succeed. Help returns 0, usage errors 2, expected operational errors 1 and interruption 130. Diagnostics go to stderr and identify known completed outputs, including post-publication cleanup notes; a nonzero status does not imply both files are absent.
+
+The same callable can be used without exiting the Python caller:
+
+```python
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from archive_line_index import read_raw_index, read_sqlite_index
+from archive_line_index.cli import main
+
+with TemporaryDirectory() as directory:
+    root = Path(directory)
+    target = root / "events.txt"
+    target.write_bytes(b"a\nb")
+    assert main([str(target)]) == 0
+    assert read_sqlite_index(root / "events.sqlite3").tolist() == [0, 2, 3]
+    assert read_raw_index(root / "events.u64").tolist() == [0, 2, 3]
+    assert main([str(target), "--overwrite"]) == 0
+    assert main([str(target), "--output", str(root / "custom")]) == 0
+    assert read_sqlite_index(root / "custom.sqlite3") == read_raw_index(root / "custom.u64")
+```
+
+Importing the package, CLI or module runner performs no command execution. An explicit argv must be a sequence of strings; `None` uses process arguments. Library APIs continue to raise exceptions directly and do not acquire CLI printing or process-exit behavior.
+
+## Source backends
+
+### Plain files
+
+Plain files expose their original bytes. The [library workflow](#index-a-source-through-the-library) shows indexing and persistence without archive setup.
 
 Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. Recognized archive signatures or suffixes select the corresponding adapter; archive claims never silently fall back to plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
 
@@ -191,71 +215,52 @@ with TemporaryDirectory() as directory:
 
 The [`7z adapter`](src/archive_line_index/backends/sevenzip.py) forwards callback data through a [`bounded producer bridge`](src/archive_line_index/backends/producer.py): one non-daemon worker, one queued block and one current consumer block, each at most 1 MiB. Callback buffers are subdivided before queueing. Dependency decompressor/callback allocations are outside those package buffer bounds. Closing cancels package waits and joins the worker; checks during package waits occur at most 0.05 seconds apart, but dependency operations can delay cancellation, so this is not a total close-latency guarantee. Early close does not assert integrity. For `records.7z`, CLI defaults are `records.sqlite3` and `records.u64` beside the archive.
 
-## Store and reload an index independently
+## Stream without indexing
 
-SQLite uses a dedicated rowid table `line_index(offset INTEGER PRIMARY KEY)`, with one row per offset including EOF. Raw files contain only consecutive little-endian unsigned 64-bit values, with no header. Both readers validate the complete representation before returning an array; neither requires the payload source.
-
-```python
-from array import array
-from pathlib import Path
-from tempfile import TemporaryDirectory
-
-from archive_line_index import (
-    read_raw_index,
-    read_sqlite_index,
-    write_raw_index,
-    write_sqlite_index,
-)
-
-with TemporaryDirectory() as directory:
-    root = Path(directory)
-    offsets = array("Q", [0, 2, 3])
-    write_sqlite_index(offsets, root / "index.sqlite3")
-    write_raw_index(offsets, root / "index.u64")
-    assert read_sqlite_index(root / "index.sqlite3") == offsets
-    assert read_raw_index(root / "index.u64") == offsets
-```
-
-Writers protect existing destinations by default, including dangling symlinks and names created at publication time. `overwrite=True` authorizes atomic replacement of the whole file; SQLite replacement also replaces any old unrelated tables. Each file is built and validated in an owned temporary sibling, closed and independently published. A failure before publication preserves the previous destination. A cleanup failure after publication retains the complete new file and reports that fact in an exception note. There is no cross-file transaction or rollback of an earlier completed publication.
-
-## Index one target through the CLI
-
-Given an existing `data/events.txt` and an existing `results` directory:
-
-```bash
-archive-line-index data/events.txt
-python -m archive_line_index data/events.txt --output results/custom
-archive-line-index data/events.txt --overwrite
-archive-line-index data/events.txt --overwrite --log-level WARNING
-archive-line-index -- -events.txt
-```
-
-The first command creates `data/events.sqlite3` and `data/events.u64`. Defaults use the input directory and remove only the final suffix: `events.tar.gz` would use stem `events.tar`, while an extensionless name or dotfile keeps its normal path stem. `--output results/custom` appends both extensions to that shared stem. Parent directories are not created automatically. Quote paths containing spaces; `--` permits a target beginning with a hyphen.
-
-Both destinations are checked before scanning. An existing output requires `--overwrite`; any output alias of the input is rejected even with overwrite. The command scans once, writes SQLite first and raw second, and reports both paths and the line count only after both succeed. Help returns 0, usage errors 2, expected operational errors 1 and interruption 130. Diagnostics go to stderr and identify known completed outputs, including post-publication cleanup notes; a nonzero status does not imply both files are absent.
-
-The same callable can be used without exiting the Python caller:
+`open_content_stream` returns an owned, readable, nonseekable `ContentStream`. Use a context manager or call `close`. Short nonempty reads are legal; zero-length reads do not establish EOF. `readinto` measures capacity in bytes and leaves unused storage unchanged.
 
 ```python
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from archive_line_index import read_raw_index, read_sqlite_index
-from archive_line_index.cli import main
+from archive_line_index import open_content_stream
 
 with TemporaryDirectory() as directory:
-    root = Path(directory)
-    target = root / "events.txt"
+    target = Path(directory) / "payload.bin"
     target.write_bytes(b"a\nb")
-    assert main([str(target)]) == 0
-    assert read_sqlite_index(root / "events.sqlite3").tolist() == [0, 2, 3]
-    assert read_raw_index(root / "events.u64").tolist() == [0, 2, 3]
-    assert main([str(target), "--overwrite"]) == 0
-    assert main([str(target), "--output", str(root / "custom")]) == 0
-    assert read_sqlite_index(root / "custom.sqlite3") == read_raw_index(root / "custom.u64")
+    with open_content_stream(target, max_uncompressed_size=3) as stream:
+        assert stream.read(2) == b"a\n"
+        buffer = bytearray(b"????")
+        assert stream.readinto(buffer) == 1
+        assert buffer == b"b???"
+        assert stream.read() == b""
+    assert stream.closed
 ```
 
-Importing the package, CLI or module runner performs no command execution. An explicit argv must be a sequence of strings; `None` uses process arguments. Library APIs continue to raise exceptions directly and do not acquire CLI printing or process-exit behavior.
+The inclusive size limit counts all payload bytes, including a BOM. Exactly-at-limit content still requires terminal validation. A read failure is retained until explicit closure; later otherwise-valid reads raise it rather than reporting EOF. Filesystem errors retain their ordinary Python types, and package-domain failures derive from `ArchiveLineIndexError`.
+
+## Scan a borrowed binary reader
+
+`scan_line_offsets` consumes from the reader's current position, defines that position as local offset zero and neither closes nor restores the reader. It needs only a blocking `read(size) -> bytes` operation; nonempty short reads are supported.
+
+```python
+import logging
+from io import BytesIO
+
+from archive_line_index import scan_line_offsets
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+payload = b"\xef\xbb\xbfalpha\r\n\nomega"
+source = BytesIO(payload)
+offsets = scan_line_offsets(source, buffer_size=2)
+assert offsets.typecode == "Q" and offsets.itemsize == 8
+assert offsets.tolist() == [3, 10, 11, 16]
+assert len(offsets) - 1 == 3
+assert payload[offsets[0]:offsets[1]] == b"alpha\r\n"
+assert not source.closed
+```
+
+Set `skip_utf8_bom=False` to include the initial BOM in first-line content. Later or incomplete BOMs remain ordinary bytes. Empty input yields `[0]`, skipped BOM-only input yields `[3]`, and a trailing LF adds no extra empty line. Line i spans `[offsets[i], offsets[i + 1])`.
 
 ## Progress logging
 
@@ -270,6 +275,19 @@ The CLI defaults to `--log-level INFO`. With no effective application handlers, 
 The default scanner buffer is 1 MiB. Working payload storage is bounded by the current block and at most three BOM-probe bytes; no complete line is assembled. The offset array grows by eight bytes per line start plus the EOF sentinel, excluding object/allocation overhead. Offsets lie in `0..2^63 - 1`. Streaming alone has no indexing-range restriction.
 
 Calling `read()` with a negative size explicitly materializes all remaining content. Use bounded reads or `readinto` for incremental consumption. Allocation, source-read and terminal-validation failures return no partial index; an unbounded read that fails late returns no partial result from that call. Owned cleanup preserves a primary exception and attaches cleanup failures; close can be retried after failed resource release.
+
+## Line-boundary scanning
+
+`scan_line_offsets` reads bounded byte blocks (1 MiB by default) and searches each block with repeated `bytes.find` calls. The core loop in [`scanner.py`](src/archive_line_index/scanner.py), shown below as an implementation excerpt, records the byte immediately after each LF; `position` is the block’s starting offset:
+
+```py
+start = 0
+while (newline := block.find(b"\n", start)) >= 0:
+    append_offset(offsets, position + newline + 1)
+    start = newline + 1
+```
+
+This keeps byte searching in the runtime’s native `bytes` implementation, with Python work per match rather than per byte, and never assembles a complete line. A one-byte LF needs no overlap between blocks; BOM handling and the final EOF sentinel are managed outside this loop. Python byte-by-byte iteration adds interpreter work, `readline()`/`split()` materialize lines or fragments, and `mmap` requires a suitable file rather than the generic binary-reader interface. Blockwise `bytes.find` fits the bounded-memory streaming contract without an extra scanning dependency.
 
 ## Development and artifact verification
 
