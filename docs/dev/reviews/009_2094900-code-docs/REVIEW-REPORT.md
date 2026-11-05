@@ -9,7 +9,7 @@ Campaign 009_2094900-code-docs; reviewed source 209490063eb2e299243fc7ad99e63a08
 | Unit | Status | Evidence |
 | --- | --- | --- |
 | U-001 | Complete | Complete public/facade/source/error/offset/scanner/stream inspection; 197 targeted tests and 3,000 independent scanner cases pass; R-001 reproduced. |
-| U-002 | Pending | Formats/backends/producer. |
+| U-002 | Complete | Complete format/adapter/producer inspection; 175 selected checks pass; no additional confirmed finding. |
 | U-003 | Pending | Persistence/CLI. |
 | U-004 | Pending | Packaging/tests/current docs/full checks/consolidation. |
 
@@ -27,3 +27,11 @@ Executed 197 targeted API/source/offset/scanner/stream/progress/export tests: al
 - Impact: a caller retaining a closed stream after a late failure can retain the full accumulated unbounded payload, potentially very large. This does not show a bounded-read whole-payload materialization bug; the failure is resource retention after explicit successful close. Existing tests assert handles/closed state but do not expose this memory lifetime.
 - Proposed correction: release the stream's retained failure reference after resource closure succeeds, while preserving retained-error behavior before close, cleanup-retry state if close fails, and externally raised exception objects/notes. Do not mutate an exception owned by the caller merely to erase traceback evidence.
 - Objective recheck: retain the closed stream but discard the caught exception, prove accumulated/read-frame resources become reclaimable after successful close, and rerun retained-error, read/readinto priority, cleanup-retry and late-failure tests. No repair is authorized by this review.
+
+## U-002 — Format detection, adapters and producer bridge
+
+Inspected formats.py and every backend owner: package marker, base protocol/size validation, plain, registry, ZIP, TAR, producer and sevenzip. Compared against archive handling and internal API/lifecycle contracts plus README format and memory/cancellation guidance. Reviewed format tests, all backend test scenario inventories and consequential ZIP-size, TAR trailing/footer, producer startup/join/cancel and actual 7z backpressure/CRC cases and fixture generators.
+
+Confirmed bounded signature inspection and signature-before-suffix selection, no malformed-archive plain fallback, sole regular-member policy without path extraction, ordinary source-I/O error preservation, and format-specific EOF validation. TAR's strict end-marker/trailing scan and compressed-reader drain cover late invalid data; ZIP deliberately claims observable member-stream validation rather than extra corruption detection unavailable through its dependency. 7z metadata precedes delivery; the worker owns extraction cleanup, queue cancellation is independent of capacity, transport is finite and close joins rather than abandoning the thread. The documented cooperative cancellation/dependency-memory limitations remain necessary and are not defects merely because shutdown has no absolute deadline. _QueueReader does clear its retained error on successful close; R-001 belongs to the common stream layer.
+
+Executed 175 selected format/backend/full-format lifecycle/backpressure tests, all passed in 4.65 seconds. Checks include actual required TAR filters and 7z codecs, independent instances, exact limits, full-queue early close, producer outcomes, CRC/truncation and SIGINT cleanup. No additional confirmed bug or documentation conflict is recorded for this unit. This is bounded inspection/execution evidence, not proof of safety for every archive or native platform.
