@@ -68,11 +68,12 @@ def test_installed_default_progress_suppression_and_invalid_level(
     assert invalid.returncode == 2 and "usage:" in invalid.stderr and not invalid.stdout
     installed_package.run(f"""
 import logging
-from archive_line_index import read_raw_index, read_sqlite_index
-assert read_raw_index({str(source.with_suffix(".u64"))!r}).tolist() == [3, 10, 11, 16]
-assert read_sqlite_index({str(source.with_suffix(".sqlite3"))!r}).tolist() == [3, 10, 11, 16]
 root = logging.getLogger()
 before = root.level, root.handlers[:]
+from archive_line_index import read_raw_index, read_sqlite_index
+assert (root.level, root.handlers) == before
+assert read_raw_index({str(source.with_suffix(".u64"))!r}).tolist() == [3, 10, 11, 16]
+assert read_sqlite_index({str(source.with_suffix(".sqlite3"))!r}).tolist() == [3, 10, 11, 16]
 from archive_line_index.cli import main
 assert (root.level, root.handlers) == before
 logger = logging.getLogger("archive_line_index.scanner")
