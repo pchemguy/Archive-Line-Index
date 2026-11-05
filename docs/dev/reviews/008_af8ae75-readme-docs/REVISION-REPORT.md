@@ -27,3 +27,7 @@ Verification: inspected actual public implementation and linked authoritative co
 Applied the user's clarification: the section is now a compact entry-point/input-output table plus a core contract map for implementing consumers. It identifies automatic format selection, in-memory library results, explicit public persistence and CLI paired-output execution, then links signatures/exports, API outcomes/errors, CLI, index model, persistence, source acceptance and logging. It summarizes original uncompressed byte coordinates and independent publication without repeating backend implementation details or a usage tutorial.
 
 Verification: existing fenced examples are unchanged, all local README links resolve and git diff --check passes. The section is explanatory navigation to existing contracts; no normative requirement, public interface, production code or tests changed. No test rerun is needed for this prose/table amendment. Commit publication/readback remains required; campaign stays Open.
+
+### V-003 wording clarification
+
+The user clarified the audience as software using archive-line-index. The opening sentence now says exactly that; consumer contracts concern the software's dependency on this package. This is a wording-only follow-up, with no change to the documented interfaces or contract links. Diff whitespace passes; publication/readback is required for this checkpoint.
