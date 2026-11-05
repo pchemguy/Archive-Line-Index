@@ -35,6 +35,7 @@ with open_content_stream({target.name!r}) as stream:
     bad.write_bytes(raw)
     failure = _invoke(installed_package, route, [bad.name])
     assert failure.returncode == 1 and not failure.stdout and failure.stderr
+    assert "Scan complete" not in failure.stderr
     assert not bad.with_suffix(".sqlite3").exists()
     assert not bad.with_suffix(".u64").exists()
 
@@ -104,6 +105,7 @@ assert read_sqlite_index({str(empty.with_suffix(".sqlite3"))!r}).tolist() == [0]
     )
     result = _invoke(installed_package, "module", [bad.name])
     assert result.returncode == 1 and not result.stdout and result.stderr
+    assert "Scan complete" not in result.stderr
     assert not bad.with_suffix(".sqlite3").exists()
     assert not bad.with_suffix(".u64").exists()
 
@@ -141,5 +143,6 @@ assert read_sqlite_index({str(stem) + ".sqlite3"!r}).tolist() == {expected!r}
     bad.write_bytes(raw)
     failed = _invoke(installed_package, route, [bad.name])
     assert failed.returncode == 1 and not failed.stdout and failed.stderr
+    assert "Scan complete" not in failed.stderr
     assert not bad.with_suffix(".sqlite3").exists()
     assert not bad.with_suffix(".u64").exists()
