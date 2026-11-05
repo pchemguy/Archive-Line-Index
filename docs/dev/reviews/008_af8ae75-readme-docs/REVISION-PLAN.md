@@ -13,3 +13,7 @@ Current authorization covers this campaign's branch, opening records, HANDOFF an
 ## Evidence and continuation
 
 [REVISION-REPORT.md](REVISION-REPORT.md) records actual campaign work. Future accepted revisions will receive stable action IDs, affected owners and objective checks. Preserve evidence and publish/read back each owned checkpoint before dependent work. No executable revision action or product task is allocated at opening.
+
+## Accepted amendment — V-001
+
+The user requested grouping different backends into one README section with subsections. V-001 introduces Source backends with Plain files, ZIP, TAR and 7z subsections, retaining all existing descriptions and examples. This later instruction authorizes this focused README edit and its campaign evidence/publication beyond the opening-only checkpoint; campaign closure, integration and release remain unselected. Verify heading hierarchy, unchanged non-heading content/code blocks, local links and diff whitespace; no production behavior or test changes are needed.

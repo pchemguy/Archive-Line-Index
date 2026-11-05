@@ -92,7 +92,9 @@ while (newline := block.find(b"\n", start)) >= 0:
 
 This keeps byte searching in the runtime’s native `bytes` implementation, with Python work per match rather than per byte, and never assembles a complete line. A one-byte LF needs no overlap between blocks; BOM handling and the final EOF sentinel are managed outside this loop. Python byte-by-byte iteration adds interpreter work, `readline()`/`split()` materialize lines or fragments, and `mmap` requires a suitable file rather than the generic binary-reader interface. Blockwise `bytes.find` fits the bounded-memory streaming contract without an extra scanning dependency.
 
-## Build from a filesystem source
+## Source backends
+
+### Plain files
 
 `build_line_index` opens and owns the content stream, scans through validated EOF and closes it on success or failure. It returns only the completed array; it creates no output files.
 
@@ -113,7 +115,7 @@ with TemporaryDirectory() as directory:
 
 Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. Recognized archive signatures or suffixes select the corresponding adapter; archive claims never silently fall back to plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
 
-## Index a ZIP payload
+### ZIP
 
 ZIP archives must contain exactly one regular file, optionally nested under directories. Empty payloads are valid; directory entries are ignored, while extra files (including metadata files), links and other special entries are rejected. Member names are never extracted to filesystem paths. Detected encryption and unavailable codecs are unsupported; malformed archives and payload integrity failures retain distinct error categories. Member CRC validation and agreement between delivered bytes and the declared member size must complete before indexing succeeds. These checks use the member stream exposed by the standard library.
 
@@ -133,7 +135,7 @@ with TemporaryDirectory() as directory:
 
 The CLI accepts the same archive target and persists offsets in the uncompressed payload's byte coordinates. For `records.zip`, its default outputs are `records.sqlite3` and `records.u64` beside the archive. Signature evidence takes precedence over a conflicting suffix, and invalid suffix-claimed ZIP input cannot fall back to plain bytes.
 
-## Index a TAR payload
+### TAR
 
 Plain TAR and gzip/bzip2/xz-compressed TAR follow the same sole-regular-file policy as ZIP. Accepted suffixes are `.tar`, `.tar.gz`, `.tgz`, `.tar.bz2`, `.tbz`, `.tbz2`, `.tar.xz` and `.txz`; supported signatures also identify unconventional filenames. Compressed data that is not TAR is rejected. Standard TAR extension headers are interpreted by the library rather than counted as payload files.
 
@@ -157,7 +159,7 @@ with TemporaryDirectory() as directory:
 
 TAR reads sequentially and validates entries after the selected payload before successful EOF. A later extra file or special entry invalidates the archive even after payload bytes were returned. Damaged later headers, incomplete end markers and non-padding trailing bytes fail validation. Compressed readers are drained through their available trailer/integrity checks; a corrupt footer cannot yield a completed index or CLI output pair. Early close releases resources without claiming terminal validation. For `records.tar.gz`, CLI defaults are `records.tar.sqlite3` and `records.tar.u64` beside the archive.
 
-## Index a 7z payload
+### 7z
 
 7z accepts exactly one regular file, including an empty or nested payload, and ignores directory entries. Extra files, links and special entries are rejected; encrypted archives and unavailable codecs raise `UnsupportedFormatError`. Extraction streams into a callback without creating member paths on disk. Metadata validation precedes delivery, and extraction, declared-size and available CRC checks must complete before an index or CLI outputs can be returned.
 
