@@ -11,3 +11,7 @@ ContentStream.close now drops its retained failure reference only after reader r
 ## V-002 — Current test ownership
 
 Replaced nonexistent index-building/resource-lifecycle allocation names with actual plain/archive workflow, cross-format lifecycle and 7z/backpressure owners. Clarified root versus integration fixture ownership and added installed CLI, safe-path/plugin prerequisites and release-helper test owners. Every delivered test module name is represented; every concrete integration path listed in the table resolves. Responsibility descriptions were compared with current test scenarios. Only the current layout map changed; no empty test files, requirement change or closed-record edit. R-002 is verified by map/path inspection; no runtime test was needed for this documentation-only action.
+
+## V-003 — Formatter policy alignment
+
+Set tool.flowmark.width to 0 while retaining semantic=false and all other Markdown settings. A stdin/stdout probe with a heading, long paragraph and long list item used the project-default formatter without a width override; all nonempty source lines were preserved exactly. No Markdown file was reformatted and no closed record changed. R-003 is repaired and verified; final configured tools/package checks follow with V-004.
