@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "archive-line-index"
-version = "0.5.0"
+version = "0.5.1"
 description = "Sequential archive payload streaming and byte-line indexing."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -181,7 +181,7 @@ warn_return_any = true
 disallow_untyped_defs = true
 
 [tool.flowmark]
-width = 88
+width = 0
 semantic = false
 smartquotes = false
 ellipses = false

@@ -170,6 +170,9 @@ class ContentStream:
         if self._closed:
             return
         self._release()
+        # A retained traceback can own failed-read buffers; CLOSED no longer
+        # needs that outcome. Leave externally held exception evidence intact.
+        self._failure = None
         self._closed = True
 
     def __enter__(self) -> ContentStream:

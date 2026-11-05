@@ -1,6 +1,8 @@
 """Stream state, validation priority and owned cleanup contracts."""
 
+import gc
 import io
+import weakref
 from collections.abc import Callable
 
 import pytest
@@ -285,3 +287,60 @@ def test_incompatible_buffer_provider_has_type_error_without_progress() -> None:
             s.readinto(IncompatibleBuffer())
         assert not r.requests
         assert s.read(1) == b"x"
+
+
+def test_successful_close_releases_failed_unbounded_read_frames() -> None:
+    class Marker:
+        pass
+
+    marker_ref: weakref.ReferenceType[Marker] | None = None
+
+    class FailingReader(Reader):
+        calls = 0
+
+        def read(self, size: int, /) -> bytes:
+            nonlocal marker_ref
+            self.calls += 1
+            if self.calls > 4:
+                marker = Marker()
+                marker_ref = weakref.ref(marker)
+                raise OSError("late delivery failure")
+            return b"x" * min(size, 1024 * 1024)
+
+    reader = FailingReader()
+    stream = make_content_stream(reader, max_uncompressed_size=None)
+    try:
+        stream.read()
+    except OSError:
+        pass
+    else:
+        pytest.fail("late failure was not raised")
+    gc.collect()
+    assert marker_ref is not None and marker_ref() is not None
+    assert not stream.closed
+    stream.close()
+    gc.collect()
+    assert stream.closed and reader.closes == 1
+    assert marker_ref() is None
+
+
+def test_close_retry_preserves_retained_error_and_external_evidence() -> None:
+    error = OSError("delivery")
+    error.add_note("external context")
+    reader = Reader(error, close_failures=2)
+    stream = make_content_stream(reader, max_uncompressed_size=None)
+    with pytest.raises(OSError, match="delivery"):
+        stream.read()
+    with pytest.raises(OSError, match="close fault"):
+        stream.close()
+    assert not stream.closed
+    with pytest.raises(OSError) as caught:
+        stream.read(0)
+    assert caught.value is error
+    traceback = error.__traceback__
+    notes = tuple(error.__notes__)
+    stream.close()
+    assert stream.closed and reader.closes == 3
+    assert error.__traceback__ is traceback and tuple(error.__notes__) == notes
+    with pytest.raises(ValueError, match="closed"):
+        stream.read(0)
