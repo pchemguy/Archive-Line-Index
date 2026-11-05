@@ -34,7 +34,7 @@ From a checkout, build private native package inputs with `python -m build`. The
 
 ## Consumer contract
 
-For software using `archive-line-index`, the public entry points and contracts below define the source-to-output boundary. Both library and CLI accept a filesystem path and automatically select plain-file, ZIP, TAR or 7z handling. No archive-backend imports or explicit format selection are required. Supported archives contain exactly one regular-file payload.
+For software consuming `archive-line-index`, the public entry points and contracts below define the source-to-output boundary. Both library and CLI accept a filesystem path and automatically select plain-file, ZIP, TAR or 7z handling. No archive-backend imports or explicit format selection are required. Supported archives contain exactly one regular-file payload.
 
 | Interface | Entry point | Result |
 | --- | --- | --- |

@@ -31,3 +31,5 @@ Verification: existing fenced examples are unchanged, all local README links res
 ### V-003 wording clarification
 
 The user clarified the audience as software using archive-line-index. The opening sentence now says exactly that; consumer contracts concern the software's dependency on this package. This is a wording-only follow-up, with no change to the documented interfaces or contract links. Diff whitespace passes; publication/readback is required for this checkpoint.
+
+The subsequent terminology clarification selects “software consuming archive-line-index” for that opening sentence. The software is the consumer; humans and agents implementing it use the interface summary and linked specifications. No interface or scope changes; whitespace check passes.
