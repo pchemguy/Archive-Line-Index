@@ -21,3 +21,7 @@ The user requested grouping different backends into one README section with subs
 ## Accepted amendment — V-002
 
 The user requested consumer-oriented source-to-output guidance and confirmation that library/CLI consumers need no backend imports or explicit format selection. Add a README Consumer contract section covering the existing automatic source selection, library array/persistence workflow, CLI paired output and direct links to public API, CLI, index, persistence and input acceptance contracts. This documents delivered interfaces; it does not add a combined library operation or change requirements. Verify against public exports, API composition, detector/registry and current contracts; preserve all executable examples and validate local links. Campaign remains open after publication.
+
+## Accepted clarification — V-003
+
+Refine Consumer contract into a concise integration reference usable by people and agents implementing consumer software. Summarize public source-to-output interfaces and guarantees, then map integration concerns to authoritative specifications. Keep implementation detail and tutorial repetition outside this section; retain explicit distinction between library array/persistence and CLI paired output. Verify linked contract coverage, unchanged executable examples and Markdown/link structure. Publish and pause within the open campaign.

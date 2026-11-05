@@ -34,30 +34,24 @@ From a checkout, build private native package inputs with `python -m build`. The
 
 ## Consumer contract
 
-Pass one filesystem path to the library or CLI. Both automatically select plain-file, ZIP, TAR or 7z handling from supported signatures and filename suffixes; callers neither import archive backends nor select a format. Archives must contain exactly one regular-file payload. Offsets address the uncompressed payload's original bytes.
+For software integrating Archive Line Index, the public entry points and contracts below define the source-to-output boundary. Both library and CLI accept a filesystem path and automatically select plain-file, ZIP, TAR or 7z handling. No archive-backend imports or explicit format selection are required. Supported archives contain exactly one regular-file payload.
 
-### Library
+| Interface | Entry point | Result |
+| --- | --- | --- |
+| Python library | `from archive_line_index import build_line_index`; call `build_line_index(source)` | Completed `array("Q")` of line-start offsets followed by an EOF sentinel; source validation and closure are library-owned. Failures raise exceptions; no files are written. |
+| Library persistence | `write_sqlite_index(offsets, destination)` and `write_raw_index(offsets, destination)`, imported from `archive_line_index` | Store the completed array at explicit paths without rescanning. Each output is published independently. |
+| CLI | `archive-line-index SOURCE` or `python -m archive_line_index SOURCE`; in Python, `archive_line_index.cli.main([source])` | Scan once and write both `.sqlite3` and `.u64` files. Defaults use the source directory and stem; `--output` selects a shared stem. Process exit status or the callable's integer result indicates success/failure. |
 
-Import `build_line_index` from `archive_line_index` and call `offsets = build_line_index("records.zip")`. The same call accepts a plain file or any supported archive. It owns source opening, validation and closure, returning a completed `array("Q")` or raising an exception. It creates no output files.
+Offsets refer to the original uncompressed payload bytes, not archive positions or decoded characters. LF ends a line; the EOF sentinel is included in both stored formats. Output naming, overwrite rules, BOM handling, validation and failure outcomes are defined by the linked contracts. A later persistence failure can leave an earlier output published; scan-complete logging alone does not certify output publication.
 
-For stored output, import `write_sqlite_index` and/or `write_raw_index` from the same package and pass that array plus explicit destination paths. These functions do not require backend imports or rescan the source. Each file is published independently; the library does not expose a combined source-to-two-files function. To use the CLI's automatic paired-output workflow inside Python, call `archive_line_index.cli.main(["records.zip"])`, which returns an integer status.
-
-### CLI
-
-Run `archive-line-index records.zip` or `python -m archive_line_index records.zip`. Success writes `records.sqlite3` and `records.u64` beside the source and returns status 0. `--output results/custom` selects a shared output stem; `--overwrite` permits replacing existing outputs. Parent directories must already exist. The CLI scans once and writes both formats; no backend option is needed.
-
-The final stdout summary reports both output paths and the line count. Default INFO progress goes to stderr; `--log-level WARNING` suppresses progress. Failures return a nonzero status and diagnostics. A later write failure can leave an earlier output published; a scan-complete log alone does not mean the output files were written successfully.
-
-### Detailed contracts
-
-| Consumer question | Contract |
+| Integration concern | Authoritative reference |
 | --- | --- |
-| Which Python functions, arguments and types are public? | [Public API signatures](docs/dev/decomposition/public-api.md) |
-| What does a library call return or raise? | [Public operation and error contracts](docs/dev/spec/public-api.md) |
-| How do CLI invocation, output naming and exit statuses work? | [CLI contract](docs/dev/spec/cli.md) |
-| What do the returned offsets, line ranges, BOM and EOF sentinel mean? | [Line-index contract](docs/dev/spec/line-index.md) |
-| What exactly is stored in SQLite/raw files, and what happens on write failure? | [Persistence contract](docs/dev/spec/persistence.md) |
-| Which sources are accepted, and how are formats selected? | [Archive-handling contract](docs/dev/spec/archive-handling.md) |
+| Public Python imports, signatures and types; operation outcomes and exceptions | [API signatures](docs/dev/decomposition/public-api.md) and [operation/error contract](docs/dev/spec/public-api.md) |
+| CLI arguments, default paths, stdout/stderr and status codes | [CLI contract](docs/dev/spec/cli.md) |
+| Offset representation, line ranges, BOM, EOF and bounds | [Line-index contract](docs/dev/spec/line-index.md) |
+| SQLite schema, raw binary encoding, readers/writers and publication guarantees | [Persistence contract](docs/dev/spec/persistence.md) |
+| Accepted source formats, automatic detection and archive restrictions | [Source/archive contract](docs/dev/spec/archive-handling.md) |
+| Progress records, verbosity and application logging configuration | [Progress-logging contract](docs/dev/spec/progress-logging.md) |
 
 ## Stream without indexing
 
