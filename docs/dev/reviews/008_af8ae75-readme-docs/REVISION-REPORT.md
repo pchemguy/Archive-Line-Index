@@ -59,3 +59,9 @@ The containing action/evidence commit requires publication/readback before depen
 Separate shared source rules from format-specific backend details. Lifted text-path, automatic-detection, stability and sole-payload rules to the Source backends parent; Plain files, ZIP, TAR and 7z remain its subsections. Archive-creation imports and steps are explicitly labeled fixture setup, separate from the identical public consumer call. Retained CRC/size/codec, trailing TAR checks and bounded 7z cancellation qualifications. All eight Python example ASTs are unchanged from the installed-tested V-005 source; links and scope checks pass.
 
 The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.
+
+## V-007 — Execution checkpoint
+
+Colocate application logging configuration and clarify local paragraph roles. Removed logging setup from borrowed-reader scanning and added a complete source-based example under Progress logging. Updated the installed-example inventory from eight to nine; all nine examples passed for installed wheel and source-rebuilt variants (2 parameterized tests, 6.58 seconds), with Ruff lint/format passing for the changed test. Separated 7z buffer, cancellation and output naming paragraphs without dropping qualifications; moved packaging rationale and checkout build detail to Development while retaining installation and pinned-release guidance.
+
+The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.

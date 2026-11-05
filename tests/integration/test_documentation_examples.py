@@ -16,8 +16,8 @@ def test_readme_examples_are_complete_and_installed(
     examples = re.findall(
         r"^```python\n(.*?)^```", readme.read_text(encoding="utf-8"), flags=re.M | re.S
     )
-    assert len(examples) == 8, (
-        "stream, scan, build, ZIP, TAR, 7z, persistence and imported CLI examples required"
+    assert len(examples) == 9, (
+        "stream, scan, build, ZIP, TAR, 7z, persistence, imported CLI and logging examples required"
     )
     for example in examples:
         installed_package.run(example)

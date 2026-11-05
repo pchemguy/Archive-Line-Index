@@ -17,9 +17,9 @@ python -m zipfile -e archive-line-index-wheel.zip .
 python -m pip install archive_line_index-0.5.0-py3-none-any.whl
 ```
 
-Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.5.0.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag. The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
+The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
 
-From a checkout, build private native package inputs with `python -m build`. The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library. The 7z dependency is loaded only when opening 7z content.
+The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library. The 7z dependency is loaded only when opening 7z content.
 
 ## Integration contract
 
@@ -223,7 +223,11 @@ with TemporaryDirectory() as directory:
     assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
 ```
 
-The [`7z adapter`](src/archive_line_index/backends/sevenzip.py) forwards callback data through a [`bounded producer bridge`](src/archive_line_index/backends/producer.py): one non-daemon worker, one queued block and one current consumer block, each at most 1 MiB. Callback buffers are subdivided before queueing. Dependency decompressor/callback allocations are outside those package buffer bounds. Closing cancels package waits and joins the worker; checks during package waits occur at most 0.05 seconds apart, but dependency operations can delay cancellation, so this is not a total close-latency guarantee. Early close does not assert integrity. For `records.7z`, CLI defaults are `records.sqlite3` and `records.u64` beside the archive.
+The [`7z adapter`](src/archive_line_index/backends/sevenzip.py) forwards callback data through a [`bounded producer bridge`](src/archive_line_index/backends/producer.py): one non-daemon worker, one queued block and one current consumer block, each at most 1 MiB. Callback buffers are subdivided before queueing. Dependency decompressor/callback allocations are outside those package buffer bounds.
+
+Closing cancels package waits and joins the worker; checks during package waits occur at most 0.05 seconds apart, but dependency operations can delay cancellation, so this is not a total close-latency guarantee. Early close does not assert integrity.
+
+For `records.7z`, CLI defaults are `records.sqlite3` and `records.u64` beside the archive.
 
 ## Stream without indexing
 
@@ -254,12 +258,10 @@ The inclusive size limit counts all payload bytes, including a BOM. Exactly-at-l
 `scan_line_offsets` consumes from the reader's current position, defines that position as local offset zero and neither closes nor restores the reader. It needs only a blocking `read(size) -> bytes` operation; nonempty short reads are supported.
 
 ```python
-import logging
 from io import BytesIO
 
 from archive_line_index import scan_line_offsets
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 payload = b"\xef\xbb\xbfalpha\r\n\nomega"
 source = BytesIO(payload)
 offsets = scan_line_offsets(source, buffer_size=2)
@@ -276,7 +278,23 @@ Set `skip_utf8_bom=False` to include the initial BOM in first-line content. Late
 
 Indexing emits standard INFO records from `archive_line_index.scanner`, reporting cumulative uncompressed bytes in the original indexed byte space, including a skipped BOM. The scanner checks at chunk boundaries and emits periodic updates only after five seconds have elapsed; it adds an exact final count after validated EOF and offset checks. It performs no per-line logging. Short or empty scans may emit only the final count, and a blocked read does not produce a timer heartbeat. A scan-complete message does not mean SQLite/raw publication has succeeded.
 
-Library use stays quiet unless the application enables INFO logging; configure logging in the application, as in the borrowed-reader example above. No root logger or console/file handler is configured by library import or scanning. Disabled progress performs no clock reads or record formatting. There are no extra payload reads, copies or extraction workers.
+Library use stays quiet unless the application enables INFO logging. Configure it in the application before indexing, for example:
+
+```python
+import logging
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
+from archive_line_index import build_line_index
+
+logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+with TemporaryDirectory() as directory:
+    source = Path(directory) / "events.txt"
+    source.write_bytes(b"a\nb")
+    assert build_line_index(source).tolist() == [0, 2, 3]
+```
+
+No root logger or console/file handler is configured by library import or scanning. Disabled progress performs no clock reads or record formatting. There are no extra payload reads, copies or extraction workers.
 
 The CLI defaults to `--log-level INFO`. With no effective application handlers, it temporarily sends concise progress to stderr; an embedding application can instead route it through its existing handlers. `--log-level WARNING` (or ERROR/CRITICAL) suppresses progress while retaining ordinary error diagnostics. Levels are case-insensitive; DEBUG adds no per-line output. The previous scanner level is restored and only CLI-owned handlers are removed, so repeated serialized calls do not accumulate logging setup. Existing root/parent/handler settings remain application-owned. Standalone stream-only reads and row-by-row persistence do not report progress.
 
@@ -315,6 +333,10 @@ python scripts/check_release_artifacts.py --dist dist --tag v0.5.0
 python -m scripts.prepare_release --native-dist dist --output release --tag v0.5.0
 python -m scripts.prepare_release --output release --tag v0.5.0 --check
 ```
+
+From a checkout, build private native package inputs with `python -m build`.
+
+Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.5.0.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag.
 
 Use clean `dist` and `release` directories: `dist` contains private native build inputs, while `release` is the complete hosted inventory of wheel/source ZIP bundles and SHA256SUMS. The native checker verifies package/tag/metadata agreement, safe contents and source/wheel equality. The release checker independently rejects versions in every hosted filename, validates the bundled native pair and verifies outer checksums; neither command publishes a release. The actual naming gate is tested against the shared notation vectors, including historical and single-component versions with matching faulty expected names. Installed integration tests build both artifacts, independently rebuild from the source distribution, and exercise clean runtimes outside the checkout. If mypy's native parser fails during container process discovery, `python -m mypy --no-native-parser` retains strict checking with its supported Python parser.
 
