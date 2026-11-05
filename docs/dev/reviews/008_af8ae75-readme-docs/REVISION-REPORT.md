@@ -37,3 +37,7 @@ The subsequent terminology clarification selects “software consuming archive-l
 ## Critical composition review checkpoint
 
 A findings-only full-README composition review of af226cae5896df44054c60c313f6d85cd64ced0c is complete in [REVIEW-REPORT.md](REVIEW-REPORT.md): four Moderate findings and two Minor findings, all Open. The review examines task sequence, duplication, backend hierarchy, archive example framing, table density and logging-example placement. README and all product artifacts remain unchanged. Proposed repair order is advisory; no repair/closure/integration authority is inferred.
+
+## Composition revision planning checkpoint
+
+The user requested a revision plan, including assessment of Consumer contract as the section title. Proposed V-004–V-008 address all six open findings; D-001 compares Consumer contract, Integration contract and Public interfaces and contracts, recommending Integration contract with explicit specification authority. The plan retains user-approved backend grouping, source-to-output scope, contract links and technical qualifications. Planning only: no title was changed, no finding is marked resolved and no README/test edit was performed. The containing plan checkpoint requires publication/readback; stop before execution.
