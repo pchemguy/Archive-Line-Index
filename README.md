@@ -144,15 +144,19 @@ Importing the package, CLI or module runner performs no command execution. An ex
 
 ## Source backends
 
+Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. Recognized archive signatures or suffixes select the corresponding adapter; archive claims never silently fall back to plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
+
+Archives contain exactly one regular-file payload, which may be empty or nested under directories. Directory entries are ignored; additional files (including metadata files), links and special entries are rejected. Member names are never extracted to filesystem paths. Early close releases resources without claiming terminal integrity validation.
+
+The archive examples below create small fixtures only to make each example self-contained. Their zipfile, tarfile and py7zr imports create test inputs; consuming an existing archive requires only the same package-level `build_line_index(source)` call shown in the library workflow.
+
 ### Plain files
 
 Plain files expose their original bytes. The [library workflow](#index-a-source-through-the-library) shows indexing and persistence without archive setup.
 
-Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. Recognized archive signatures or suffixes select the corresponding adapter; archive claims never silently fall back to plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
-
 ### ZIP
 
-ZIP archives must contain exactly one regular file, optionally nested under directories. Empty payloads are valid; directory entries are ignored, while extra files (including metadata files), links and other special entries are rejected. Member names are never extracted to filesystem paths. Detected encryption and unavailable codecs are unsupported; malformed archives and payload integrity failures retain distinct error categories. Member CRC validation and agreement between delivered bytes and the declared member size must complete before indexing succeeds. These checks use the member stream exposed by the standard library.
+ZIP rejects detected encryption and unavailable codecs; malformed archives and payload integrity failures retain distinct error categories. Member CRC validation and agreement between delivered bytes and the declared member size must complete before indexing succeeds. These checks use the member stream exposed by the standard library.
 
 ```python
 from pathlib import Path
@@ -162,9 +166,11 @@ from zipfile import ZIP_DEFLATED, ZipFile
 from archive_line_index import build_line_index
 
 with TemporaryDirectory() as directory:
+    # Fixture setup: create an archive for this self-contained example.
     target = Path(directory) / "records.zip"
     with ZipFile(target, "w", compression=ZIP_DEFLATED) as archive:
         archive.writestr("nested/records.txt", b"alpha\nbeta")
+    # Consumer: use the same public call for every supported source.
     assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
 ```
 
@@ -183,12 +189,14 @@ from tempfile import TemporaryDirectory
 from archive_line_index import build_line_index
 
 with TemporaryDirectory() as directory:
+    # Fixture setup: create an archive for this self-contained example.
     target = Path(directory) / "records.tar.gz"
     payload = b"alpha\nbeta"
     with tarfile.open(target, "w:gz") as archive:
         member = tarfile.TarInfo("nested/records.txt")
         member.size = len(payload)
         archive.addfile(member, BytesIO(payload))
+    # Consumer: use the same public call for every supported source.
     assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
 ```
 
@@ -196,7 +204,7 @@ TAR reads sequentially and validates entries after the selected payload before s
 
 ### 7z
 
-7z accepts exactly one regular file, including an empty or nested payload, and ignores directory entries. Extra files, links and special entries are rejected; encrypted archives and unavailable codecs raise `UnsupportedFormatError`. Extraction streams into a callback without creating member paths on disk. Metadata validation precedes delivery, and extraction, declared-size and available CRC checks must complete before an index or CLI outputs can be returned.
+7z rejects encrypted archives and unavailable codecs with `UnsupportedFormatError`. Extraction streams into a callback without creating member paths on disk. Metadata validation precedes delivery, and extraction, declared-size and available CRC checks must complete before an index or CLI outputs can be returned.
 
 ```python
 from pathlib import Path
@@ -207,9 +215,11 @@ from py7zr import SevenZipFile
 from archive_line_index import build_line_index
 
 with TemporaryDirectory() as directory:
+    # Fixture setup: create an archive for this self-contained example.
     target = Path(directory) / "records.7z"
     with SevenZipFile(target, "w") as archive:
         archive.writestr(b"alpha\nbeta", "nested/records.txt")
+    # Consumer: use the same public call for every supported source.
     assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
 ```
 

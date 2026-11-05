@@ -53,3 +53,9 @@ The containing action/evidence commit requires publication/readback before depen
 Prioritize complete library and CLI workflows. Moved library construction and independent persistence together, followed immediately by CLI console/module/imported use; backend detail, streaming and scanner implementation now follow the primary workflows. Expanded the existing build example to write and reload both index formats without adding another example. All eight README Python examples passed in both installed wheel/source-rebuilt variants (2 parameterized tests, 11.40 seconds). Heading order and current links pass; exact publication warnings and scanner rationale remain.
 
 The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.
+
+## V-006 — Execution checkpoint
+
+Separate shared source rules from format-specific backend details. Lifted text-path, automatic-detection, stability and sole-payload rules to the Source backends parent; Plain files, ZIP, TAR and 7z remain its subsections. Archive-creation imports and steps are explicitly labeled fixture setup, separate from the identical public consumer call. Retained CRC/size/codec, trailing TAR checks and bounded 7z cancellation qualifications. All eight Python example ASTs are unchanged from the installed-tested V-005 source; links and scope checks pass.
+
+The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.
