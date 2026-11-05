@@ -100,3 +100,7 @@ The user accepted execution of the proposed plan. D-001 is resolved by the plan'
 ## Execution outcome
 
 V-004–V-008 are complete. D-001 uses Integration contract; the two public interfaces and authoritative specification map are retained. Full revision comparison and per-finding rechecks are recorded in REVIEW-REPORT; action/publication evidence is in REVISION-REPORT. All six findings are Verified. Current stop: publish/read back V-008, then remain on the open campaign branch awaiting direction. Earlier proposed-state statements are the retained pre-execution plan, not outstanding tasks.
+
+## Closure authorization
+
+The user subsequently requested close. V-001–V-008 are complete and all six findings Verified; the remaining authorized operations are campaign finalization, explicit verified/published integration into main, clean return and closure. No new revision action, version bump or release is added. Closure completes on verified target publication; plans/reports then remain frozen.
