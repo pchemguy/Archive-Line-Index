@@ -2,7 +2,7 @@
 
 ## Scope and baseline
 
-Campaign 009_2094900-code-docs; reviewed source 209490063eb2e299243fc7ad99e63a08305e0f3e; working branch revision/009_2094900-code-docs created from main at that exact source. [Review plan](REVIEW-PLAN.md). State: comprehensive review complete; campaign Open for decisions. Three confirmed findings remain Open. The opening checkpoint originally initialized the review; subsequent units and actual checks are recorded below.
+Campaign 009_2094900-code-docs; reviewed source 209490063eb2e299243fc7ad99e63a08305e0f3e; working branch revision/009_2094900-code-docs created from main at that exact source. [Review plan](REVIEW-PLAN.md). State: comprehensive review and authorized repairs complete; all three findings Verified. Campaign finalization/main integration and authorized 0.5.1 publication remain pending actual effects. The opening checkpoint originally initialized the review; subsequent units and actual checks are recorded below.
 
 ## Coverage checkpoints
 
@@ -21,7 +21,7 @@ Executed 197 targeted API/source/offset/scanner/stream/progress/export tests: al
 
 ### R-001 — Successful close retains failed-read payload buffers
 
-- Priority/type/status: Moderate resource-lifecycle defect; Open. Confidence: high, reproduced.
+- Priority/type/status: Moderate resource-lifecycle defect; Verified by V-001. Confidence: high, reproduced.
 - Location: src/archive_line_index/stream.py:50–55 stores the exception; :97–105 accumulates unbounded-read blocks and retains its failure traceback; :168–173 closes the reader but never drops _failure. Related obligation: spec/content-stream.md, State and failure priority and Close and producer outcomes, require failure retention until explicit closure and successful close to release package-owned buffers.
 - Evidence: a controlled reader yielded twenty distinct 1-MiB blocks then raised OSError. After read() failed, exception handling exited, stream.close() succeeded, reader.closed and stream.closed were True, and garbage collection ran. tracemalloc still reported 20,974,196 live bytes; dropping the closed stream reduced live bytes to 737 (20,973,459 released). The stream's retained exception traceback keeps the read frame and its blocks list alive. No external exception reference was retained by the probe.
 - Impact: a caller retaining a closed stream after a late failure can retain the full accumulated unbounded payload, potentially very large. This does not show a bounded-read whole-payload materialization bug; the failure is resource retention after explicit successful close. Existing tests assert handles/closed state but do not expose this memory lifetime.
@@ -54,7 +54,7 @@ Artifact checkers reject unsafe/special/duplicate entries, forbidden development
 
 ### R-002 — Current test ownership map points to undelivered filenames
 
-- Priority/type/status: Minor documentation/navigation drift; Open. Confidence: high.
+- Priority/type/status: Minor documentation/navigation drift; Verified by V-002. Confidence: high.
 - Location: docs/dev/layout/tests.md:28–29 lists test_index_building.py and test_resource_lifecycle.py under tests/integration; neither file exists. Actual relevant delivered owners include test_full_format_lifecycle.py, test_zip_workflows.py, test_tar_workflows.py, test_sevenzip_stream.py, test_sevenzip_index_cli.py and test_sevenzip_backpressure.py. The map still uses initial allocation placeholders despite completed delivery.
 - Consequence: people/agents using the physical ownership map are directed to nonexistent files and cannot reliably locate the implemented source-index/lifecycle checks. The map's general intended-allocation disclaimer explains its origin but does not reconcile the delivered ownership. Existing executable tests do cover these capabilities; this is not a finding of missing test functionality.
 - Proposed amendment/owner: reconcile the current layout test map with actual cohesive test owners and distinguish any truly future allocation explicitly. Do not create empty tests merely to satisfy old names. This is a current layout-document amendment requiring acceptance; leave prior closed reports unchanged.
@@ -62,7 +62,7 @@ Artifact checkers reject unsafe/special/duplicate entries, forbidden development
 
 ### R-003 — Markdown formatter defaults contradict the no-wrap policy
 
-- Priority/type/status: Moderate tooling/documentation-policy conflict; Open. Confidence: high, reproduced.
+- Priority/type/status: Moderate tooling/documentation-policy conflict; Verified by V-003. Confidence: high, reproduced.
 - Location: pyproject.toml:183–189 sets tool.flowmark.width = 88 and semantic = false; AGENTS.md:62 directs Flowmark use but explicitly prohibits hard-wrapping Markdown unless requested. The user's standing instruction likewise requires single-source-line paragraphs/list items.
 - Evidence: passed the same single 677-character Markdown paragraph to the installed flowmark console entry via stdin, output to stdout, without writing a file. Default project configuration produced eight nonempty lines (maximum width 86); --width 0 produced one nonempty 677-character line. Installed CLI help explicitly documents width 0 as disabling wrapping. semantic=false alone does not prevent width-based wrapping. An initial python -m flowmark probe found no __main__; using the package's installed console entry is the supported command and gave the reproduction.
 - Consequence: a routine formatter invocation following the configured tool defaults can systematically violate the required Markdown source style, especially across broad documentation updates. No repository Markdown was reformatted by this probe.
@@ -91,10 +91,16 @@ Build/check outputs were kept outside the repository: ali-009-native, ali-009-bu
 
 | Finding | Priority | Status | Recommended next action |
 | --- | --- | --- | --- |
-| R-001 | Moderate | Open | Repair successful-close failure-reference lifetime with targeted memory/state regressions. |
-| R-002 | Minor | Open | Reconcile the current test ownership map with delivered files. |
-| R-003 | Moderate | Open | Align Flowmark defaults with the explicit no-hard-wrap policy and verify nonmutating examples. |
+| R-001 | Moderate | Verified | Repair successful-close failure-reference lifetime with targeted memory/state regressions. |
+| R-002 | Minor | Verified | Reconcile the current test ownership map with delivered files. |
+| R-003 | Moderate | Verified | Align Flowmark defaults with the explicit no-hard-wrap policy and verify nonmutating examples. |
 
 The review found one confirmed runtime resource-retention defect, one documentation navigation issue and one formatter/policy conflict. No Critical issue was confirmed within this coverage. The package builds and its configured suite passes; that does not close the reproduced defect or authorize release-readiness claims beyond these checks. Recommended revision priority is R-001, then the independent R-003 configuration correction and R-002 current-document map update, with test/doc checks matched to their changes.
 
 All review units are complete and this report is the selected stopping deliverable. The campaign remains Open for human decisions. No fixes, revision plan execution, closure, integration, version bump or release are authorized by the review request. Actual host is Linux/CPython 3.12.14 with py7zr 1.1.4; native Windows/macOS, other Python versions, physical big-endian execution, remote CI and current hosted bytes remain unverified. The earlier observed setup failures were corrected as described and are not unresolved product test failures. Review publication/readback is still required for this containing final checkpoint.
+
+## Authorized revision recheck
+
+The user authorized all repairs and patch-release delivery. R-001: close clears its stored failure only after successful resource release, preserving failed-cleanup retry and caller exception traceback/notes. New deterministic frame-lifetime regression was observed failing before the code change and passes afterward; the 20-MiB failure probe drops from 20,974,172 live bytes before close to 880 after close while retaining the closed stream. R-002: the current test layout now names actual delivered owners; all concrete integration paths resolve and all delivered test module names are represented. R-003: project Flowmark width 0/semantic=false preserves long paragraphs and list items under default invocation, without a width override or file mutation. Original baseline observations above remain historical evidence; the three findings are now Verified.
+
+Full final patch suite passes 757 tests at 95% production statement/branch coverage; Ruff lint/format passes over 77 files and strict mypy --no-native-parser over 26 source/script files. Actual 0.5.1 native source/wheel candidates and stable bundles pass metadata/package/content/checksum and independent complete-name checks. All nine README Python examples run for installed native/source-rebuilt variants. Current source/README/version/notes agree; no public signature, index encoding or scope changed. Prior closed packages remain unchanged. See REVISION-REPORT for action evidence and integration/publication boundary. Native Windows/macOS/other Python/big-endian execution remains unverified; no hosted 0.5.1 success is claimed before its actual publication/readback.
