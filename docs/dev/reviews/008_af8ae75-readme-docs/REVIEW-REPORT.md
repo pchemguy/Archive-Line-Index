@@ -29,12 +29,12 @@ The approximately 3,094 whitespace-separated words are not inherently excessive.
 
 | Finding | Priority | Status | Concern |
 | --- | --- | --- | --- |
-| R-001 | Moderate | Open | Main task sequence prioritizes advanced APIs and implementation over source-to-output use. |
-| R-002 | Moderate | Open | Two overlapping interface summaries lack a clear division of responsibility. |
-| R-003 | Moderate | Open | Common source behavior is nested under Plain files. |
-| R-004 | Moderate | Open | Archive examples emphasize creating sources rather than consuming existing ones. |
-| R-005 | Minor | Open | Consumer table cells mix interface identification with operational detail. |
-| R-006 | Minor | Open | Logging setup is developed in an unrelated borrowed-reader example. |
+| R-001 | Moderate | Verified | Main task sequence prioritizes advanced APIs and implementation over source-to-output use. |
+| R-002 | Moderate | Verified | Two overlapping interface summaries lack a clear division of responsibility. |
+| R-003 | Moderate | Verified | Common source behavior is nested under Plain files. |
+| R-004 | Moderate | Verified | Archive examples emphasize creating sources rather than consuming existing ones. |
+| R-005 | Minor | Verified | Consumer table cells mix interface identification with operational detail. |
+| R-006 | Minor | Verified | Logging setup is developed in an unrelated borrowed-reader example. |
 
 Priorities describe editorial impact, not production severity. No Critical composition finding is identified; this review does not establish absence of runtime defects.
 
@@ -84,4 +84,25 @@ Resolve R-001 and R-002 together by choosing the document's main task sequence a
 
 Retain the useful early purpose/input/output explanation, automatic backend selection, source-versus-payload byte coordinates, the separation of array construction and file persistence, the core contract map, independent publication caveats, and the explicitly requested scanner implementation snippet. The public API design and operational contract are separate useful targets; there is no finding that they should be merged merely because both filenames are public-api.md.
 
-All six findings remain Open pending revision authorization. No README, source, tests or governing contracts are changed by this review. Closed campaign/feature records are excluded from loading and current-validity checks. No external-source verification, render/screen-size assessment, link-target content audit beyond the selected consumer contracts, full specification composition review or software execution is claimed. The containing report checkpoint must be published/read back; stop before repairs, campaign closure, integration or release.
+At the original review checkpoint, all six findings remained Open pending revision authorization; current dispositions and subsequent recheck evidence are recorded below. No README, source, tests or governing contracts are changed by this review. Closed campaign/feature records are excluded from loading and current-validity checks. No external-source verification, render/screen-size assessment, link-target content audit beyond the selected consumer contracts, full specification composition review or software execution is claimed. The containing report checkpoint must be published/read back; stop before repairs, campaign closure, integration or release.
+
+## Authorized revision recheck — V-008
+
+The user authorized execution of V-004–V-008, including the recommended Integration contract title for D-001. Rechecked the revised README at published source 39c032ac75361b79fa5ee7214b852322ac034d54 against the pinned original review source and requested audience. Original observations and their locations above describe the baseline; the findings index now reflects the verified after-state.
+
+| Finding | After-state evidence | Current disposition |
+| --- | --- | --- |
+| R-001 | Integration contract is followed directly by Index a source through the library (construction, paired persistence and readback), then CLI use. Source backends, independent streaming/borrowing and the scanner explanation follow these workflows. | Verified by full-document sequence inspection and actual installed examples/CLI checks. |
+| R-002 | Removed the competing opening function inventory; the opening retains purpose/input/output and the small byte-range example. Integration contract is the main interface/specification map. Task sections carry examples with local warnings rather than a second inventory. | Verified; limited repetition of byte coordinates and independent publication serves orientation and safe local reading. |
+| R-003 | Shared path types, URL exclusion, automatic format selection, source stability and archive member policy are parent-level Source backends content. Its four subsections retain their actual format differences. | Verified by heading/topic-scope comparison and retained contract mapping. |
+| R-004 | One common source-based call and complete persistence workflow precede backend details. Archive examples explicitly identify imports/construction as fixture setup and label the common consuming call; their executable behavior is unchanged. | Verified; complete examples remain independently runnable and backend selection is explicitly automatic. |
+| R-005 | The integration table has two interface rows, Python library and CLI. Library persistence is within the library interface, and alternate CLI invocation forms are adjacent prose. Naming/error/publication details remain in relevant workflows/contracts. | Verified by table and paragraph inspection; no interface/guarantee change. |
+| R-006 | Progress logging contains its own complete source-based application-configuration example. Borrowed-reader scanning no longer imports/configures logging; progress guidance no longer depends on that unrelated example. | Verified by example inspection and execution of all nine examples in both installed variants. |
+
+The after-state retains all seven core contract links, public identifiers, original payload-byte coordinates, BOM/LF/EOF and bounds, supported formats/sole-member constraints, input stability/ownership, file encodings/schema, protected/independent publication, cleanup notes and CLI outcomes. ZIP CRC/declared-size checks, TAR trailing-entry/footer validation and 7z bounded-worker/cancellation limitations retain their scope and qualifications. The explicitly requested scanner excerpt and alternatives/rationale/link are unchanged. Packaging rationale moved to Development without losing pinned-release guidance beside installation.
+
+Example fidelity: six original Python example ASTs are unchanged, two are intentionally revised (complete source-to-storage workflow; borrowed-reader logging removed), and one new source-based logging example is added. The example test explicitly requires and runs all nine, rather than skipping new material or weakening coverage. The scanner excerpt is byte-for-byte unchanged. Runtime source, APIs, normative contracts, version, release notes and frozen records are unchanged.
+
+Actual verification: 27 focused integration cases passed in 11.99 seconds, comprising tests/integration/test_documentation_examples.py, test_installed_cli.py and test_progress_logging.py. The documentation cases execute all nine Python examples in clean installed wheel and source-rebuilt runtimes; the CLI cases exercise console/module/imported routes and progress cases cover configuration behavior. Ruff lint and formatting pass across src/tests/scripts (77 files). Current README/active-record paths and heading links, Markdown whitespace and scoped/protected-path checks pass. Earlier action-specific example results remain in REVISION-REPORT. No full runtime-suite rerun, live release/download check or native Windows/macOS execution is claimed for this documentation change; no visual browser-render assessment was performed.
+
+All six selected findings are Verified with no remaining revision decision. The campaign remains Open at the human-selected execution boundary; verification does not authorize closure, main integration, version bump or release.

@@ -65,3 +65,9 @@ The containing action/evidence commit requires publication/readback before depen
 Colocate application logging configuration and clarify local paragraph roles. Removed logging setup from borrowed-reader scanning and added a complete source-based example under Progress logging. Updated the installed-example inventory from eight to nine; all nine examples passed for installed wheel and source-rebuilt variants (2 parameterized tests, 6.58 seconds), with Ruff lint/format passing for the changed test. Separated 7z buffer, cancellation and output naming paragraphs without dropping qualifications; moved packaging rationale and checkout build detail to Development while retaining installation and pinned-release guidance.
 
 The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.
+
+## V-008 — Execution checkpoint
+
+Verify the completed README composition revisions. All six findings are Verified with located after-state evidence in REVIEW-REPORT; D-001 resolves to Integration contract. Final focused verification passed 27 documentation/installed CLI/progress cases in 11.99 seconds, including all nine examples in wheel and source-rebuilt consumers; Ruff lint/format passes over 77 files. Verified current links/anchors, retained technical qualifications, six unchanged example ASTs plus two authorized changes/one new example, unchanged scanner excerpt and protected-source/frozen-record scope. Full runtime suite and native/visual execution were not repeated. V-004–V-007 are published; this final evidence checkpoint completes the requested execution range while leaving the campaign Open.
+
+The containing action/evidence commit requires publication/readback before dependent work. Campaign remains Open; no closure, integration, version bump or release is selected.

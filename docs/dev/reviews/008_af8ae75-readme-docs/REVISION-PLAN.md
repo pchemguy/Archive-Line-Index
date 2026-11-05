@@ -2,7 +2,7 @@
 
 ## Campaign and authority
 
-Campaign 008_af8ae75; working branch revision/008_af8ae75-readme-docs; creation parent and intended integration target main; full branch-off baseline af8ae75219275e0142f4abdcb09bb10443f1fda6. The user requested opening a README/docs revision campaign. State: prior V-001–V-003 amendments delivered; critical composition review complete; V-004–V-008 below are proposed and await execution authorization.
+Campaign 008_af8ae75; working branch revision/008_af8ae75-readme-docs; creation parent and intended integration target main; full branch-off baseline af8ae75219275e0142f4abdcb09bb10443f1fda6. The user requested opening a README/docs revision campaign. State: V-001–V-008 executed and verified; D-001 resolved as Integration contract. Campaign remains Open pending further human direction; integration/closure/release are not selected.
 
 ## Scope and boundaries
 
@@ -96,3 +96,7 @@ Current deliverable: publish this proposed plan, present D-001 and the ordered a
 ## Execution authorization
 
 The user accepted execution of the proposed plan. D-001 is resolved by the plan's recommended Integration contract title. V-004–V-008 may proceed with per-action verification/publication; stop after V-008 while the campaign remains Open. Earlier planning-only limits are superseded only for these actions; closure, integration and release remain unselected.
+
+## Execution outcome
+
+V-004–V-008 are complete. D-001 uses Integration contract; the two public interfaces and authoritative specification map are retained. Full revision comparison and per-finding rechecks are recorded in REVIEW-REPORT; action/publication evidence is in REVISION-REPORT. All six findings are Verified. Current stop: publish/read back V-008, then remain on the open campaign branch awaiting direction. Earlier proposed-state statements are the retained pre-execution plan, not outstanding tasks.
