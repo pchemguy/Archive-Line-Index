@@ -12,7 +12,13 @@
 
 ## Scope
 
-The user requested a revision campaign for Demo Alphanum. The opening checkpoint establishes the campaign records and branch. The demo scenario, intended audience and deliverables await the user's brief. Once scope is established, record the revision actions and their acceptance checks here.
+The user requested a checkout-only command-line demonstration using three alphanumeric lines and the same payload in ZIP, TGZ, TBZ, TAR and 7z archives. All inputs and the CMD launcher live under the repository's existing `docs/demo/alphanum/` tree.
+
+| Action | Deliverable | Acceptance |
+| --- | --- | --- |
+| R-001 | Plain fixture, five single-member archives and CMD launcher under `docs/demo/alphanum/` | Every archive contains exactly `demo.txt` with the plain fixture's bytes. The launcher resolves the checkout from its own location and invokes the CLI from `src` on all six inputs. Each input yields the same SQLite and raw offsets. |
+
+The launcher uses the selected Python's existing runtime dependencies, including `py7zr` for 7z. The campaign remains open after publishing this action.
 
 ## Evidence
 
