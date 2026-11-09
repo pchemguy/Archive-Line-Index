@@ -17,3 +17,7 @@ Verified that ZIP, TGZ, TBZ, TAR and 7z each contain exactly one `demo.txt` matc
 Renamed the CLI launcher to [demo_cli.bat](../../../demo/alphanum/demo_cli.bat) and added [demo_api.py](../../../demo/alphanum/demo_api.py) with a [CMD wrapper](../../../demo/alphanum/demo_api.bat). The API script prepends checkout `src` to `sys.path` before importing Archive Line Index and calls the public index builder and writers with their defaults.
 
 On Linux, launched the API script from outside two temporary checkout copies with spaces in their paths and no `PYTHONPATH` or installed Archive Line Index on the import path. Compared its outputs with the six CLI commands run on separate clean fixtures. All relative output names and SQLite and raw offsets matched. A repeat API run preserved the existing SQLite output and returned a failure status. Ruff lint and format checks passed, and Git checkout preserved CRLF in both CMD launchers. Native Windows CMD execution remains unverified.
+
+## R-003 README demo
+
+Added a concise [Alphanum demo section](../../../../README.md#alphanum-demo) after the CLI workflow. It gives the checkout commands, the 7z dependency, the output locations and the rerun requirement. Verified the documented launchers, fixture paths and dependency against the checkout. All nine existing README Python snippets were preserved, and both installed-artifact documentation tests passed.
