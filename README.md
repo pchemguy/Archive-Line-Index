@@ -142,6 +142,17 @@ with TemporaryDirectory() as directory:
 
 Importing the package, CLI or module runner performs no command execution. An explicit argv must be a sequence of strings; `None` uses process arguments. Library APIs continue to raise exceptions directly and do not acquire CLI printing or process-exit behavior.
 
+## Alphanum demo
+
+Run either command from the checkout root in Windows CMD. Both demos load Archive Line Index from `src` without installing it. The selected Python needs `py7zr>=1.1.4,<1.2` for the 7z fixture.
+
+```bat
+docs\demo\alphanum\demo_cli.bat
+docs\demo\alphanum\demo_api.bat
+```
+
+The CLI and Python API demos index the same three-line payload as plain text, ZIP, TGZ, TBZ, TAR and 7z. Each writes `demo.sqlite3` and `demo.u64` beside each input in [the demo directory](docs/demo/alphanum). Remove the generated indexes before rerunning either demo.
+
 ## Source backends
 
 Sources are strings or path-like objects returning strings. Bytes paths are rejected; URL fetching is not supported. Recognized archive signatures or suffixes select the corresponding adapter; archive claims never silently fall back to plain content. Sources must remain stable during an operation, and callers serialize operations on each stream.
