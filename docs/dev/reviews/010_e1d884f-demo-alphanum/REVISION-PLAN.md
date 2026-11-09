@@ -5,7 +5,7 @@
 | Field | Value |
 | --- | --- |
 | Campaign | `010_e1d884f` |
-| Status | Open |
+| Status at final campaign checkpoint | Verified for integration |
 | Working branch | `revision/010_e1d884f-demo-alphanum` |
 | Creation parent and integration target | `main` |
 | Baseline and branch-off commit | `e1d884f396e63d972a355423358632d19d34a987` |
@@ -20,7 +20,7 @@ The user requested a checkout-only command-line demonstration using three alphan
 | R-002 | Rename the CLI launcher to `demo_cli.bat` and add `demo_api.py` and `demo_api.bat`. | The API script imports from checkout `src` and uses public indexing and persistence functions with their defaults. On clean inputs, both demos create matching SQLite and raw indexes at the same relative paths. |
 | R-003 | Add a concise Alphanum demo section to the README. | Both checkout launchers, the 7z dependency, output paths and rerun behavior match the demo. |
 
-Both demos use the selected Python's existing runtime dependencies, including `py7zr` for 7z. The campaign remains open after publishing this action.
+Both demos use the selected Python's existing runtime dependencies, including `py7zr` for 7z. R-001 through R-003 are verified. The user requested closure through integration into `main`.
 
 ## Evidence
 

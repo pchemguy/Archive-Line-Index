@@ -21,3 +21,9 @@ On Linux, launched the API script from outside two temporary checkout copies wit
 ## R-003 README demo
 
 Added a concise [Alphanum demo section](../../../../README.md#alphanum-demo) after the CLI workflow. It gives the checkout commands, the 7z dependency, the output locations and the rerun requirement. Verified the documented launchers, fixture paths and dependency against the checkout. All nine existing README Python snippets were preserved, and both installed-artifact documentation tests passed.
+
+## Final campaign verification
+
+R-001 through R-003 are verified at the final implementation tip `4ed9a2c04de6715bf02d31fb403f11fcb78f2092`. All five archives contain only `demo.txt` with bytes identical to the plain fixture. From checkout sources on Linux, the API script and the six CLI commands produced identical SQLite and raw offsets for every fixture. Checked the final CMD path assignment, launchers' CRLF checkout and README commands. Both installed-artifact README example tests passed, and Ruff lint and format checks passed for the API demo. Native Windows CMD execution remains unverified.
+
+The user requested closure. The recorded creation parent and integration target are `main`, confirmed at `e1d884f396e63d972a355423358632d19d34a987` before this checkpoint. The opening commit is `5985aec9abed6bf74261d7a21fa88ae2b0b37e79`. Closure takes effect when the verified two-parent integration commit is published on `main`.
