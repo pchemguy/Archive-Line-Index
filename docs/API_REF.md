@@ -1,6 +1,6 @@
 # Archive Stream API reference
 
-Optional arguments are shown at their defaults. Example values supply required arguments.
+Default values are listed with each optional argument. Example values supply required arguments.
 
 ## Python library
 
@@ -8,21 +8,26 @@ Import these operations from `archive_stream`. A source path may be a string or 
 
 ### Stream a payload
 
+Read blocks into one reusable buffer. This example hashes the payload as it streams.
+
 ```python
+from hashlib import sha256
+
 from archive_stream import open_content_stream
 
+buffer = bytearray(65_536)
+digest = sha256()
 with open_content_stream(source="data/events.zip", max_uncompressed_size=None) as stream:
-    payload = stream.read(-1)
+    while count := stream.readinto(buffer):
+        digest.update(memoryview(buffer)[:count])
 ```
-
-For bounded reads into reusable storage, allocate `buffer = bytearray(65536)` once and call `stream.readinto(buffer)` on an open stream.
 
 | Parameter | Meaning |
 | --- | --- |
 | `source` | Required path to a plain file or a supported archive. |
 | `max_uncompressed_size=None` | Inclusive limit in payload bytes. `None` applies no size limit. |
-| `size=-1` in `read(-1)` | Positional-only byte limit. The default reads all remaining bytes. Use a positive size for bounded streaming. Zero makes no progress. |
-| `buffer` in `readinto(buffer)` | Required positional-only writable contiguous buffer. Returns the number of bytes copied and leaves the unused suffix unchanged. |
+| `size=-1` in `read(-1)` | Positional-only byte limit. The default loads all remaining payload bytes into memory. Use a positive size for bounded streaming. Zero makes no progress. |
+| `buffer` in `readinto(buffer)` | Required positional-only writable contiguous buffer. Returns the number of bytes copied and leaves the unused suffix unchanged. A zero count with a nonempty buffer signals validated EOF. |
 
 The context manager closes the stream. For manual ownership, call `stream.close()`. Use `stream.closed`, `stream.readable()`, `stream.writable()`, and `stream.seekable()` to inspect its state and capabilities. [Content stream contract](dev/spec/content-stream.md)
 
