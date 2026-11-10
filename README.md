@@ -296,7 +296,9 @@ Set `skip_utf8_bom=False` to include the initial BOM in first-line content. Late
 
 ## Progress logging
 
-Indexing emits standard INFO records from `archive_stream.scanner`, reporting cumulative uncompressed bytes in the original indexed byte space, including a skipped BOM. The scanner checks at chunk boundaries and emits periodic updates only after five seconds have elapsed; it adds an exact final count after validated EOF and offset checks. It performs no per-line logging. Short or empty scans may emit only the final count, and a blocked read does not produce a timer heartbeat. A scan-complete message does not mean SQLite/raw publication has succeeded.
+Indexing emits INFO records from `archive_stream.scanner`. The scanner checks at chunk boundaries and emits a periodic update once at least one second has elapsed since the previous update or scan start. It counts only complete scan buffers in the uncompressed payload, including any skipped BOM bytes. The CLI uses 1 MiB buffers. Periodic counts are rounded to a whole number in binary units, such as `Scanned 2 GiB of uncompressed data`. A value that rounds to 1024 moves up to the next unit.
+
+The final record gives the exact byte count after validated EOF and offset checks, including any partial buffer. Short scans may emit only that record. Updates occur at read boundaries, so a blocked read delays them. Index files are written after scan completion.
 
 Library use stays quiet unless the application enables INFO logging. Configure it in the application before indexing, for example:
 

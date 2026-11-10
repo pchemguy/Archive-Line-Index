@@ -74,6 +74,6 @@ Reader doubles exercise common-stream completion and size enforcement without co
 
 ## Progress ownership
 
-The scanner owns archive_stream.scanner and operation-local timing/counter observations around processed chunks; no per-LF callback or additional readable interface is needed. Its final event follows validated exhaustion and offset validation, not persistence. Disabled INFO skips clock and record work. Public indexing function signatures and root exports remain unchanged.
+The scanner owns archive_stream.scanner and operation-local timing and complete-buffer reporting around processed chunks; no per-LF callback or additional readable interface is needed. Its final event follows validated exhaustion and offset validation, not persistence. Disabled INFO skips clock and record work. Public indexing function signatures and root exports remain unchanged.
 
 The CLI owns --log-level and scoped invocation configuration on that emitting logger, including an application's explicitly configured child level. It restores the previous level, preserves propagation/disabled state and existing root/parent/handler configuration, and removes/closes only its own temporary stderr handler. Existing effective handlers control routing/formatting; no root configuration is performed. Shared errors, facade, adapters and persistence do not acquire progress responsibilities. Exact behavior is in the [progress contract](spec/progress-logging.md).

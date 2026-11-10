@@ -17,16 +17,24 @@ _LOGGER = logging.getLogger(__name__)
 class _ScanProgress:
     """Observe byte positions without clock or record work when INFO is disabled."""
 
-    def __init__(self) -> None:
+    def __init__(self, buffer_size: int) -> None:
+        self._buffer_size = buffer_size
         self._last_report = monotonic() if _LOGGER.isEnabledFor(logging.INFO) else None
 
     def update(self, position: int) -> None:
         if self._last_report is None:
             return
         now = monotonic()
-        if now - self._last_report >= 5.0:
-            _LOGGER.info("Scanned %d uncompressed bytes", position)
-            self._last_report = now
+        if now - self._last_report >= 1.0:
+            completed = position - position % self._buffer_size
+            unit_size = 1
+            for unit in ("B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"):
+                rounded = (completed + unit_size // 2) // unit_size
+                if rounded < 1024:
+                    _LOGGER.info("Scanned %d %s of uncompressed data", rounded, unit)
+                    self._last_report = now
+                    break
+                unit_size *= 1024
 
     def finish(self, position: int) -> None:
         if self._last_report is not None:
@@ -94,8 +102,9 @@ def scan_line_offsets(
     only a current block and up to three initial probe bytes, never a full line.
     A trailing LF creates no extra empty line; coordinates include skipped BOM
     bytes. The last value is EOF, and len(result) - 1 is the line count.
-    INFO logging reports byte progress at chunk boundaries at most every five
-    seconds, plus a final validated-scan total. Configure logging in the caller.
+    INFO logging reports completed buffer capacity in rounded binary units
+    after at least one elapsed second at a chunk boundary. The final record
+    reports exact bytes after validated EOF. Configure logging in the caller.
     """
     validate_scan_options(skip_utf8_bom=skip_utf8_bom, buffer_size=buffer_size)
     if not callable(getattr(stream, "read", None)):
@@ -103,7 +112,7 @@ def scan_line_offsets(
     offsets = array("Q", [0])
     if offsets.itemsize != 8:
         raise InvalidIndexError("Native unsigned Q offsets require eight-byte items")
-    progress = _ScanProgress()
+    progress = _ScanProgress(buffer_size)
     prefix = b""
     exhausted = False
     while len(prefix) < 3:
