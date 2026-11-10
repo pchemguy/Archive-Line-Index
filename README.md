@@ -16,7 +16,7 @@ python -m pip install .
 
 If the same environment has the previous `archive-line-index` distribution, uninstall it first with `python -m pip uninstall archive-line-index`. Both distributions register the `archive-line-index` console command. Update Python imports and module invocations to `archive_stream` and scanner logger configuration to `archive_stream.scanner`.
 
-The [v0.5.1 release](https://github.com/pchemguy/Archive-Line-Index/releases/tag/v0.5.1) provides the previous distribution and its installation instructions.
+The [v0.5.1 release](https://github.com/pchemguy/Archive-Stream/releases/tag/v0.5.1) provides the previous distribution and its installation instructions.
 
 The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library. The 7z dependency is loaded only when opening 7z content.
 
