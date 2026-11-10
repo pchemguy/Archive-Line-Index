@@ -1,12 +1,8 @@
 # Archive Line Index
 
-Archive Line Index is a Python library and minimal CLI for building compact byte-offset indexes of line-oriented data, streaming source bytes, and storing or reloading indexes in SQLite or raw binary form. An index records where each line starts and where the content ends, allowing consumers to identify line byte ranges without decoding text or retaining complete lines in memory. Streaming, indexing and persistence are independently usable.
+Archive Line Index is a Python library for streaming large payloads from plain files and single-payload ZIP, TAR (plain/gzip/bzip2/xz), and 7z archives. Pass a filesystem path to `open_content_stream()` to read the original payload bytes in blocks. The library selects the format automatically and streams archive members without extracting them to disk.
 
-Payload inputs are filesystem paths or caller-supplied blocking binary readers. Python index construction returns an in-memory `array("Q")` of unsigned eight-byte offsets: one start per line, followed by an end-of-file sentinel. For example, `b"a\nb"` produces `[0, 2, 3]`, describing the byte ranges `[0, 2)` and `[2, 3)`. Streaming returns original payload bytes through `read` or `readinto`. Persistence stores the completed array at an explicit path; the CLI indexes one target once and writes both `.sqlite3` and `.u64` files.
-
-The library requires Python 3.11 or later and supports plain payload files, single-payload ZIP, TAR (plain/gzip/bzip2/xz) and 7z archives, caller-supplied binary readers, both persistence formats and all three CLI invocation forms.
-
-The library preserves payload bytes. LF is the only line terminator, CRLF retains both bytes, and the final offset is an EOF sentinel. An optional initial UTF-8 BOM policy changes the first line's start to 3 while retaining coordinates in the original bytes. No text decoding or line-ending normalization occurs.
+For line-oriented data, the library can independently build, store, and reload a byte-offset index. The index records each LF-delimited line start and an end-of-file offset in the uncompressed payload. Python callers can build an index from a path or a caller-supplied blocking binary reader. The single-target CLI writes both SQLite and raw binary indexes. The library requires Python 3.11 or later.
 
 ## Installation
 
@@ -23,12 +19,13 @@ The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; devel
 
 ## Integration contract
 
-For software consuming `archive-line-index`, this section summarizes the public integration boundary; the linked specifications define exact behavior. Both library and CLI accept a filesystem path and automatically select plain-file, ZIP, TAR or 7z handling. No archive-backend imports or explicit format selection are required. Supported archives contain exactly one regular-file payload.
+The Python stream and index builder both accept a filesystem path and select the source backend automatically. The index CLI uses the same source handling. Supported archives contain exactly one regular-file payload.
 
 | Interface | Entry point | Result |
 | --- | --- | --- |
-| Python library | `from archive_line_index import build_line_index`; `build_line_index(source)` | A completed offset array. Persistence is explicit through package-root writer/reader functions. |
-| CLI | `archive-line-index SOURCE` | Both SQLite and raw index files from one scan; exit status reports success or failure. |
+| Python payload stream | `open_content_stream(source)` | A context-managed sequential stream with `read` and `readinto`. |
+| Python line index | `build_line_index(source)` | A completed `array("Q")` of byte offsets. Package-root readers and writers load and store it independently. |
+| Index CLI | `archive-line-index SOURCE` | Both SQLite and raw index files from one scan; exit status reports success or failure. |
 
 The CLI also runs as `python -m archive_line_index SOURCE` or through the importable `archive_line_index.cli.main([source])`, which returns an integer status. Library calls raise exceptions; index construction creates no output files. Each persistence output is published independently.
 
@@ -37,17 +34,46 @@ Offsets refer to the original uncompressed payload bytes, not archive positions 
 | Integration concern | Authoritative reference |
 | --- | --- |
 | Public Python imports, signatures and types; operation outcomes and exceptions | [API signatures](docs/dev/decomposition/public-api.md) and [operation/error contract](docs/dev/spec/public-api.md) |
+| Block reads, size limits, EOF and resource ownership | [Content stream contract](docs/dev/spec/content-stream.md) |
 | CLI arguments, default paths, stdout/stderr and status codes | [CLI contract](docs/dev/spec/cli.md) |
 | Offset representation, line ranges, BOM, EOF and bounds | [Line-index contract](docs/dev/spec/line-index.md) |
 | SQLite schema, raw binary encoding, readers/writers and publication guarantees | [Persistence contract](docs/dev/spec/persistence.md) |
 | Accepted source formats, automatic detection and archive restrictions | [Source/archive contract](docs/dev/spec/archive-handling.md) |
 | Progress records, verbosity and application logging configuration | [Progress-logging contract](docs/dev/spec/progress-logging.md) |
 
+## Stream a payload
+
+`open_content_stream` returns an owned, readable, nonseekable `ContentStream`. Use a context manager or call `close`. For block processing, call `read(block_size)` with a positive size until it returns `b""`. A short nonempty block is valid. Use `readinto` to reuse a buffer. It measures capacity in bytes and leaves unused storage unchanged.
+
+```python
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from zipfile import ZipFile
+
+from archive_line_index import open_content_stream
+
+with TemporaryDirectory() as directory:
+    target = Path(directory) / "payload.zip"
+    with ZipFile(target, "w") as archive:
+        archive.writestr("payload.bin", b"a\nb")
+    with open_content_stream(target, max_uncompressed_size=3) as stream:
+        assert stream.read(2) == b"a\n"
+        buffer = bytearray(b"????")
+        assert stream.readinto(buffer) == 1
+        assert buffer == b"b???"
+        assert stream.read(2) == b""
+    assert stream.closed
+```
+
+The inclusive size limit counts all payload bytes, including a BOM. Exactly-at-limit content still requires terminal validation. A read failure is retained until explicit closure; later otherwise-valid reads raise it rather than reporting EOF. Filesystem errors retain their ordinary Python types, and package-domain failures derive from `ArchiveLineIndexError`.
+
+Archive integrity errors can surface after some bytes have already been delivered. If downstream results require a valid complete archive, publish them after the stream reaches validated EOF. The application owns record parsing and any worker coordination or shared-memory transport.
+
 ## Index a source through the library
 
 For an existing source, call `build_line_index(source)`; the same call handles a plain file or supported archive. Persist its result with the package-root writers when files are needed. The self-contained example below creates a small plain source, builds its index and writes/reloads both outputs.
 
-`build_line_index` opens and owns the content stream, scans through validated EOF and closes it on success or failure. It returns only the completed array; it creates no output files.
+`build_line_index` opens its own content stream, scans through validated EOF, and closes it on success or failure. Opening the source separately to process its bytes makes a separate pass through the payload. The completed index can be stored and reloaded independently. Its offsets describe line ranges without changing the stream's sequential access.
 
 ```python
 from pathlib import Path
@@ -159,11 +185,11 @@ Sources are strings or path-like objects returning strings. Bytes paths are reje
 
 Archives contain exactly one regular-file payload, which may be empty or nested under directories. Directory entries are ignored; additional files (including metadata files), links and special entries are rejected. Member names are never extracted to filesystem paths. Early close releases resources without claiming terminal integrity validation.
 
-The archive examples below create small fixtures only to make each example self-contained. Their zipfile, tarfile and py7zr imports create test inputs; consuming an existing archive requires only the same package-level `build_line_index(source)` call shown in the library workflow.
+The examples below use `zipfile`, `tarfile`, and `py7zr` to create their own fixtures. Pass an existing archive directly to `open_content_stream(source)` for payload reads or `build_line_index(source)` for a line index.
 
 ### Plain files
 
-Plain files expose their original bytes. The [library workflow](#index-a-source-through-the-library) shows indexing and persistence without archive setup.
+Plain files expose their original bytes through the same [stream API](#stream-a-payload). The [indexing example](#index-a-source-through-the-library) uses a plain file.
 
 ### ZIP
 
@@ -239,30 +265,6 @@ The [`7z adapter`](src/archive_line_index/backends/sevenzip.py) forwards callbac
 Closing cancels package waits and joins the worker; checks during package waits occur at most 0.05 seconds apart, but dependency operations can delay cancellation, so this is not a total close-latency guarantee. Early close does not assert integrity.
 
 For `records.7z`, CLI defaults are `records.sqlite3` and `records.u64` beside the archive.
-
-## Stream without indexing
-
-`open_content_stream` returns an owned, readable, nonseekable `ContentStream`. Use a context manager or call `close`. Short nonempty reads are legal; zero-length reads do not establish EOF. `readinto` measures capacity in bytes and leaves unused storage unchanged.
-
-```python
-from pathlib import Path
-from tempfile import TemporaryDirectory
-
-from archive_line_index import open_content_stream
-
-with TemporaryDirectory() as directory:
-    target = Path(directory) / "payload.bin"
-    target.write_bytes(b"a\nb")
-    with open_content_stream(target, max_uncompressed_size=3) as stream:
-        assert stream.read(2) == b"a\n"
-        buffer = bytearray(b"????")
-        assert stream.readinto(buffer) == 1
-        assert buffer == b"b???"
-        assert stream.read() == b""
-    assert stream.closed
-```
-
-The inclusive size limit counts all payload bytes, including a BOM. Exactly-at-limit content still requires terminal validation. A read failure is retained until explicit closure; later otherwise-valid reads raise it rather than reporting EOF. Filesystem errors retain their ordinary Python types, and package-domain failures derive from `ArchiveLineIndexError`.
 
 ## Scan a borrowed binary reader
 

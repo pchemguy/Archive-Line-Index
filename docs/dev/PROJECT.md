@@ -2,9 +2,9 @@
 
 ## Purpose and users
 
-Archive Line Index is a synchronous Python library with a minimal importable command-line interface for developers who need to consume a large byte-oriented payload from a plain file or archive and locate its LF-delimited line ranges. Typical inputs include logs, text datasets and JSONL files; the library treats their content as bytes rather than parsing records.
+Archive Line Index is a synchronous Python library for downstream applications that need to stream large byte-oriented payloads from plain files and archives. Sequential payload access is its primary capability. Typical inputs include logs, text datasets, and JSONL files. The application owns record parsing, worker coordination, and any shared-memory transport.
 
-It provides two independently useful capabilities: sequential payload streaming and byte-line indexing. Callers can use the stream without building an index, or scan a caller-owned binary stream without using archive handling.
+Byte-line indexing is a companion capability for line-oriented payloads. Callers can stream bytes on their own or independently build, store, and reload an index that describes line ranges in the uncompressed payload. The scanner also accepts a caller-owned binary reader. A minimal importable CLI builds and stores an index for a single target.
 
 ## Intended outcomes
 
