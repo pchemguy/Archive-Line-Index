@@ -58,7 +58,8 @@ def build_line_index(
     All non-I/O arguments are checked before source acquisition. Read/allocation
     failures return no partial index. Mandatory cleanup must also succeed.
     Caller-configured INFO logging on archive_stream.scanner observes
-    one-second complete-buffer progress and exact validated scan completion.
+    one-second complete-buffer progress, exact final bytes, and elapsed scan
+    time. Scan timing excludes source acquisition, cleanup, and publication.
     """
     validate_scan_options(skip_utf8_bom=skip_utf8_bom, buffer_size=buffer_size)
     validate_stream_limit(max_uncompressed_size)

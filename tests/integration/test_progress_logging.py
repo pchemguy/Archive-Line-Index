@@ -10,7 +10,7 @@ import pytest
 from tests.helpers.archives import make_tar
 from tests.helpers.packaging import InstalledPackage
 from tests.helpers.sevenzip import make_7z
-from tests.integration.test_installed_cli import _invoke
+from tests.integration.test_installed_cli import _assert_progress_success, _invoke
 
 from archive_stream import build_line_index, open_content_stream, scan_line_offsets
 
@@ -39,14 +39,15 @@ def test_actual_formats_report_payload_bytes_without_duplicate_stream_logging(
     with caplog.at_level(logging.INFO, logger="archive_stream.scanner"):
         assert build_line_index(source, buffer_size=2).tolist() == [3, 10, 11, 16]
         records = [r for r in caplog.records if r.name == "archive_stream.scanner"]
-        assert records[-1].getMessage() == "Scan complete: 16 uncompressed bytes"
+        assert records[-2].getMessage() == "Scan complete: 16 uncompressed bytes"
+        assert records[-1].getMessage().startswith("Scan time: ")
         caplog.clear()
         with open_content_stream(source) as stream:
             assert stream.read() == PAYLOAD
         assert not [r for r in caplog.records if r.name == "archive_stream.scanner"]
         assert scan_line_offsets(io.BytesIO(PAYLOAD)).tolist() == [3, 10, 11, 16]
         assert [r for r in caplog.records if r.name == "archive_stream.scanner"][
-            -1
+            -2
         ].args == (16,)
 
 
@@ -57,9 +58,7 @@ def test_installed_default_progress_suppression_and_invalid_level(
     source = installed_package.workdir / ("progress-" + route + ".txt")
     source.write_bytes(PAYLOAD)
     result = _invoke(installed_package, route, [source.name])
-    assert result.returncode == 0, result.stderr
-    assert "Scan complete: 16 uncompressed bytes" in result.stderr
-    assert result.stderr.count("Scan complete:") == 1
+    _assert_progress_success(result, 16)
     quiet = _invoke(
         installed_package, route, ["--overwrite", "--log-level", "warning", source.name]
     )

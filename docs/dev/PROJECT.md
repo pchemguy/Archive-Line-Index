@@ -44,7 +44,7 @@ A user can index one filesystem target with a single positional command-line arg
 
 ### Lightweight progress
 
-Index construction reports the cumulative capacity of complete scan buffers through standard Python logging, with one-second chunk-boundary updates in rounded binary units and a final exact validated byte count. Library callers own logging configuration; the CLI defaults to INFO progress on stderr and provides logging-level suppression. No per-line logging, background heartbeat, extra payload pass or progress bar is required. Scan completion is distinct from successful index-file publication.
+Index construction reports the cumulative capacity of complete scan buffers through standard Python logging, with one-second chunk-boundary updates in rounded binary units and final records for the exact validated byte count and elapsed scan time. Library callers own logging configuration; the CLI defaults to INFO progress on stderr and provides logging-level suppression. No per-line logging, background heartbeat, extra payload pass or progress bar is required. Scan completion is distinct from successful index-file publication.
 
 ## Constraints and quality priorities
 

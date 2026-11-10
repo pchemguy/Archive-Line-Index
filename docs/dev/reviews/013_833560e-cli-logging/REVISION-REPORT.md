@@ -19,3 +19,9 @@ The focused logging tests showed 12 expected failures before implementation and 
 Replaced R-001's integer-only periodic formatting with the fewest decimal places needed for the last displayed digit to represent at most 100 scan buffers. Rounding uses integer arithmetic and ties round up. Trailing zeros retain the chosen precision. If rounding reaches 1024, the formatter promotes the unit and recalculates its precision. The default 1 MiB buffer produces whole MiB and two decimal places for GiB. Periodic timing, complete-buffer accounting and the exact final byte count carry forward.
 
 Eight of the eleven precision cases failed against the integer-only formatter. All 42 focused logging and CLI checks passed after the change, and the full Linux suite passed 773 tests with 95% coverage. Ruff, strict mypy, and active documentation link checks passed.
+
+## R-003 elapsed scan time
+
+Successful scans retain the exact-byte completion record and then emit elapsed scan time in seconds to two decimal places. The original monotonic start is preserved independently of the last periodic report. Timing ends after EOF and index validation, before source cleanup or persistence. Failure and disabled-INFO behavior were verified. Updated the README, Phase 5 and its current design and contracts.
+
+Nine focused cases failed before implementation. Afterward, all 141 focused logging, CLI and installed-archive tests passed. The full Linux suite passed 773 tests with 95% coverage. Ruff lint and format, strict mypy and changed-document link checks passed.

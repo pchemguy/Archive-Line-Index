@@ -19,7 +19,8 @@ class _ScanProgress:
 
     def __init__(self, buffer_size: int) -> None:
         self._buffer_size = buffer_size
-        self._last_report = monotonic() if _LOGGER.isEnabledFor(logging.INFO) else None
+        self._started_at = monotonic() if _LOGGER.isEnabledFor(logging.INFO) else None
+        self._last_report = self._started_at
 
     def update(self, position: int) -> None:
         if self._last_report is None:
@@ -45,8 +46,10 @@ class _ScanProgress:
                 unit_size *= 1024
 
     def finish(self, position: int) -> None:
-        if self._last_report is not None:
+        if self._started_at is not None:
+            elapsed = monotonic() - self._started_at
             _LOGGER.info("Scan complete: %d uncompressed bytes", position)
+            _LOGGER.info("Scan time: %.2f s", elapsed)
 
 
 class ReadableBinary(Protocol):
@@ -111,8 +114,9 @@ def scan_line_offsets(
     A trailing LF creates no extra empty line; coordinates include skipped BOM
     bytes. The last value is EOF, and len(result) - 1 is the line count.
     INFO logging reports completed buffer capacity in binary units with
-    buffer-based precision at one-second chunk boundaries. The final record
-    reports exact bytes after validated EOF. Configure logging in the caller.
+    buffer-based precision at one-second chunk boundaries. Completion records
+    report exact bytes and elapsed scan time after validation. Configure logging
+    in the caller.
     """
     validate_scan_options(skip_utf8_bom=skip_utf8_bom, buffer_size=buffer_size)
     if not callable(getattr(stream, "read", None)):

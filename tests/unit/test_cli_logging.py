@@ -72,13 +72,16 @@ def test_default_cli_periodic_uses_complete_buffer_and_final_exact_bytes(
     source = tmp_path / "payload.txt"
     size = scanner.DEFAULT_BUFFER_SIZE + 7
     source.write_bytes(b"x" * size)
-    monkeypatch.setattr(scanner, "monotonic", Mock(side_effect=[0, 0.999, 1, 1.1]))
+    monkeypatch.setattr(
+        scanner, "monotonic", Mock(side_effect=[0, 0.999, 1, 1.1, 1.25])
+    )
 
     assert cli.main([str(source)]) == 0
     output = capsys.readouterr()
     assert output.err.splitlines() == [
         "INFO: Scanned 1 MiB of uncompressed data",
         f"INFO: Scan complete: {size} uncompressed bytes",
+        "INFO: Scan time: 1.25 s",
     ]
     assert output.out.startswith("Indexed 1 lines:")
 

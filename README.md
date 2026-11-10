@@ -298,7 +298,7 @@ Set `skip_utf8_bom=False` to include the initial BOM in first-line content. Late
 
 Indexing emits INFO records from `archive_stream.scanner`. The scanner checks at chunk boundaries and emits a periodic update once at least one second has elapsed since the previous update or scan start. It counts only complete scan buffers in the uncompressed payload, including any skipped BOM bytes. The CLI uses 1 MiB buffers. Periodic counts use binary units. The last displayed digit represents at most 100 scan buffers. With the default buffer, MiB counts are integers and GiB counts have two decimal places, as in `Scanned 2.00 GiB of uncompressed data`. A value that rounds to 1024 moves up to the next unit.
 
-The final record gives the exact byte count after validated EOF and offset checks, including any partial buffer. Short scans may emit only that record. Updates occur at read boundaries, so a blocked read delays them. Index files are written after scan completion.
+After validated EOF and offset checks, `Scan complete` gives the exact byte count, including any partial buffer. A separate line such as `Scan time: 2.35 s` gives total elapsed scan time. This covers payload reads, scanning and final validation. Opening and closing the source and writing the index files occur outside that interval. Short scans may emit only the two completion lines. Periodic updates occur at read boundaries, so a blocked read delays them.
 
 Library use stays quiet unless the application enables INFO logging. Configure it in the application before indexing, for example:
 
