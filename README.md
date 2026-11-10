@@ -1,6 +1,8 @@
 # Archive Line Index
 
-Archive Line Index is a Python library for streaming large payloads from plain files and single-payload ZIP, TAR (plain/gzip/bzip2/xz), and 7z archives. Pass a filesystem path to `open_content_stream()` to read the original payload bytes in blocks. The library selects the format automatically and streams archive members without extracting them to disk.
+Archive Line Index transparently streams uncompressed files and compressed archive payloads through a single Python interface. Pass a path to `open_content_stream()` and read the original payload bytes in blocks. The library detects the format, selects the appropriate reader and decompressor automatically, and decompresses as you read.
+
+Supported sources include plain files, ZIP, TAR (uncompressed or gzip-, bzip2-, or xz-compressed), and 7z. Each archive contains one regular-file payload, streamed without extracting a member file to disk.
 
 For line-oriented data, the library can independently build, store, and reload a byte-offset index. The index records each LF-delimited line start and an end-of-file offset in the uncompressed payload. Python callers can build an index from a path or a caller-supplied blocking binary reader. The single-target CLI writes both SQLite and raw binary indexes. The library requires Python 3.11 or later.
 

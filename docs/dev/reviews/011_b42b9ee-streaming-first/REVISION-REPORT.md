@@ -15,3 +15,5 @@ The [architecture](../../ARCHITECTURE.md) and [content stream contract](../../sp
 Updated the [project brief](../../PROJECT.md) and [README](../../../../README.md). The README puts a ZIP streaming example before the indexing walkthrough and links the stream contract from the integration table. It explains that independent reads and index construction make separate passes, and that downstream publication can wait for validated EOF. A combined helper and incremental index APIs await demonstrated demand. Naming remains undecided.
 
 Both installed-artifact documentation tests and 32 stream, lifecycle, and backpressure tests passed. README local links and section order passed inspection. The campaign remains open.
+
+Clarified the opening of both documents to state the main purpose explicitly: transparent streaming of uncompressed files and compressed archive payloads through one interface with automatic reader and decompressor selection. Verified identical payload bytes from all six Alphanum fixtures using bounded reads through `open_content_stream(path)`.
