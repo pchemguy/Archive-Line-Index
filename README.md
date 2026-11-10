@@ -10,14 +10,14 @@ For line-oriented data, the library can independently build, store, and reload a
 
 If the target environment has the previous `archive-line-index` distribution, uninstall it first with `python -m pip uninstall archive-line-index`. Both distributions register the `archive-line-index` console command. Update Python imports and module invocations to `archive_stream` and scanner logger configuration to `archive_stream.scanner`.
 
-Download the [v0.5.2 wheel bundle](https://github.com/pchemguy/Archive-Stream/releases/download/v0.5.2/archive-stream-wheel.zip) and [SHA256SUMS](https://github.com/pchemguy/Archive-Stream/releases/download/v0.5.2/SHA256SUMS). Compare the bundle's SHA-256 with the manifest, then extract and install the wheel:
+Download the [v0.5.3 wheel bundle](https://github.com/pchemguy/Archive-Stream/releases/download/v0.5.3/archive-stream-wheel.zip) and [SHA256SUMS](https://github.com/pchemguy/Archive-Stream/releases/download/v0.5.3/SHA256SUMS). Compare the bundle's SHA-256 with the manifest, then extract and install the wheel:
 
 ```bash
 python -m zipfile -e archive-stream-wheel.zip .
-python -m pip install archive_stream-0.5.2-py3-none-any.whl
+python -m pip install archive_stream-0.5.3-py3-none-any.whl
 ```
 
-The [source bundle](https://github.com/pchemguy/Archive-Stream/releases/download/v0.5.2/archive-stream-source.zip) contains the source distribution. To install directly from a repository checkout, run `python -m pip install .` at its root.
+The [source bundle](https://github.com/pchemguy/Archive-Stream/releases/download/v0.5.3/archive-stream-source.zip) contains the source distribution. To install directly from a repository checkout, run `python -m pip install .` at its root.
 
 The [v0.5.1 release](https://github.com/pchemguy/Archive-Stream/releases/tag/v0.5.1) provides the previous distribution and its installation instructions.
 
