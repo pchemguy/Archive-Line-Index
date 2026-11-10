@@ -17,3 +17,9 @@ Updated the [project brief](../../PROJECT.md) and [README](../../../../README.md
 Both installed-artifact documentation tests and 32 stream, lifecycle, and backpressure tests passed. README local links and section order passed inspection. The campaign remains open.
 
 Clarified the opening of both documents to state the main purpose explicitly: transparent streaming of uncompressed files and compressed archive payloads through one interface with automatic reader and decompressor selection. Verified identical payload bytes from all six Alphanum fixtures using bounded reads through `open_content_stream(path)`.
+
+## R-002 rename planning
+
+Mapped the current display, distribution, import, console, logger and artifact names to their code, packaging, test, documentation and demo owners. The [revision plan](REVISION-PLAN.md#archive-stream-rename-proposal) records the proposed Archive Stream cutover, the retained index command, the old-to-new installation sequence and a verification matrix. Implementation awaits acceptance.
+
+Baseline verification at `d082938b68016189372aaeb0bdb96f01b4c9d498` on Linux passed all 757 tests with the existing package names. No rename work was executed at this planning checkpoint.
