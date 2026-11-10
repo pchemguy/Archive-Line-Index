@@ -1,6 +1,6 @@
 # Archive Stream API reference
 
-Default values are listed with each optional argument. Example values supply required arguments.
+The indexing and CLI examples show their defaults explicitly. Example values supply required inputs.
 
 ## Python library
 
@@ -8,31 +8,23 @@ Import these operations from `archive_stream`. A source path may be a string or 
 
 ### Stream a payload
 
-Read blocks into one reusable buffer. This example hashes the payload as it streams.
-
 ```python
-from hashlib import sha256
-
 from archive_stream import open_content_stream
 
-buffer = bytearray(65_536)
-digest = sha256()
-with open_content_stream(source="data/events.zip", max_uncompressed_size=None) as stream:
-    while count := stream.readinto(buffer):
-        digest.update(memoryview(buffer)[:count])
+source = "data/events.zip"
+block_size = 1_048_576
+
+with open_content_stream(source) as stream:
+    while block := stream.read(block_size):
+        print(len(block))
 ```
 
-| `open_content_stream()` parameter | Meaning |
+| Input | Meaning |
 | --- | --- |
-| `source` | Required path to a plain file or a supported archive. |
-| `max_uncompressed_size=None` | Inclusive limit in payload bytes. `None` applies no size limit. |
+| `source` | Path to a plain file or supported archive. |
+| `block_size` | Maximum uncompressed bytes per read. Choose a positive integer. This example uses 1 MiB. |
 
-| Stream method call | Parameter | Meaning |
-| --- | --- | --- |
-| `stream.read(-1)` | `size=-1` | Positional-only byte limit. The default loads all remaining payload bytes into memory. Use a positive size for bounded streaming. Zero makes no progress. |
-| `stream.readinto(buffer)` | `buffer` | Required positional-only writable contiguous buffer. Returns the bytes copied as a count and leaves the unused suffix unchanged. A zero count with a nonempty buffer signals validated EOF. |
-
-The context manager closes the stream. For manual ownership, call `stream.close()`. Use `stream.closed`, `stream.readable()`, `stream.writable()`, and `stream.seekable()` to inspect its state and capabilities. [Content stream contract](dev/spec/content-stream.md)
+Each read returns up to `block_size` bytes. An empty result signals validated EOF. [Content stream contract](dev/spec/content-stream.md)
 
 ### Build an index
 

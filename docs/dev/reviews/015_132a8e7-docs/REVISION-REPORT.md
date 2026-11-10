@@ -13,3 +13,5 @@ Checked live Python signatures and executed the library examples and CLI module 
 The stream example now uses a bounded `readinto` loop inside the context manager and consumes only the populated part of the reusable buffer. The parameter table retains `read(-1)` as the default and describes its memory cost. Verified the example against a compressed ZIP with multiple blocks and a short tail by comparing the digest and checking EOF and closure.
 
 Separated the opener parameters from the stream method calls so their arguments and defaults are scoped to the correct callable. Checked the tables against the live signatures.
+
+Simplified the stream reference to the two inputs needed for bounded reading. The source goes to `open_content_stream` and the block size goes to `stream.read`. Verified the documented 1 MiB size against a ZIP with two full blocks and a short tail.
