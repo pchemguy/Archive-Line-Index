@@ -49,6 +49,7 @@ def test_native_distribution_metadata_and_inventory(
     for required in (
         "pyproject.toml",
         "README.md",
+        "docs/API_REF.md",
         "LICENSE",
         "src/archive_stream/__init__.py",
         "tests/unit/test_scanner.py",

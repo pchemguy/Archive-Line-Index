@@ -25,6 +25,8 @@ The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; devel
 
 ## Integration contract
 
+See the [API reference](docs/API_REF.md) for library and CLI invocations with explicit defaults.
+
 The Python stream and index builder both accept a filesystem path and select the source backend automatically. The index CLI uses the same source handling. Supported archives contain exactly one regular-file payload.
 
 | Interface | Entry point | Result |

@@ -73,6 +73,7 @@ only-include = [
     "LICENSE",
     "AI_DISCLOSURE.md",
     "SDD-MANAGER.md",
+    "docs/API_REF.md",
     "docs/dev",
 ]
 

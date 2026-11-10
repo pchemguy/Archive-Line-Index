@@ -5,6 +5,7 @@
 | Location | Canonical ownership |
 | --- | --- |
 | Root `README.md` | Installation, quick library/CLI use, delivered capability scope and discoverable project documentation links. |
+| `docs/API_REF.md` | Compact library and CLI invocations, defaults and parameter definitions. |
 | Root `RELEASE-NOTES.md` | Finalized notes for the release being prepared; published GitHub releases and Git history retain earlier versions. |
 | `docs/dev/PROJECT.md` | Purpose, users, complete scope/non-goals and consequential constraints. |
 | `docs/dev/ARCHITECTURE.md` | Major system blocks, dependencies and structural rationale. |
