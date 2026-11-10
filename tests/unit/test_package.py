@@ -2,7 +2,7 @@
 
 import pytest
 
-import archive_line_index as ali
+import archive_stream as ali
 
 
 def test_exact_delivered_exports() -> None:
@@ -42,7 +42,7 @@ def test_version_and_console_metadata() -> None:
         )
     )["project"]
     assert re.fullmatch(r"\d+\.\d+\.\d+", project["version"])
-    assert project["scripts"] == {"archive-line-index": "archive_line_index.cli:main"}
+    assert project["scripts"] == {"archive-line-index": "archive_stream.cli:main"}
 
 
 def test_imports_have_no_cli_execution(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -52,7 +52,7 @@ def test_imports_have_no_cli_execution(monkeypatch: pytest.MonkeyPatch) -> None:
     from pathlib import Path
     from unittest.mock import patch
 
-    import archive_line_index.cli as cli
+    import archive_stream.cli as cli
 
     class UnreadableArgv:
         def __getitem__(self, key: object) -> object:
@@ -69,7 +69,7 @@ def test_imports_have_no_cli_execution(monkeypatch: pytest.MonkeyPatch) -> None:
     ):
         importlib.reload(ali)
         importlib.reload(cli)
-        importlib.import_module("archive_line_index.__main__")
+        importlib.import_module("archive_stream.__main__")
 
 
 def test_module_runner_converts_main_status_to_exit(
@@ -79,11 +79,11 @@ def test_module_runner_converts_main_status_to_exit(
     import sys
     from unittest.mock import patch
 
-    monkeypatch.delitem(sys.modules, "archive_line_index.__main__", raising=False)
+    monkeypatch.delitem(sys.modules, "archive_stream.__main__", raising=False)
     with (
-        patch("archive_line_index.cli.main", return_value=17) as main,
+        patch("archive_stream.cli.main", return_value=17) as main,
         pytest.raises(SystemExit) as caught,
     ):
-        runpy.run_module("archive_line_index", run_name="__main__")
+        runpy.run_module("archive_stream", run_name="__main__")
     assert caught.value.code == 17
     main.assert_called_once_with()

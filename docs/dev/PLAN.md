@@ -1,4 +1,4 @@
-# Archive Line Index delivery plan
+# Archive Stream delivery plan
 
 ## Objective and strategy
 
@@ -89,7 +89,7 @@ Two delivery milestones keep the adapter's bounded streaming/ownership risk dist
 
 The final phase review prepares verified package candidates and release notes for that phase’s delivered scope, including installation/use instructions, checks performed and material evidence limits. After verified integration, finalize and verify the release commit on the actual default branch, rebuild/verify the source distribution and wheel from that exact source, publish/read back the corresponding version tag, and publish the GitHub release with both explicit wheel/source bundles and `SHA256SUMS`. Verify the hosted notes, tag target, asset names and downloaded bytes against the local inventory before declaring release completion or starting an authorized successor phase. A partial implementation range does not trigger a phase release.
 
-Every hosted release artifact has a stable version-free name. The complete expected inventory is `archive-line-index-wheel.zip`, `archive-line-index-source.zip` and `SHA256SUMS`. The wheel/source bundles each contain exactly one valid native package with its ecosystem-required internal filename and matching version metadata. Native packages are private build inputs and bundled payloads; only the stable outer bundles and checksum file are hosted assets. Validate the entire flat hosted inventory against the independent naming contract and shared notation vectors, with no extension allowlist or matching-manifest exemption. Verify native metadata/source equality, bundle checksums and downloaded-byte identity before publication is complete. PyPI publication is not part of the phase release policy.
+Every hosted release artifact has a stable version-free name. The complete expected inventory is `archive-stream-wheel.zip`, `archive-stream-source.zip` and `SHA256SUMS`. The wheel/source bundles each contain exactly one valid native package with its ecosystem-required internal filename and matching version metadata. Native packages are private build inputs and bundled payloads; only the stable outer bundles and checksum file are hosted assets. Validate the entire flat hosted inventory against the independent naming contract and shared notation vectors, with no extension allowlist or matching-manifest exemption. Verify native metadata/source equality, bundle checksums and downloaded-byte identity before publication is complete. PyPI publication is not part of the phase release policy.
 
 ## Implementation ownership
 

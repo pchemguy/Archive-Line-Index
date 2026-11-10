@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-import archive_line_index as ali
+import archive_stream as ali
 
 
 @pytest.mark.parametrize(

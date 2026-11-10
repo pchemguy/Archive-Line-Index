@@ -15,17 +15,19 @@ def test_installed_plain_workflows_and_runtime_boundary(
             f"expected_version = {project_version!r}\n"
             + """
 import importlib.metadata as metadata
+import importlib.util
 import io
 from pathlib import Path
 import sys
-import archive_line_index as ali
+import archive_stream as ali
 
 assert Path(ali.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())
-assert metadata.version("archive-line-index") == expected_version
+assert metadata.version("archive-stream") == expected_version
+assert importlib.util.find_spec("archive_line_index") is None
 assert metadata.version("py7zr")
 names = {d.metadata["Name"].lower() for d in metadata.distributions()}
-assert not names.intersection({"pytest", "mypy", "ruff", "build", "hatchling", "flowmark"})
-assert not any(k == "py7zr" or k.startswith("archive_line_index.backends.zip") or k.startswith("archive_line_index.backends.sevenzip") for k in sys.modules)
+assert not names.intersection({"archive-line-index", "pytest", "mypy", "ruff", "build", "hatchling", "flowmark"})
+assert not any(k == "py7zr" or k.startswith("archive_stream.backends.zip") or k.startswith("archive_stream.backends.sevenzip") for k in sys.modules)
 expected = {"read_raw_index", "write_raw_index", "read_sqlite_index", "write_sqlite_index", "Source", "ReadableBinary", "DEFAULT_BUFFER_SIZE", "ContentStream", "open_content_stream", "scan_line_offsets", "build_line_index", "ArchiveLineIndexError", "UnsupportedFormatError", "InvalidArchiveError", "ArchiveStructureError", "SizeLimitExceededError", "ExtractionError", "InvalidIndexError", "PersistenceError"}
 assert set(ali.__all__) == expected
 payload = b"\\xef\\xbb\\xbfabc\\r\\n\\nlast"

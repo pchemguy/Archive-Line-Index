@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from tests.helpers.archives import make_tar
 
-from archive_line_index import (
+from archive_stream import (
     ArchiveStructureError,
     ExtractionError,
     InvalidArchiveError,
@@ -17,7 +17,7 @@ from archive_line_index import (
     read_raw_index,
     read_sqlite_index,
 )
-from archive_line_index.cli import main
+from archive_stream.cli import main
 
 VARIANTS = [
     (".tar", "w"),

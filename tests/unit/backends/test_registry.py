@@ -4,8 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from archive_line_index.backends.registry import open_backend
-from archive_line_index.formats import FormatCandidate, FormatKind
+from archive_stream.backends.registry import open_backend
+from archive_stream.formats import FormatCandidate, FormatKind
 
 
 @pytest.mark.parametrize("kind", list(FormatKind))

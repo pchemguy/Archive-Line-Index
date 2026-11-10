@@ -4,10 +4,10 @@ from pathlib import Path
 
 import pytest
 
-from archive_line_index.backends.registry import open_backend
-from archive_line_index.errors import SizeLimitExceededError
-from archive_line_index.formats import detect_format
-from archive_line_index.stream import make_content_stream
+from archive_stream.backends.registry import open_backend
+from archive_stream.errors import SizeLimitExceededError
+from archive_stream.formats import detect_format
+from archive_stream.stream import make_content_stream
 
 
 @pytest.mark.parametrize("size", [0, 1, 17, 131073])

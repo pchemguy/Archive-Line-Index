@@ -7,9 +7,9 @@ from unittest.mock import Mock
 import pytest
 from tests.helpers.readers import Reader
 
-from archive_line_index import InvalidIndexError, scan_line_offsets, scanner
+from archive_stream import InvalidIndexError, scan_line_offsets, scanner
 
-LOGGER = "archive_line_index.scanner"
+LOGGER = "archive_stream.scanner"
 
 
 def messages(caplog: pytest.LogCaptureFixture) -> list[str]:

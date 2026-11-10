@@ -26,13 +26,13 @@ def _invoke(
             )
         ]
     elif route == "module":
-        command = [str(package.python), "-I", "-m", "archive_line_index"]
+        command = [str(package.python), "-I", "-m", "archive_stream"]
     else:
         command = [
             str(package.python),
             "-I",
             "-c",
-            code or "from archive_line_index.cli import main; raise SystemExit(main())",
+            code or "from archive_stream.cli import main; raise SystemExit(main())",
         ]
     env = {k: v for k, v in os.environ.items() if k not in {"PYTHONPATH", "PYTHONHOME"}}
     return subprocess.run(
@@ -74,7 +74,7 @@ def test_installed_forms_default_explicit_and_overwrite(
     )
     stem = source.stem
     installed_package.run(f"""
-from archive_line_index import read_sqlite_index, read_raw_index
+from archive_stream import read_sqlite_index, read_raw_index
 assert read_sqlite_index({stem + ".sqlite3"!r}).tolist() == [3, 8, 9, 13]
 assert read_raw_index({stem + ".u64"!r}).tolist() == [3, 8, 9, 13]
 """)
@@ -130,8 +130,8 @@ def test_installed_partial_failure_and_signal_cleanup(
     code = f"""
 import signal
 from unittest.mock import patch
-from archive_line_index.cli import main
-with patch("archive_line_index.persistence.raw._write_all", side_effect={effect}):
+from archive_stream.cli import main
+with patch("archive_stream.persistence.raw._write_all", side_effect={effect}):
     raise SystemExit(main())
 """
     result = _invoke(installed_package, "imported", [source.name], code=code)
@@ -144,6 +144,6 @@ with patch("archive_line_index.persistence.raw._write_all", side_effect={effect}
     assert not (installed_package.workdir / (name + ".u64")).exists()
     assert not list(installed_package.workdir.glob("." + name + ".*.tmp"))
     installed_package.run(f"""
-from archive_line_index import read_sqlite_index
+from archive_stream import read_sqlite_index
 assert read_sqlite_index({name + ".sqlite3"!r}).tolist() == [0, 3]
 """)

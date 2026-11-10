@@ -8,9 +8,9 @@ from unittest.mock import Mock
 
 import pytest
 
-from archive_line_index import cli, scanner
+from archive_stream import cli, scanner
 
-LOGGER = "archive_line_index.scanner"
+LOGGER = "archive_stream.scanner"
 
 
 @pytest.fixture

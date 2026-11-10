@@ -60,7 +60,7 @@ def _parser() -> argparse.ArgumentParser:
 @contextmanager
 def _progress_logging(level: int) -> Iterator[None]:
     """Select scan verbosity, reusing application handlers and restoring state."""
-    logger = logging.getLogger("archive_line_index.scanner")
+    logger = logging.getLogger("archive_stream.scanner")
     previous = logger.level
     handler: logging.Handler | None = None
     try:

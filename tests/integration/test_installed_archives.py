@@ -20,7 +20,7 @@ def test_installed_zip_pairs_and_corruption(
     _assert_progress_success(result, 16)
     stem = target.stem
     installed_package.run(f"""
-from archive_line_index import build_line_index, open_content_stream, read_raw_index, read_sqlite_index
+from archive_stream import build_line_index, open_content_stream, read_raw_index, read_sqlite_index
 assert build_line_index({target.name!r}).tolist() == [3, 10, 11, 16]
 assert read_sqlite_index({stem + ".sqlite3"!r}).tolist() == [3, 10, 11, 16]
 assert read_raw_index({stem + ".u64"!r}).tolist() == [3, 10, 11, 16]
@@ -71,7 +71,7 @@ def test_installed_tar_variants_and_pairs(
     _assert_progress_success(result, 16)
     stem = str(target.with_suffix(""))
     installed_package.run(f"""
-from archive_line_index import build_line_index, read_raw_index, read_sqlite_index
+from archive_stream import build_line_index, read_raw_index, read_sqlite_index
 assert build_line_index({target.name!r}, buffer_size=1).tolist() == [3, 10, 11, 16]
 assert read_sqlite_index({stem + ".sqlite3"!r}).tolist() == [3, 10, 11, 16]
 assert read_raw_index({stem + ".u64"!r}).tolist() == [3, 10, 11, 16]
@@ -94,7 +94,7 @@ def test_installed_empty_and_late_invalid_tar(
     )
     _assert_progress_success(_invoke(installed_package, "console", [empty.name]), 0)
     installed_package.run(f"""
-from archive_line_index import read_raw_index, read_sqlite_index
+from archive_stream import read_raw_index, read_sqlite_index
 assert read_raw_index({str(empty.with_suffix(".u64"))!r}).tolist() == [0]
 assert read_sqlite_index({str(empty.with_suffix(".sqlite3"))!r}).tolist() == [0]
 """)
@@ -128,7 +128,7 @@ def test_installed_7z_pairs_and_corruption(
     _assert_progress_success(result, len(payload))
     stem = target.with_suffix("")
     installed_package.run(f"""
-from archive_line_index import build_line_index, read_raw_index, read_sqlite_index
+from archive_stream import build_line_index, read_raw_index, read_sqlite_index
 assert build_line_index({target.name!r}, buffer_size=1).tolist() == {expected!r}
 assert read_raw_index({str(stem) + ".u64"!r}).tolist() == {expected!r}
 assert read_sqlite_index({str(stem) + ".sqlite3"!r}).tolist() == {expected!r}

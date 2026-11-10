@@ -49,7 +49,7 @@ If cleanup fails while another exception is propagating, the original remains pr
 
 ## Distribution contract
 
-The distribution is named `archive-line-index`, requires Python 3.11 or later and packages `archive_line_index`. It uses Hatchling and declares the required `py7zr` runtime dependency; ZIP, TAR and SQLite use the standard library. No separate archive executable or development dependency is required for installed-library use. The source distribution contains the files needed to build the wheel.
+The distribution is named `archive-stream`, requires Python 3.11 or later and packages `archive_stream`. It uses Hatchling and declares the required `py7zr` runtime dependency; ZIP, TAR and SQLite use the standard library. No separate archive executable or development dependency is required for installed-library use. The source distribution contains the files needed to build the wheel.
 
 Version metadata must be present and consistent across distribution metadata and the built artifacts. Public imports work outside the checkout. Package initialization exports exactly the package-root names in the public API design and does not import optional development tools. The implementation chooses and records a dependency constraint supported by its actual integration evidence; dependency updates require rerunning affected format/lifecycle checks. The distribution also installs the console entry point and module runner defined by the public API design; both share the importable CLI callable and obey the [CLI contract](cli.md). This contract does not authorize PyPI or other external package publication.
 

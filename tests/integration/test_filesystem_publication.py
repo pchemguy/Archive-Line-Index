@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 import pytest
 
-from archive_line_index.persistence import raw, sqlite
-from archive_line_index.persistence.fs import publish_index_file
+from archive_stream.persistence import raw, sqlite
+from archive_stream.persistence.fs import publish_index_file
 
 
 @pytest.mark.parametrize("kind", ["raw", "sqlite"])

@@ -17,7 +17,7 @@ from tests.helpers.archives import make_tar
 from tests.helpers.sevenzip import make_7z
 from tests.integration.test_sevenzip_stream import owned_threads
 
-from archive_line_index import (
+from archive_stream import (
     SizeLimitExceededError,
     build_line_index,
     open_content_stream,
@@ -176,7 +176,7 @@ print("signal-cleanup-complete")
 
 
 def _exercise_sigint_cleanup(tmp_path: Path) -> None:
-    from archive_line_index.backends.sevenzip import _ForwardWriter
+    from archive_stream.backends.sevenzip import _ForwardWriter
 
     source = make_7z(tmp_path / "signal.7z", [("data", b"a\nb" * (1024 * 1024))])
     ready = threading.Event()

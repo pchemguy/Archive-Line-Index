@@ -20,8 +20,8 @@ from scripts.check_release_artifacts import check_release_artifacts
 from scripts.release_names import check_names
 
 ASSET_NAMES = [
-    "archive-line-index-wheel.zip",
-    "archive-line-index-source.zip",
+    "archive-stream-wheel.zip",
+    "archive-stream-source.zip",
     "SHA256SUMS",
 ]
 
@@ -47,8 +47,8 @@ def check_bundles(
         ASSET_NAMES, [p.name for p in files], version, complete=not write_checksums
     )
     native_names = [
-        f"archive_line_index-{version}-py3-none-any.whl",
-        f"archive_line_index-{version}.tar.gz",
+        f"archive_stream-{version}-py3-none-any.whl",
+        f"archive_stream-{version}.tar.gz",
     ]
     with tempfile.TemporaryDirectory() as temporary:
         native = Path(temporary)
@@ -96,8 +96,8 @@ def prepare_bundles(
     if any(directory.iterdir()):
         raise ValueError("Use an empty release staging directory")
     names = [
-        f"archive_line_index-{version}-py3-none-any.whl",
-        f"archive_line_index-{version}.tar.gz",
+        f"archive_stream-{version}-py3-none-any.whl",
+        f"archive_stream-{version}.tar.gz",
     ]
     for asset, name in zip(ASSET_NAMES[:2], names, strict=True):
         info = zipfile.ZipInfo(name)

@@ -2,9 +2,9 @@
 
 ## Package and public surface
 
-All production code is allocated under `src/archive_line_index/`. The [public design](../decomposition/public-api.md) owns supported imports/signatures; this map identifies their implementation homes. Every project-owned Python module has an appropriate module docstring, with Google-style documentation for public operations.
+All production code is allocated under `src/archive_stream/`. The [public design](../decomposition/public-api.md) owns supported imports/signatures; this map identifies their implementation homes. Every project-owned Python module has an appropriate module docstring, with Google-style documentation for public operations.
 
-| Path relative to `src/archive_line_index/` | Logical owner and responsibility |
+| Path relative to `src/archive_stream/` | Logical owner and responsibility |
 | --- | --- |
 | `__init__.py` | Explicit package-root re-exports from owning modules; no CLI execution, backend state or independent implementation. Exports match the delivered phase and reach the full accepted set by final delivery. |
 | `api.py` | Public facade: `open_content_stream` and `build_line_index`; validates/composes providers and transfers resource ownership. |
@@ -19,7 +19,7 @@ All production code is allocated under `src/archive_line_index/`. The [public de
 
 ## Backend adapters
 
-| Path relative to `src/archive_line_index/backends/` | Logical owner and responsibility |
+| Path relative to `src/archive_stream/backends/` | Logical owner and responsibility |
 | --- | --- |
 | `__init__.py` | Internal package marker; no eager import of all concrete adapters. |
 | `base.py` | Internal `BackendReader` protocol consumed by the common stream and implemented by adapters. |
@@ -34,7 +34,7 @@ The format adapter and producer bridge have separate physical homes because call
 
 ## Persistence
 
-| Path relative to `src/archive_line_index/persistence/` | Logical owner and responsibility |
+| Path relative to `src/archive_stream/persistence/` | Logical owner and responsibility |
 | --- | --- |
 | `__init__.py` | Internal package marker; public re-exports remain at the package root. |
 | `fs.py` | Unique temporary sibling context, exclusive creation/replacement primitive and ownership-aware cleanup. Publication and later cleanup remain distinguishable. |

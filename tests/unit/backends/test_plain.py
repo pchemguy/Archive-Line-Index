@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import pytest
 
-from archive_line_index.backends.plain import open_plain_backend
+from archive_stream.backends.plain import open_plain_backend
 
 
 def test_binary_delivery_and_terminal_completion(tmp_path: Path) -> None:
@@ -51,7 +51,7 @@ def test_open_metadata_failure_closes_acquired_handle(tmp_path: Path) -> None:
     with (
         patch.object(Path, "open", return_value=handle),
         patch(
-            "archive_line_index.backends.plain.os.fstat",
+            "archive_stream.backends.plain.os.fstat",
             side_effect=OSError("metadata"),
         ),
     ):

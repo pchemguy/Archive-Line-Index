@@ -7,7 +7,7 @@ import py7zr
 import pytest
 from tests.helpers.sevenzip import make_7z
 
-from archive_line_index.errors import (
+from archive_stream.errors import (
     ArchiveStructureError,
     InvalidArchiveError,
     UnsupportedFormatError,
@@ -22,7 +22,7 @@ from archive_line_index.errors import (
 def test_real_7z_nested_payload_without_filesystem_extraction(
     tmp_path: Path, payload: bytes
 ) -> None:
-    from archive_line_index.backends.sevenzip import open_7z_backend
+    from archive_stream.backends.sevenzip import open_7z_backend
 
     p = make_7z(tmp_path / "source.7z", [("nested/data", payload)])
     with patch.object(Path, "mkdir", side_effect=AssertionError("member extraction")):
@@ -49,7 +49,7 @@ def test_real_7z_nested_payload_without_filesystem_extraction(
 def test_7z_member_counts_are_validated_before_extraction(
     tmp_path: Path, entries: list[tuple[str, bytes]]
 ) -> None:
-    from archive_line_index.backends.sevenzip import open_7z_backend
+    from archive_stream.backends.sevenzip import open_7z_backend
 
     p = make_7z(tmp_path / "source.7z", entries)
     with pytest.raises(ArchiveStructureError):
@@ -61,7 +61,7 @@ def test_7z_member_counts_are_validated_before_extraction(
 def test_detected_7z_encryption_is_unsupported(
     tmp_path: Path, header_encryption: bool
 ) -> None:
-    from archive_line_index.backends.sevenzip import open_7z_backend
+    from archive_stream.backends.sevenzip import open_7z_backend
 
     p = make_7z(
         tmp_path / "source.7z",
@@ -75,7 +75,7 @@ def test_detected_7z_encryption_is_unsupported(
 
 
 def test_bad_7z_open_releases_source_and_preserves_cause(tmp_path: Path) -> None:
-    from archive_line_index.backends.sevenzip import open_7z_backend
+    from archive_stream.backends.sevenzip import open_7z_backend
 
     p = tmp_path / "bad.7z"
     p.write_bytes(b"not 7z")
@@ -89,7 +89,7 @@ def test_bad_7z_open_releases_source_and_preserves_cause(tmp_path: Path) -> None
 
 
 def test_7z_directory_is_ignored_and_symlink_rejected(tmp_path: Path) -> None:
-    from archive_line_index.backends.sevenzip import open_7z_backend
+    from archive_stream.backends.sevenzip import open_7z_backend
 
     directory = tmp_path / "folder"
     directory.mkdir()
@@ -118,7 +118,7 @@ def test_7z_directory_is_ignored_and_symlink_rejected(tmp_path: Path) -> None:
     [py7zr.FILTER_LZMA2, py7zr.FILTER_COPY, py7zr.FILTER_DEFLATE, py7zr.FILTER_BZIP2],
 )
 def test_real_selected_7z_codecs(tmp_path: Path, method: int) -> None:
-    from archive_line_index.backends.sevenzip import open_7z_backend
+    from archive_stream.backends.sevenzip import open_7z_backend
 
     payload = b"a\n\0\xff" * 10000
     p = make_7z(tmp_path / "source.7z", [("data", payload)], filters=[{"id": method}])
@@ -136,7 +136,7 @@ def test_forward_writer_is_thread_safe_and_nonseekable() -> None:
     import io
     import threading
 
-    from archive_line_index.backends.sevenzip import _ForwardWriter
+    from archive_stream.backends.sevenzip import _ForwardWriter
 
     class Endpoint:
         def __init__(self) -> None:
@@ -171,7 +171,7 @@ def test_forward_writer_is_thread_safe_and_nonseekable() -> None:
 
 
 def test_missing_extraction_codec_preserves_unsupported_cause(tmp_path: Path) -> None:
-    from archive_line_index.backends.sevenzip import open_7z_backend
+    from archive_stream.backends.sevenzip import open_7z_backend
 
     p = make_7z(tmp_path / "source.7z", [("data", b"data")])
     with patch.object(
@@ -190,14 +190,14 @@ def test_missing_extraction_codec_preserves_unsupported_cause(tmp_path: Path) ->
 def test_opening_allocation_failure_releases_owned_file(
     tmp_path: Path, allocation: str
 ) -> None:
-    from archive_line_index.backends.sevenzip import open_7z_backend
+    from archive_stream.backends.sevenzip import open_7z_backend
 
     p = make_7z(tmp_path / "source.7z", [("data", b"x")])
     handle = p.open("rb")
     with (
         patch.object(Path, "open", return_value=handle),
         patch(
-            "archive_line_index.backends.sevenzip." + allocation,
+            "archive_stream.backends.sevenzip." + allocation,
             side_effect=MemoryError("allocation"),
         ),
     ):
@@ -213,7 +213,7 @@ def test_opening_allocation_failure_releases_owned_file(
 def test_real_dependency_source_io_failure_stays_ordinary(
     tmp_path: Path, operation: str
 ) -> None:
-    from archive_line_index.backends.sevenzip import open_7z_backend
+    from archive_stream.backends.sevenzip import open_7z_backend
 
     p = make_7z(tmp_path / "source.7z", [("data", b"payload\n")])
     source = p.open("rb")

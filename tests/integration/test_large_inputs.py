@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from archive_line_index.scanner import scan_line_offsets
+from archive_stream.scanner import scan_line_offsets
 
 
 def test_long_line_storage_does_not_grow_with_payload() -> None:
@@ -41,7 +41,7 @@ def test_plain_stream_delivers_incrementally_with_bounded_storage(
     tmp_path: Path,
     default_buffer: int,
 ) -> None:
-    from archive_line_index import open_content_stream
+    from archive_stream import open_content_stream
 
     path = tmp_path / "large.bin"
     with path.open("wb") as output:
