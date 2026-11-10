@@ -31,14 +31,14 @@ def test_scan_completion_uses_original_uncompressed_bytes(
     source = io.BytesIO(payload)
     with caplog.at_level(logging.INFO, logger=LOGGER):
         assert scan_line_offsets(source, buffer_size=1).tolist() == expected
-    assert messages(caplog)[-1] == f"Scan complete: {len(payload)} uncompressed bytes"
+    assert messages(caplog)[-2] == f"Scan complete: {len(payload)} uncompressed bytes"
     assert not source.closed
 
 
-def test_five_second_boundary_no_catchup_and_exact_final(
+def test_one_second_boundary_no_catchup_and_exact_final(
     caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    clock = Mock(side_effect=[0.0, 4.999, 5.0, 99.0])
+    clock = Mock(side_effect=[0.0, 0.999, 1.0, 99.0, 99.25])
     monkeypatch.setattr(scanner, "monotonic", clock, raising=False)
     with caplog.at_level(logging.INFO, logger=LOGGER):
         assert scan_line_offsets(io.BytesIO(b"abc\nd\nz"), buffer_size=3).tolist() == [
@@ -48,11 +48,59 @@ def test_five_second_boundary_no_catchup_and_exact_final(
             7,
         ]
     assert messages(caplog) == [
-        "Scanned 6 uncompressed bytes",
-        "Scanned 7 uncompressed bytes",
+        "Scanned 6 B of uncompressed data",
+        "Scanned 6 B of uncompressed data",
         "Scan complete: 7 uncompressed bytes",
+        "Scan time: 99.25 s",
     ]
-    assert clock.call_count == 4
+    assert clock.call_count == 5
+
+
+def test_completed_buffer_capacity_across_bom_and_short_reads(
+    caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = Reader(b"\xef", b"\xbb\xbf", b"a", b"b\nc", b"de")
+    monkeypatch.setattr(scanner, "monotonic", Mock(side_effect=[0, 1, 2, 3, 4, 4.5]))
+    with caplog.at_level(logging.INFO, logger=LOGGER):
+        assert scan_line_offsets(source, buffer_size=4).tolist() == [3, 6, 9]
+    assert messages(caplog) == [
+        "Scanned 0 B of uncompressed data",
+        "Scanned 4 B of uncompressed data",
+        "Scanned 4 B of uncompressed data",
+        "Scanned 8 B of uncompressed data",
+        "Scan complete: 9 uncompressed bytes",
+        "Scan time: 4.50 s",
+    ]
+
+
+@pytest.mark.parametrize(
+    ("buffer_size", "position", "expected"),
+    [
+        (1, 1023, "1023 B"),
+        (1, 1024, "1.00 KiB"),
+        (1, 1152, "1.13 KiB"),
+        (10, 1530, "1.5 KiB"),
+        (11, 1540, "2 KiB"),
+        (1, 1023 * 1024 + 512, "1023.50 KiB"),
+        (1024**2, 1023 * 1024**2, "1023 MiB"),
+        (512 * 1024, 1024**3 - 512 * 1024, "1.00 GiB"),
+        (1024**2, 3 * 1024**3 // 2, "1.50 GiB"),
+        (1024**2, 1024**4, "1.00000 TiB"),
+        (1024**2, 2**63 - 1, "8.00000000000 EiB"),
+    ],
+)
+def test_periodic_report_precision_and_binary_unit_promotion(
+    caplog: pytest.LogCaptureFixture,
+    monkeypatch: pytest.MonkeyPatch,
+    buffer_size: int,
+    position: int,
+    expected: str,
+) -> None:
+    monkeypatch.setattr(scanner, "monotonic", Mock(side_effect=[0, 1]))
+    with caplog.at_level(logging.INFO, logger=LOGGER):
+        progress = scanner._ScanProgress(buffer_size=buffer_size)
+        progress.update(position)
+    assert messages(caplog) == [f"Scanned {expected} of uncompressed data"]
 
 
 def test_disabled_progress_has_no_clock_or_info_calls(
@@ -78,7 +126,7 @@ def test_enabled_observation_cost_depends_on_chunks_not_lines(
             scan_line_offsets(io.BytesIO(payload), buffer_size=8)
             counts.append(clock.call_count)
     assert counts[0] == counts[1] and 1 < counts[0] <= 11
-    assert len(messages(caplog)) == 2
+    assert len(messages(caplog)) == 4
 
 
 @pytest.mark.parametrize(
@@ -92,7 +140,9 @@ def test_failed_scan_never_claims_completion(
     source = Reader(b"abc", error)
     with caplog.at_level(logging.INFO, logger=LOGGER), pytest.raises(type(error)):
         scan_line_offsets(source)
-    assert not any(m.startswith("Scan complete:") for m in messages(caplog))
+    assert not any(
+        m.startswith(("Scan complete:", "Scan time:")) for m in messages(caplog)
+    )
     assert source.closes == 0
 
 
@@ -104,20 +154,27 @@ def test_index_validation_failure_never_claims_completion(
     )
     with caplog.at_level(logging.INFO, logger=LOGGER), pytest.raises(InvalidIndexError):
         scan_line_offsets(io.BytesIO(b"a\nb"))
-    assert not any(m.startswith("Scan complete:") for m in messages(caplog))
+    assert not any(
+        m.startswith(("Scan complete:", "Scan time:")) for m in messages(caplog)
+    )
 
 
 def test_scans_have_independent_timer_state(
     caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     monkeypatch.setattr(
-        scanner, "monotonic", Mock(side_effect=[0.0, 5.0, 100.0, 100.1]), raising=False
+        scanner,
+        "monotonic",
+        Mock(side_effect=[0.0, 1.0, 3.0, 100.0, 100.1, 100.25]),
+        raising=False,
     )
     with caplog.at_level(logging.INFO, logger=LOGGER):
-        scan_line_offsets(io.BytesIO(b"abc"))
+        scan_line_offsets(io.BytesIO(b"abc"), buffer_size=3)
         scan_line_offsets(io.BytesIO(b"x"))
     assert messages(caplog) == [
-        "Scanned 3 uncompressed bytes",
+        "Scanned 3 B of uncompressed data",
         "Scan complete: 3 uncompressed bytes",
+        "Scan time: 3.00 s",
         "Scan complete: 1 uncompressed bytes",
+        "Scan time: 0.25 s",
     ]

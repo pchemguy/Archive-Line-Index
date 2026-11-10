@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 
 import pytest
@@ -51,11 +52,10 @@ def _assert_progress_success(
     """Retain success/diagnostic checks while accepting informational progress."""
     assert result.returncode == 0, result.stderr
     lines = result.stderr.splitlines()
-    assert (
-        lines and lines[-1] == f"INFO: Scan complete: {byte_count} uncompressed bytes"
-    )
-    assert sum("Scan complete:" in line for line in lines) == 1
-    assert all(line.startswith("INFO: Scanned ") or line == lines[-1] for line in lines)
+    assert len(lines) >= 2
+    assert lines[-2] == f"INFO: Scan complete: {byte_count} uncompressed bytes"
+    assert re.fullmatch(r"INFO: Scan time: \d+\.\d{2} s", lines[-1])
+    assert all(line.startswith("INFO: Scanned ") for line in lines[:-2])
 
 
 @pytest.mark.parametrize("route", ["console", "module", "imported"])

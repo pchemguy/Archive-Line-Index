@@ -195,7 +195,7 @@ def test_inventory_symlink_rejected(inventory: tuple[Path, Path]) -> None:
     assert project.read_text().startswith("[project]")
 
 
-@pytest.mark.parametrize("fault", ["absent", "stale", "source"])
+@pytest.mark.parametrize("fault", ["absent", "stale", "source", "delimiter"])
 def test_console_script_declaration_must_match(
     inventory: tuple[Path, Path], fault: str
 ) -> None:
@@ -215,6 +215,8 @@ def test_console_script_declaration_must_match(
         declared = declared.replace(target, old_target)
     elif fault == "stale":
         entry_points = entry_points.replace(target.encode(), old_target.encode())
+    elif fault == "delimiter":
+        entry_points = entry_points.replace(b" = ", b" : ")
     write_candidates(
         dist,
         source_project=declared,

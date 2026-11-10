@@ -62,6 +62,30 @@ def test_default_and_selected_cli_progress(
     assert isolated_logger.level == logging.ERROR and not isolated_logger.handlers
 
 
+def test_default_cli_periodic_uses_complete_buffer_and_final_exact_bytes(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+    isolated_logger: logging.Logger,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    isolated_logger.propagate = False
+    source = tmp_path / "payload.txt"
+    size = scanner.DEFAULT_BUFFER_SIZE + 7
+    source.write_bytes(b"x" * size)
+    monkeypatch.setattr(
+        scanner, "monotonic", Mock(side_effect=[0, 0.999, 1, 1.1, 1.25])
+    )
+
+    assert cli.main([str(source)]) == 0
+    output = capsys.readouterr()
+    assert output.err.splitlines() == [
+        "INFO: Scanned 1 MiB of uncompressed data",
+        f"INFO: Scan complete: {size} uncompressed bytes",
+        "INFO: Scan time: 1.25 s",
+    ]
+    assert output.out.startswith("Indexed 1 lines:")
+
+
 def test_warning_suppresses_preconfigured_info_child(
     tmp_path: Path,
     capsys: pytest.CaptureFixture[str],

@@ -296,7 +296,18 @@ Set `skip_utf8_bom=False` to include the initial BOM in first-line content. Late
 
 ## Progress logging
 
-Indexing emits standard INFO records from `archive_stream.scanner`, reporting cumulative uncompressed bytes in the original indexed byte space, including a skipped BOM. The scanner checks at chunk boundaries and emits periodic updates only after five seconds have elapsed; it adds an exact final count after validated EOF and offset checks. It performs no per-line logging. Short or empty scans may emit only the final count, and a blocked read does not produce a timer heartbeat. A scan-complete message does not mean SQLite/raw publication has succeeded.
+The indexing CLI sends INFO progress to stderr by default. Use `--log-level WARNING` to suppress it while retaining error diagnostics. A scan can produce output like this:
+
+```text
+INFO: Scanned 1 MiB of uncompressed data
+INFO: Scan complete: 2097159 uncompressed bytes
+INFO: Scan time: 2.35 s
+```
+
+- **Periodic progress.** The scanner checks after each chunk and reports once at least one second has elapsed since the last update or scan start. It counts only the capacity of complete scan buffers. The CLI uses 1 MiB buffers, so the last displayed digit represents at most 100 MiB. For example, MiB counts are integers and GiB counts have two decimal places. A rounded value of 1024 moves to the next binary unit. A blocked read delays the next report.
+- **Scan completion.** After validated EOF and offset checks, the scanner logs exact uncompressed bytes, including any partial buffer or skipped BOM, followed by total elapsed scan time. The timer covers payload reads, scanning and final validation. Source opening, cleanup and index-file writes occur outside that interval. Short scans may produce only these two lines.
+
+### Application logging
 
 Library use stays quiet unless the application enables INFO logging. Configure it in the application before indexing, for example:
 
@@ -314,9 +325,9 @@ with TemporaryDirectory() as directory:
     assert build_line_index(source).tolist() == [0, 2, 3]
 ```
 
-No root logger or console/file handler is configured by library import or scanning. Disabled progress performs no clock reads or record formatting. There are no extra payload reads, copies or extraction workers.
+The library uses the named logger `archive_stream.scanner` and leaves root and handler configuration to the application. Disabled progress performs no clock reads or formatting. Logging adds no payload reads, copies or workers.
 
-The CLI defaults to `--log-level INFO`. With no effective application handlers, it temporarily sends concise progress to stderr; an embedding application can instead route it through its existing handlers. `--log-level WARNING` (or ERROR/CRITICAL) suppresses progress while retaining ordinary error diagnostics. Levels are case-insensitive; DEBUG adds no per-line output. The previous scanner level is restored and only CLI-owned handlers are removed, so repeated serialized calls do not accumulate logging setup. Existing root/parent/handler settings remain application-owned. Standalone stream-only reads and row-by-row persistence do not report progress.
+When called from an application, the CLI reuses existing effective handlers. Otherwise it temporarily attaches a stderr handler. It restores the scanner logger's previous level and removes only its own handler on exit. Only indexing emits these records. Standalone payload reads and persistence do not emit scan progress.
 
 ## Memory and failure behavior
 
@@ -348,10 +359,10 @@ python -m ruff format --check src tests scripts
 python -m mypy
 python -m pytest --cov=archive_stream --cov-report=term-missing
 python -m build
-python scripts/check_release_artifacts.py --dist dist --tag v0.5.2 --write-checksums
-python scripts/check_release_artifacts.py --dist dist --tag v0.5.2
-python -m scripts.prepare_release --native-dist dist --output release --tag v0.5.2
-python -m scripts.prepare_release --output release --tag v0.5.2 --check
+python scripts/check_release_artifacts.py --dist dist --tag v0.5.3 --write-checksums
+python scripts/check_release_artifacts.py --dist dist --tag v0.5.3
+python -m scripts.prepare_release --native-dist dist --output release --tag v0.5.3
+python -m scripts.prepare_release --output release --tag v0.5.3 --check
 ```
 
 From a checkout, build private native package inputs with `python -m build`.

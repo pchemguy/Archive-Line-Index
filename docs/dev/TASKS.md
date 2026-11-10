@@ -368,9 +368,11 @@ Dedicated milestone/phase reviews perform code review separately from test execu
             - Report: `docs/dev/reports/phases/4/PHASE-REPORT.md`; include HANDOFF with this boundary.
             - Final evidence: `docs/dev/reports/IMPLEMENTATION-REPORT.md` aggregates all unresolved/deferred TODOs, options, owners and resolution provenance; full-scope acceptance must be supported.
 
-## Progress logging feature delivery
+## Phase 5 — Lightweight progress logging
 
-The completed Phase 5 tasks below are the sole canonical task records for T-053–T-056. Accepted feature preparation and original task-closing evidence are retained as [historical sources](features/006_c33ec54-progress-logging/FEATURE-TASKS.md); that archived list is not an executable second owner. T-053–T-055 transfer their already verified completions, not new execution; the containing T-056 checkpoint closes only T-056 for the first time.
+The completed Phase 5 tasks below are the sole canonical task records for T-053–T-056. Accepted feature preparation and original task-closing evidence are retained as [historical sources](features/006_c33ec54-progress-logging/FEATURE-TASKS.md); that archived list is not an executable second owner. T-053–T-055 transfer their original verified completions. The containing T-056 checkpoint closes T-056 for the first time.
+
+The current [Phase 5 logging contract](spec/progress-logging.md) applies one-second timing, complete-buffer capacity and buffer-based precision in binary units to periodic reports. Successful scans log exact bytes and elapsed scan time. The [CLI logging revision](reviews/013_833560e-cli-logging/REVISION-REPORT.md) owns recheck evidence for T-053 timing and counts and T-055 consumer behavior. The completed task evidence below records the original phase execution.
 
 - [x] Phase 5 — Lightweight progress logging
     - [x] Milestone 5.1 — Progress logging
