@@ -5,7 +5,7 @@
 | Field | Value |
 | --- | --- |
 | Campaign | `011_b42b9ee` |
-| Status | Open |
+| Status at final campaign checkpoint | Verified for integration |
 | Working branch | `revision/011_b42b9ee-streaming-first` |
 | Creation parent and integration target | `main` |
 | Baseline and branch-off commit | `b42b9ee8b87ba69430c0ded6e5c6edf9384c8a17` |

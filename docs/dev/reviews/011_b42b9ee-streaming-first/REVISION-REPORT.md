@@ -31,3 +31,9 @@ The user accepted Archive Stream and authorized the cutover. Moved all 23 produc
 The updated wheel metadata and hosted inventory checks first failed against the old names and passed after the cutover. The full suite passed 757 tests with 95% coverage, including both the native wheel and sdist-rebuilt wheel installed outside the checkout. Ruff lint and format passed on 78 files and strict mypy passed on 26 source and script files. The native artifact, stable-bundle, checksum and independent complete-name gates passed. All 23 staged package files matched their bytes inside both native artifacts.
 
 An isolated install of the wheel built from tag v0.5.1, followed by uninstall and installation of the renamed candidate, restored the retained command with the new import and produced byte-identical SQLite and raw indexes for both plain and 7z inputs. Checkout CLI/API parity passed for all six Alphanum fixtures. Windows launcher commands and CRLF checkout were checked, with native CMD execution still unverified. The active-name and link audit and independent cutover review found no critical or important issues. Frozen campaign records and the published release evidence were preserved.
+
+## Final campaign checkpoint
+
+The user requested closure. R-001 and R-002 are verified at implementation tip `d260319e6820081b974331ecb28b8475f182d603`. Fresh verification passed all nine artifact and bundle tests, Ruff lint and format, strict mypy, and checkout CLI/API parity for all six demo inputs. The receiving `main` ref was confirmed at `b42b9ee8b87ba69430c0ded6e5c6edf9384c8a17`. The opening commit is `f942e858da4cfc373debfcf607d154d200294f21`.
+
+Closure takes effect when the verified two-parent integration commit is published on `main`. Release preparation is a separate boundary.
