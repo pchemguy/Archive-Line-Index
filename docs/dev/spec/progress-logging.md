@@ -4,7 +4,7 @@ The [component design](../DECOMPOSITION.md) assigns observation to the scanner a
 
 ## Scan records and cost
 
-Emit INFO records from archive_stream.scanner. Periodic records use the cumulative uncompressed scan position rounded down to a multiple of the configured `buffer_size`. Accumulate short reads and BOM-probe bytes in the same byte coordinate. A report can repeat a value or show zero while the current buffer is incomplete. Display the completed capacity as a whole number in B, KiB, MiB, GiB, TiB, PiB or EiB. Round to the nearest integer with ties up, selecting the first unit whose rounded value is less than 1024.
+Emit INFO records from archive_stream.scanner. Periodic records use the cumulative uncompressed scan position rounded down to a multiple of the configured `buffer_size`. Accumulate short reads and BOM-probe bytes in the same byte coordinate. A report can repeat a value or show zero while the current buffer is incomplete. Display the completed capacity in B, KiB, MiB, GiB, TiB, PiB or EiB. For each candidate unit, use the fewest decimal places for which the last displayed digit represents at most `100 * buffer_size` bytes. Use an integer when one unit is already within that limit. Round to that precision with ties up and preserve trailing zeros. Select the smallest binary unit whose rounded value is less than 1024.
 
 The final record reports the exact EOF byte count, including any incomplete buffer and any skipped BOM. Counts start at local zero for borrowed readers. Empty input finishes at zero and BOM-only input at three. Exact prose and record formatting may change.
 
@@ -25,7 +25,7 @@ The stdout summary, help/usage streams, operational/interruption statuses and fa
 | ID | Observable condition |
 | --- | --- |
 | LOG-01 | Plain/archive source builds and direct short-read scans produce unchanged canonical offsets; Final INFO records report exact uncompressed byte counts, including empty and BOM-only inputs. |
-| LOG-02 | Controlled monotonic times demonstrate no periodic record before one second, one when due and no catch-up burst. Complete-buffer counts cover short reads and the BOM probe. Rounded units handle ties and promotion at 1024. Final bytes are exact, and separate scans retain independent state. |
+| LOG-02 | Controlled monotonic times demonstrate no periodic record before one second, one when due and no catch-up burst. Complete-buffer counts cover short reads and the BOM probe. Binary unit formatting covers the 100-buffer precision threshold, ties, trailing zeros and promotion at 1024. Final bytes are exact, and separate scans retain independent state. |
 | LOG-03 | Disabled INFO performs no clock/record work; dense versus sparse LF input with the same chunking has the same observation cost rather than per-line work. Read bounds and borrowed-input ownership remain unchanged. |
 | LOG-04 | Read, terminal, index-validation or interruption failures do not emit scan-complete; source-building cleanup and no output-after-source-failure still hold. |
 | LOG-05 | All CLI routes expose the log-level option, default progress and WARNING suppression; invalid/help paths do no work, and original summaries/statuses/persistence results remain correct. |

@@ -27,11 +27,19 @@ class _ScanProgress:
         now = monotonic()
         if now - self._last_report >= 1.0:
             completed = position - position % self._buffer_size
+            max_step = 100 * self._buffer_size
             unit_size = 1
+            scale = 1
+            places = 0
             for unit in ("B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB"):
-                rounded = (completed + unit_size // 2) // unit_size
-                if rounded < 1024:
-                    _LOGGER.info("Scanned %d %s of uncompressed data", rounded, unit)
+                while unit_size > max_step * scale:
+                    scale *= 10
+                    places += 1
+                rounded = (completed * scale + unit_size // 2) // unit_size
+                if rounded < 1024 * scale:
+                    whole, fraction = divmod(rounded, scale)
+                    amount = f"{whole}.{fraction:0{places}d}" if places else str(whole)
+                    _LOGGER.info("Scanned %s %s of uncompressed data", amount, unit)
                     self._last_report = now
                     break
                 unit_size *= 1024
@@ -102,8 +110,8 @@ def scan_line_offsets(
     only a current block and up to three initial probe bytes, never a full line.
     A trailing LF creates no extra empty line; coordinates include skipped BOM
     bytes. The last value is EOF, and len(result) - 1 is the line count.
-    INFO logging reports completed buffer capacity in rounded binary units
-    after at least one elapsed second at a chunk boundary. The final record
+    INFO logging reports completed buffer capacity in binary units with
+    buffer-based precision at one-second chunk boundaries. The final record
     reports exact bytes after validated EOF. Configure logging in the caller.
     """
     validate_scan_options(skip_utf8_bom=skip_utf8_bom, buffer_size=buffer_size)

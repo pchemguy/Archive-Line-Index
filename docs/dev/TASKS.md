@@ -372,7 +372,7 @@ Dedicated milestone/phase reviews perform code review separately from test execu
 
 The completed Phase 5 tasks below are the sole canonical task records for T-053–T-056. Accepted feature preparation and original task-closing evidence are retained as [historical sources](features/006_c33ec54-progress-logging/FEATURE-TASKS.md); that archived list is not an executable second owner. T-053–T-055 transfer their original verified completions. The containing T-056 checkpoint closes T-056 for the first time.
 
-The current [Phase 5 logging contract](spec/progress-logging.md) applies one-second timing, complete-buffer capacity and rounded binary units to periodic reports. The [CLI logging revision](reviews/013_833560e-cli-logging/REVISION-REPORT.md) owns recheck evidence for T-053 timing and counts and T-055 consumer behavior. The completed task evidence below records the original phase execution.
+The current [Phase 5 logging contract](spec/progress-logging.md) applies one-second timing, complete-buffer capacity and buffer-based precision in binary units to periodic reports. The [CLI logging revision](reviews/013_833560e-cli-logging/REVISION-REPORT.md) owns recheck evidence for T-053 timing and counts and T-055 consumer behavior. The completed task evidence below records the original phase execution.
 
 - [x] Phase 5 — Lightweight progress logging
     - [x] Milestone 5.1 — Progress logging

@@ -72,27 +72,31 @@ def test_completed_buffer_capacity_across_bom_and_short_reads(
 
 
 @pytest.mark.parametrize(
-    ("position", "expected"),
+    ("buffer_size", "position", "expected"),
     [
-        (1023, "1023 B"),
-        (1024, "1 KiB"),
-        (1535, "1 KiB"),
-        (1536, "2 KiB"),
-        (1023 * 1024 + 512, "1 MiB"),
-        (3 * 1024**3 // 2, "2 GiB"),
-        (1024**4, "1 TiB"),
-        (2**63 - 1, "8 EiB"),
+        (1, 1023, "1023 B"),
+        (1, 1024, "1.00 KiB"),
+        (1, 1152, "1.13 KiB"),
+        (10, 1530, "1.5 KiB"),
+        (11, 1540, "2 KiB"),
+        (1, 1023 * 1024 + 512, "1023.50 KiB"),
+        (1024**2, 1023 * 1024**2, "1023 MiB"),
+        (512 * 1024, 1024**3 - 512 * 1024, "1.00 GiB"),
+        (1024**2, 3 * 1024**3 // 2, "1.50 GiB"),
+        (1024**2, 1024**4, "1.00000 TiB"),
+        (1024**2, 2**63 - 1, "8.00000000000 EiB"),
     ],
 )
-def test_periodic_report_rounds_and_promotes_binary_units(
+def test_periodic_report_precision_and_binary_unit_promotion(
     caplog: pytest.LogCaptureFixture,
     monkeypatch: pytest.MonkeyPatch,
+    buffer_size: int,
     position: int,
     expected: str,
 ) -> None:
     monkeypatch.setattr(scanner, "monotonic", Mock(side_effect=[0, 1]))
     with caplog.at_level(logging.INFO, logger=LOGGER):
-        progress = scanner._ScanProgress(buffer_size=1)
+        progress = scanner._ScanProgress(buffer_size=buffer_size)
         progress.update(position)
     assert messages(caplog) == [f"Scanned {expected} of uncompressed data"]
 
