@@ -25,3 +25,9 @@ Eight of the eleven precision cases failed against the integer-only formatter. A
 Successful scans retain the exact-byte completion record and then emit elapsed scan time in seconds to two decimal places. The original monotonic start is preserved independently of the last periodic report. Timing ends after EOF and index validation, before source cleanup or persistence. Failure and disabled-INFO behavior were verified. Updated the README, Phase 5 and its current design and contracts.
 
 Nine focused cases failed before implementation. Afterward, all 141 focused logging, CLI and installed-archive tests passed. The full Linux suite passed 773 tests with 95% coverage. Ruff lint and format, strict mypy and changed-document link checks passed.
+
+## Final campaign checkpoint
+
+The nested [v0.5.3 prerelease review](../014_39132c2-prerelease/REVISION-REPORT.md) reviewed R-001 through R-003 and prepared the release. Its fixes align the README and current contracts and reject malformed console metadata. The nested integration joins this branch's verified implementation checkpoint `39132c2089c63808a2df5c914554b27d504b5f94` with child tip `2c0c3d404953841970d9ff7061267212ec496313`.
+
+Return to the logging campaign with the combined verified scope. The user's release request authorizes integration into `main` at `833560e4e85fb0dc0b5c23dc41df885a4e2a976e`. Closure takes effect at published integration. The default-branch release commit and exact-source publication follow.

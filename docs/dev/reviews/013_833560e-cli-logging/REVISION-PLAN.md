@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Campaign | `013_833560e` |
-| Status | Open |
+| Status at final campaign checkpoint | Verified for integration |
 | Working branch | `revision/013_833560e-cli-logging` |
 | Creation parent and integration target | `main` |
 | Baseline and branch-off commit | `833560e4e85fb0dc0b5c23dc41df885a4e2a976e` |
