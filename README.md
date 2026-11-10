@@ -345,10 +345,10 @@ python -m ruff format --check src tests scripts
 python -m mypy
 python -m pytest --cov=archive_stream --cov-report=term-missing
 python -m build
-python scripts/check_release_artifacts.py --dist dist --tag v0.5.1 --write-checksums
-python scripts/check_release_artifacts.py --dist dist --tag v0.5.1
-python -m scripts.prepare_release --native-dist dist --output release --tag v0.5.1
-python -m scripts.prepare_release --output release --tag v0.5.1 --check
+python scripts/check_release_artifacts.py --dist dist --tag v0.5.2 --write-checksums
+python scripts/check_release_artifacts.py --dist dist --tag v0.5.2
+python -m scripts.prepare_release --native-dist dist --output release --tag v0.5.2
+python -m scripts.prepare_release --output release --tag v0.5.2 --check
 ```
 
 From a checkout, build private native package inputs with `python -m build`.
