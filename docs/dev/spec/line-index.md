@@ -48,4 +48,4 @@ A `ContentStream` scan proceeds to validated terminal EOF, including late archiv
 
 ## Progress observation
 
-The scanner's existing indexed-byte position also supplies optional INFO observations under the [progress contract](progress-logging.md). The observed position includes skipped BOM bytes. Periodic reports use complete scan buffers, and the final report gives the exact EOF byte count. Observation happens outside the LF-match loop, with no per-line work, extra payload storage or additional reads. A final scan message follows successful EOF and completed-array validation; it does not certify later source cleanup or persistence publication.
+The scanner's existing indexed-byte position also supplies optional INFO observations under the [progress contract](progress-logging.md). The observed position includes skipped BOM bytes. Periodic reports use complete scan buffers. Successful EOF and completed-array validation produce two completion records giving exact bytes and elapsed scan time. Source cleanup and persistence follow these records. Observation happens outside the LF-match loop, with no per-line work, extra payload storage or additional reads.

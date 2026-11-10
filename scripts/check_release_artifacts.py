@@ -198,7 +198,7 @@ def check_release_artifacts(
     scripts = config.get("scripts", {})
     if embedded.get("scripts", {}) != scripts:
         raise ValueError("Source build console scripts mismatch")
-    entry_points = _EntryPoints(interpolation=None)
+    entry_points = _EntryPoints(delimiters=("=",), interpolation=None)
     try:
         entry_points.read_string(
             wheel.get(info + "entry_points.txt", b"").decode("utf-8")
