@@ -15,6 +15,7 @@ import stat
 import tarfile
 import tomllib
 import zipfile
+from configparser import ConfigParser, Error as ConfigError
 from email.parser import BytesParser
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -38,6 +39,11 @@ _FORBIDDEN = {
     "id_rsa",
     "id_ed25519",
 }
+
+
+class _EntryPoints(ConfigParser):
+    def optionxform(self, optionstr: str) -> str:
+        return optionstr
 
 
 def _safe_name(name: str) -> None:
@@ -189,6 +195,23 @@ def check_release_artifacts(
         for key in ("name", "version", "requires-python")
     ):
         raise ValueError("Source build metadata mismatch")
+    scripts = config.get("scripts", {})
+    if embedded.get("scripts", {}) != scripts:
+        raise ValueError("Source build console scripts mismatch")
+    entry_points = _EntryPoints(interpolation=None)
+    try:
+        entry_points.read_string(
+            wheel.get(info + "entry_points.txt", b"").decode("utf-8")
+        )
+    except ConfigError as error:
+        raise ValueError("Invalid wheel console scripts metadata") from error
+    console = (
+        dict(entry_points.items("console_scripts"))
+        if entry_points.has_section("console_scripts")
+        else {}
+    )
+    if entry_points.defaults() or console != scripts:
+        raise ValueError("Wheel console scripts mismatch")
     wheel_package = {n: data for n, data in wheel.items() if n.startswith(package)}
     source_package = {
         n[4:]: data for n, data in source.items() if n.startswith("src/" + package)

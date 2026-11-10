@@ -31,6 +31,7 @@ def write_candidates(
     family: str = "wheel",
     metadata: bytes = METADATA,
     source_project: str = PROJECT,
+    entry_points: bytes | None = None,
 ) -> None:
     package = {
         "archive_line_index/__init__.py": b'"""Package."""\n',
@@ -46,6 +47,8 @@ def write_candidates(
             info + "RECORD": b"",
         }
     )
+    if entry_points is not None:
+        wheel_entries[info + "entry_points.txt"] = entry_points
     source_entries = {"src/" + name: data for name, data in package.items()}
     source_entries.update(
         {
@@ -190,3 +193,33 @@ def test_inventory_symlink_rejected(inventory: tuple[Path, Path]) -> None:
     with pytest.raises(ValueError, match="ordinary"):
         check_release_artifacts(dist, project, "v0.1.0", write_checksums=True)
     assert project.read_text().startswith("[project]")
+
+
+@pytest.mark.parametrize("fault", ["absent", "stale", "source"])
+def test_console_script_declaration_must_match(
+    inventory: tuple[Path, Path], fault: str
+) -> None:
+    dist, project = inventory
+    target = "archive_line_index.cli:main"
+    old_target = "removed_package.cli:main"
+    declared = PROJECT + f'\n[project.scripts]\narchive-line-index = "{target}"\n'
+    project.write_text("[project]\n" + declared)
+    entry_points = f"[console_scripts]\narchive-line-index = {target}\n".encode()
+    write_candidates(dist, source_project=declared, entry_points=entry_points)
+    assert (
+        len(check_release_artifacts(dist, project, "v0.1.0", write_checksums=True)) == 2
+    )
+    (dist / "SHA256SUMS").unlink()
+
+    if fault == "source":
+        declared = declared.replace(target, old_target)
+    elif fault == "stale":
+        entry_points = entry_points.replace(target.encode(), old_target.encode())
+    write_candidates(
+        dist,
+        source_project=declared,
+        entry_points=None if fault == "absent" else entry_points,
+    )
+    with pytest.raises(ValueError, match="console scripts"):
+        check_release_artifacts(dist, project, "v0.1.0", write_checksums=True)
+    assert not (dist / "SHA256SUMS").exists()

@@ -1,5 +1,5 @@
 # Project handoff
 
-Archive Stream revision campaign `011_b42b9ee` is closed at its published integration into `main`. The [revision plan](reviews/011_b42b9ee-streaming-first/REVISION-PLAN.md) and [revision report](reviews/011_b42b9ee-streaming-first/REVISION-REPORT.md) retain verification for the streaming-first documentation and rename. The distribution is `archive-stream`, the Python import is `archive_stream`, and `archive-line-index` is the indexing command. The [README](../../README.md) documents checkout installation and the Alphanum demos.
+Archive Stream prerelease campaign `012_2fda1e4` closes with its verified integration into `main`. The [review report](reviews/012_2fda1e4-prerelease/REVIEW-REPORT.md) and [revision report](reviews/012_2fda1e4-prerelease/REVISION-REPORT.md) record the README and comprehensive reviews, repairs and v0.5.2 preparation.
 
-The merge parents are the receiving `main` baseline `b42b9ee8b87ba69430c0ded6e5c6edf9384c8a17` and the published campaign tip `3690c24ad4507459326b8adec7762f3f047ee91b`. [v0.5.1](https://github.com/pchemguy/Archive-Stream/releases/tag/v0.5.1) provides the previous distribution. An Archive Stream release awaits a separate release decision.
+The integration joins receiving `main` at `2fda1e405fac8df69e72068eee4d5edc7f05487c` with the published campaign tip `fff2ad383f645f34a59ea9e7a5376d6f98095144`. The next authorized step is the v0.5.2 default-branch release commit, followed by exact-source build, tag and stable GitHub publication.

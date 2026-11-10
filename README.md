@@ -1,6 +1,6 @@
 # Archive Stream
 
-Archive Stream transparently streams uncompressed files and compressed archive payloads through a single Python interface. Pass a path to `open_content_stream()` and read the original payload bytes in blocks. The library detects the format, selects the appropriate reader and decompressor automatically, and decompresses as you read.
+Archive Stream transparently streams uncompressed files and compressed archive payloads through a single Python interface. Pass a path to `open_content_stream()` and read the original payload bytes in blocks. The library detects the format, selects the appropriate reader and decompressor automatically, and decompresses the payload on the fly.
 
 Supported sources include plain files, ZIP, TAR (uncompressed or gzip-, bzip2-, or xz-compressed), and 7z. Each archive contains one regular-file payload, streamed without extracting a member file to disk.
 
@@ -46,26 +46,27 @@ Offsets refer to the original uncompressed payload bytes, not archive positions 
 
 ## Stream a payload
 
-`open_content_stream` returns an owned, readable, nonseekable `ContentStream`. Use a context manager or call `close`. For block processing, call `read(block_size)` with a positive size until it returns `b""`. A short nonempty block is valid. Use `readinto` to reuse a buffer. It measures capacity in bytes and leaves unused storage unchanged.
+`open_content_stream` returns an owned, readable, nonseekable `ContentStream`. Use a context manager or call `close`. For block processing, call `read(block_size)` with a positive size until it returns `b""`. A short nonempty block is valid. Use `readinto` to reuse a buffer. It measures capacity in bytes and leaves unused storage unchanged. The example creates a small compressed ZIP fixture and hashes its payload incrementally.
 
 ```python
+from hashlib import sha256
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from zipfile import ZipFile
+from zipfile import ZIP_DEFLATED, ZipFile
 
 from archive_stream import open_content_stream
 
 with TemporaryDirectory() as directory:
     target = Path(directory) / "payload.zip"
-    with ZipFile(target, "w") as archive:
-        archive.writestr("payload.bin", b"a\nb")
+    payload = b"a\nb"
+    with ZipFile(target, "w", compression=ZIP_DEFLATED) as archive:
+        archive.writestr("payload.bin", payload)
+
+    digest = sha256()
     with open_content_stream(target, max_uncompressed_size=3) as stream:
-        assert stream.read(2) == b"a\n"
-        buffer = bytearray(b"????")
-        assert stream.readinto(buffer) == 1
-        assert buffer == b"b???"
-        assert stream.read(2) == b""
-    assert stream.closed
+        while block := stream.read(2):
+            digest.update(block)
+    assert digest.digest() == sha256(payload).digest()
 ```
 
 The inclusive size limit counts all payload bytes, including a BOM. Exactly-at-limit content still requires terminal validation. A read failure is retained until explicit closure; later otherwise-valid reads raise it rather than reporting EOF. Filesystem errors retain their ordinary Python types, and package-domain failures derive from `ArchiveLineIndexError`.
@@ -180,7 +181,7 @@ docs\demo\alphanum\demo_cli.bat
 docs\demo\alphanum\demo_api.bat
 ```
 
-The CLI and Python API demos index the same three-line payload as plain text, ZIP, TGZ, TBZ, TAR and 7z. Each writes `demo.sqlite3` and `demo.u64` beside each input in [the demo directory](docs/demo/alphanum). Remove the generated indexes before rerunning either demo.
+The CLI and Python API demos index the same three-line payload as plain text, ZIP, TGZ, TBZ, TAR and 7z. Each writes `demo.sqlite3` and `demo.u64` beside each input in [the demo directory](https://github.com/pchemguy/Archive-Stream/tree/main/docs/demo/alphanum). Remove the generated indexes before rerunning either demo.
 
 ## Source backends
 
@@ -188,7 +189,7 @@ Sources are strings or path-like objects returning strings. Bytes paths are reje
 
 Archives contain exactly one regular-file payload, which may be empty or nested under directories. Directory entries are ignored; additional files (including metadata files), links and special entries are rejected. Member names are never extracted to filesystem paths. Early close releases resources without claiming terminal integrity validation.
 
-The examples below use `zipfile`, `tarfile`, and `py7zr` to create their own fixtures. Pass an existing archive directly to `open_content_stream(source)` for payload reads or `build_line_index(source)` for a line index.
+Gzip, bzip2, and xz inputs must contain a TAR archive. The same `open_content_stream(source)` call handles all supported formats. The format-specific examples below illustrate index construction and create their own fixtures with `zipfile`, `tarfile`, or `py7zr`.
 
 ### Plain files
 
@@ -344,16 +345,16 @@ python -m ruff format --check src tests scripts
 python -m mypy
 python -m pytest --cov=archive_stream --cov-report=term-missing
 python -m build
-python scripts/check_release_artifacts.py --dist dist --tag v0.5.1 --write-checksums
-python scripts/check_release_artifacts.py --dist dist --tag v0.5.1
-python -m scripts.prepare_release --native-dist dist --output release --tag v0.5.1
-python -m scripts.prepare_release --output release --tag v0.5.1 --check
+python scripts/check_release_artifacts.py --dist dist --tag v0.5.2 --write-checksums
+python scripts/check_release_artifacts.py --dist dist --tag v0.5.2
+python -m scripts.prepare_release --native-dist dist --output release --tag v0.5.2
+python -m scripts.prepare_release --output release --tag v0.5.2 --check
 ```
 
 From a checkout, build private native package inputs with `python -m build`.
 
 Each hosted bundle has a stable version-free name. `archive-stream-wheel.zip` contains one native wheel. `archive-stream-source.zip` contains one source distribution that independently rebuilds the wheel. Version identity remains in package metadata, internal native filenames and the release tag.
 
-Use clean `dist` and `release` directories: `dist` contains private native build inputs, while `release` is the complete hosted inventory of wheel/source ZIP bundles and SHA256SUMS. The native checker verifies package/tag/metadata agreement, safe contents and source/wheel equality. The release checker independently rejects versions in every hosted filename, validates the bundled native pair and verifies outer checksums; neither command publishes a release. The actual naming gate is tested against the shared notation vectors, including historical and single-component versions with matching faulty expected names. Installed integration tests build both artifacts, independently rebuild from the source distribution, and exercise clean runtimes outside the checkout. If mypy's native parser fails during container process discovery, `python -m mypy --no-native-parser` retains strict checking with its supported Python parser.
+Use clean `dist` and `release` directories: `dist` contains private native build inputs, while `release` is the complete hosted inventory of wheel/source ZIP bundles and SHA256SUMS. The native checker verifies package/tag/metadata agreement, safe contents, console entry points, and source/wheel package equality. The release checker independently rejects versions in every hosted filename, validates the bundled native pair and verifies outer checksums; neither command publishes a release. The actual naming gate is tested against the shared notation vectors, including historical and single-component versions with matching faulty expected names. Installed integration tests build both artifacts, independently rebuild from the source distribution, and exercise clean runtimes outside the checkout. If mypy's native parser fails during container process discovery, `python -m mypy --no-native-parser` retains strict checking with its supported Python parser.
 
 The [public API design](docs/dev/decomposition/public-api.md) and [contracts](docs/dev/SPEC.md) define the complete intended system. [Project brief](docs/dev/PROJECT.md), [architecture](docs/dev/ARCHITECTURE.md), [delivery plan](docs/dev/PLAN.md) and [implementation tasks](docs/dev/TASKS.md) describe scope and delivery. Development uses [SDD Manager](SDD-MANAGER.md); see the [AI-assisted development disclosure](AI_DISCLOSURE.md).
