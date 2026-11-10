@@ -22,12 +22,15 @@ with open_content_stream(source="data/events.zip", max_uncompressed_size=None) a
         digest.update(memoryview(buffer)[:count])
 ```
 
-| Parameter | Meaning |
+| `open_content_stream()` parameter | Meaning |
 | --- | --- |
 | `source` | Required path to a plain file or a supported archive. |
 | `max_uncompressed_size=None` | Inclusive limit in payload bytes. `None` applies no size limit. |
-| `size=-1` in `read(-1)` | Positional-only byte limit. The default loads all remaining payload bytes into memory. Use a positive size for bounded streaming. Zero makes no progress. |
-| `buffer` in `readinto(buffer)` | Required positional-only writable contiguous buffer. Returns the number of bytes copied and leaves the unused suffix unchanged. A zero count with a nonempty buffer signals validated EOF. |
+
+| Stream method call | Parameter | Meaning |
+| --- | --- | --- |
+| `stream.read(-1)` | `size=-1` | Positional-only byte limit. The default loads all remaining payload bytes into memory. Use a positive size for bounded streaming. Zero makes no progress. |
+| `stream.readinto(buffer)` | `buffer` | Required positional-only writable contiguous buffer. Returns the bytes copied as a count and leaves the unused suffix unchanged. A zero count with a nonempty buffer signals validated EOF. |
 
 The context manager closes the stream. For manual ownership, call `stream.close()`. Use `stream.closed`, `stream.readable()`, `stream.writable()`, and `stream.seekable()` to inspect its state and capabilities. [Content stream contract](dev/spec/content-stream.md)
 
