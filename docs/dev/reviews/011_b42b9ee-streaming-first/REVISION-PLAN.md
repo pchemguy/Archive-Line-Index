@@ -40,7 +40,7 @@ Use **Archive Stream** for the library. Keep the established positioning: one in
 | Hosted bundles for the new distribution | `archive-line-index-wheel.zip`, `archive-line-index-source.zip`, `SHA256SUMS` | `archive-stream-wheel.zip`, `archive-stream-source.zip`, `SHA256SUMS` |
 | GitHub repository | `pchemguy/Archive-Line-Index` | Retain the repository identity and URL. |
 
-Proposed compatibility policy is a clean import rename. Existing Python imports, module invocations, logger configuration, and distribution requirements need to move to the new identifiers. Keep the indexing console command. Since both distributions register that command, verify and document removing the old distribution before installing the new one in the same environment. Old version tags and release assets continue to identify their original distribution. Confirm this policy before executing the cutover.
+Proposed compatibility policy is a clean import rename. Existing Python imports, module invocations, logger configuration, and distribution requirements need to move to the new identifiers. Keep the indexing console command. Since both distributions register that command, verify and document removing the old distribution before installing the new one in the same environment. Old version tags and release assets continue to identify their original distribution. The user approved this policy and requested execution.
 
 ### R-002 coordinated rename
 
@@ -62,4 +62,4 @@ Proposed compatibility policy is a clean import rename. Existing Python imports,
 | Checkout demos | Run API and CLI against separate clean fixture copies with no installed project. Require matching `demo.sqlite3` and `demo.u64` paths and offsets for all six inputs. Verify both CMD launchers on Windows where available. Otherwise verify their CLI/Python commands and path/line-ending rules and record the native execution limit. |
 | Reference audit | Search tracked current source, config, tests, demos, docs and release tooling for the old spelling variants. Account for each retained occurrence by its role as the console command, repository identity, prior-release reference, historical record or intentional test fixture. Check live Markdown links and protected-record path identity. |
 
-The implementation checkpoint starts after acceptance of the naming and compatibility proposal. Any release publication follows its own authorized boundary.
+R-002 implementation and verification are complete on the campaign branch. Integration and release publication follow their own authorized boundaries.

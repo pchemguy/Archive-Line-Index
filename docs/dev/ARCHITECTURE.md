@@ -1,4 +1,4 @@
-# Archive Line Index architecture
+# Archive Stream architecture
 
 ## Purpose and boundaries
 

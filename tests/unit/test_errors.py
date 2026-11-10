@@ -1,7 +1,7 @@
 """Check the stable domain-error boundary."""
 
-import archive_line_index as ali
-from archive_line_index import errors
+import archive_stream as ali
+from archive_stream import errors
 
 
 def test_domain_error_hierarchy_and_identity() -> None:

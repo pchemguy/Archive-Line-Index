@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from archive_line_index import cli, read_raw_index, read_sqlite_index, scan_line_offsets
+from archive_stream import cli, read_raw_index, read_sqlite_index, scan_line_offsets
 
 
 @pytest.mark.parametrize("payload", [b"", b"\xef\xbb\xbf", b"a\nb", b"a\r\n\nlast"])
@@ -124,7 +124,7 @@ def test_interrupt_inside_raw_writer_cleans_owned_temporary(
     source = tmp_path / "payload.txt"
     source.write_bytes(b"abc")
     with patch(
-        "archive_line_index.persistence.raw._write_all", side_effect=KeyboardInterrupt
+        "archive_stream.persistence.raw._write_all", side_effect=KeyboardInterrupt
     ):
         assert cli.main([str(source)]) == 130
     assert read_sqlite_index(tmp_path / "payload.sqlite3").tolist() == [0, 3]

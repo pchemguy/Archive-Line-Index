@@ -8,7 +8,7 @@ import py7zr
 import pytest
 from tests.helpers.sevenzip import make_7z
 
-from archive_line_index import (
+from archive_stream import (
     ExtractionError,
     SizeLimitExceededError,
     open_content_stream,
@@ -94,7 +94,7 @@ def test_failed_7z_worker_start_releases_archive_and_source(tmp_path: Path) -> N
     with (
         patch.object(Path, "open", side_effect=[inspection, source]),
         patch(
-            "archive_line_index.backends.sevenzip.start_queue_reader",
+            "archive_stream.backends.sevenzip.start_queue_reader",
             side_effect=RuntimeError("startup"),
         ),
     ):

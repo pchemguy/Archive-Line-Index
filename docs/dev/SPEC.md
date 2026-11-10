@@ -1,8 +1,8 @@
-# Archive Line Index specification
+# Archive Stream specification
 
 ## Purpose and scope
 
-Archive Line Index is a synchronous Python library for sequential payload access, LF byte-line indexing and independent index persistence. [PROJECT](PROJECT.md) owns intent and exclusions; [ARCHITECTURE](ARCHITECTURE.md) and [DECOMPOSITION](DECOMPOSITION.md) own structure. The system accepts filesystem paths to plain files or supported single-member archives and exposes original payload bytes without extracting member paths.
+Archive Stream is a synchronous Python library for sequential payload access, LF byte-line indexing and independent index persistence. [PROJECT](PROJECT.md) owns intent and exclusions; [ARCHITECTURE](ARCHITECTURE.md) and [DECOMPOSITION](DECOMPOSITION.md) own structure. The system accepts filesystem paths to plain files or supported single-member archives and exposes original payload bytes without extracting member paths.
 
 The complete scope includes Python 3.11 or later on Windows, Linux and macOS; unencrypted ZIP, TAR, gzip/bzip2/xz-compressed TAR and 7z; caller-provided readable binary scanner inputs; canonical offset arrays; dedicated SQLite and raw little-endian persistence; an installable distribution; an importable minimal single-target CLI and lightweight standard-logging indexing progress. Unsupported scope includes text/record parsing, random compressed seeking, encrypted content, remote sources, multiple selected payloads, source/index identity, stale-index detection, mmap/lazy indexes, automatic naming inside library persistence APIs, public asynchronous interfaces, batch/recursive CLI processing, stdin payloads, GUI and cross-file transactions.
 

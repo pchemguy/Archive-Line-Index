@@ -1,6 +1,6 @@
-# Archive Line Index
+# Archive Stream
 
-Archive Line Index transparently streams uncompressed files and compressed archive payloads through a single Python interface. Pass a path to `open_content_stream()` and read the original payload bytes in blocks. The library detects the format, selects the appropriate reader and decompressor automatically, and decompresses as you read.
+Archive Stream transparently streams uncompressed files and compressed archive payloads through a single Python interface. Pass a path to `open_content_stream()` and read the original payload bytes in blocks. The library detects the format, selects the appropriate reader and decompressor automatically, and decompresses as you read.
 
 Supported sources include plain files, ZIP, TAR (uncompressed or gzip-, bzip2-, or xz-compressed), and 7z. Each archive contains one regular-file payload, streamed without extracting a member file to disk.
 
@@ -8,14 +8,15 @@ For line-oriented data, the library can independently build, store, and reload a
 
 ## Installation
 
-GitHub releases provide a [wheel bundle](https://github.com/pchemguy/Archive-Line-Index/releases/latest/download/archive-line-index-wheel.zip), [source bundle](https://github.com/pchemguy/Archive-Line-Index/releases/latest/download/archive-line-index-source.zip) and [SHA256SUMS](https://github.com/pchemguy/Archive-Line-Index/releases/latest/download/SHA256SUMS). Verify the downloaded bundle against SHA256SUMS, then extract and install its native package:
+Install the `archive-stream` distribution from the repository checkout:
 
 ```bash
-python -m zipfile -e archive-line-index-wheel.zip .
-python -m pip install archive_line_index-0.5.1-py3-none-any.whl
+python -m pip install .
 ```
 
-The links above refer to the latest published release; use its tag-specific assets and included package version when installing a pinned release.
+If the same environment has the previous `archive-line-index` distribution, uninstall it first with `python -m pip uninstall archive-line-index`. Both distributions register the `archive-line-index` console command. Update Python imports and module invocations to `archive_stream` and scanner logger configuration to `archive_stream.scanner`.
+
+The [v0.5.1 release](https://github.com/pchemguy/Archive-Line-Index/releases/tag/v0.5.1) provides the previous distribution and its installation instructions.
 
 The declared runtime dependency is `py7zr>=1.1.4,<1.2`, tested with 1.1.4; development tools and separate archive executables are not required for installed use. ZIP and plain/gzip/bzip2/xz TAR use the Python standard library. The 7z dependency is loaded only when opening 7z content.
 
@@ -29,7 +30,7 @@ The Python stream and index builder both accept a filesystem path and select the
 | Python line index | `build_line_index(source)` | A completed `array("Q")` of byte offsets. Package-root readers and writers load and store it independently. |
 | Index CLI | `archive-line-index SOURCE` | Both SQLite and raw index files from one scan; exit status reports success or failure. |
 
-The CLI also runs as `python -m archive_line_index SOURCE` or through the importable `archive_line_index.cli.main([source])`, which returns an integer status. Library calls raise exceptions; index construction creates no output files. Each persistence output is published independently.
+The CLI also runs as `python -m archive_stream SOURCE` or through the importable `archive_stream.cli.main([source])`, which returns an integer status. Library calls raise exceptions; index construction creates no output files. Each persistence output is published independently.
 
 Offsets refer to the original uncompressed payload bytes, not archive positions or decoded characters. LF ends a line; the EOF sentinel is included in both stored formats. Output naming, overwrite rules, BOM handling, validation and failure outcomes are defined by the linked contracts. A later persistence failure can leave an earlier output published; scan-complete logging alone does not certify output publication.
 
@@ -52,7 +53,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from zipfile import ZipFile
 
-from archive_line_index import open_content_stream
+from archive_stream import open_content_stream
 
 with TemporaryDirectory() as directory:
     target = Path(directory) / "payload.zip"
@@ -81,7 +82,7 @@ For an existing source, call `build_line_index(source)`; the same call handles a
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from archive_line_index import (
+from archive_stream import (
     build_line_index,
     read_raw_index,
     read_sqlite_index,
@@ -113,7 +114,7 @@ from array import array
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from archive_line_index import (
+from archive_stream import (
     read_raw_index,
     read_sqlite_index,
     write_raw_index,
@@ -137,7 +138,7 @@ Given an existing `data/events.txt` and an existing `results` directory:
 
 ```bash
 archive-line-index data/events.txt
-python -m archive_line_index data/events.txt --output results/custom
+python -m archive_stream data/events.txt --output results/custom
 archive-line-index data/events.txt --overwrite
 archive-line-index data/events.txt --overwrite --log-level WARNING
 archive-line-index -- -events.txt
@@ -153,8 +154,8 @@ The same callable can be used without exiting the Python caller:
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from archive_line_index import read_raw_index, read_sqlite_index
-from archive_line_index.cli import main
+from archive_stream import read_raw_index, read_sqlite_index
+from archive_stream.cli import main
 
 with TemporaryDirectory() as directory:
     root = Path(directory)
@@ -172,7 +173,7 @@ Importing the package, CLI or module runner performs no command execution. An ex
 
 ## Alphanum demo
 
-Run either command from the checkout root in Windows CMD. Both demos load Archive Line Index from `src` without installing it. The selected Python needs `py7zr>=1.1.4,<1.2` for the 7z fixture.
+Run either command from the checkout root in Windows CMD. Both demos load Archive Stream from `src` without installing it. The selected Python needs `py7zr>=1.1.4,<1.2` for the 7z fixture.
 
 ```bat
 docs\demo\alphanum\demo_cli.bat
@@ -202,7 +203,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from zipfile import ZIP_DEFLATED, ZipFile
 
-from archive_line_index import build_line_index
+from archive_stream import build_line_index
 
 with TemporaryDirectory() as directory:
     # Fixture setup: create an archive for this self-contained example.
@@ -225,7 +226,7 @@ from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from archive_line_index import build_line_index
+from archive_stream import build_line_index
 
 with TemporaryDirectory() as directory:
     # Fixture setup: create an archive for this self-contained example.
@@ -251,7 +252,7 @@ from tempfile import TemporaryDirectory
 
 from py7zr import SevenZipFile
 
-from archive_line_index import build_line_index
+from archive_stream import build_line_index
 
 with TemporaryDirectory() as directory:
     # Fixture setup: create an archive for this self-contained example.
@@ -262,7 +263,7 @@ with TemporaryDirectory() as directory:
     assert build_line_index(target, buffer_size=2).tolist() == [0, 6, 10]
 ```
 
-The [`7z adapter`](src/archive_line_index/backends/sevenzip.py) forwards callback data through a [`bounded producer bridge`](src/archive_line_index/backends/producer.py): one non-daemon worker, one queued block and one current consumer block, each at most 1 MiB. Callback buffers are subdivided before queueing. Dependency decompressor/callback allocations are outside those package buffer bounds.
+The [`7z adapter`](src/archive_stream/backends/sevenzip.py) forwards callback data through a [`bounded producer bridge`](src/archive_stream/backends/producer.py): one non-daemon worker, one queued block and one current consumer block, each at most 1 MiB. Callback buffers are subdivided before queueing. Dependency decompressor/callback allocations are outside those package buffer bounds.
 
 Closing cancels package waits and joins the worker; checks during package waits occur at most 0.05 seconds apart, but dependency operations can delay cancellation, so this is not a total close-latency guarantee. Early close does not assert integrity.
 
@@ -275,7 +276,7 @@ For `records.7z`, CLI defaults are `records.sqlite3` and `records.u64` beside th
 ```python
 from io import BytesIO
 
-from archive_line_index import scan_line_offsets
+from archive_stream import scan_line_offsets
 
 payload = b"\xef\xbb\xbfalpha\r\n\nomega"
 source = BytesIO(payload)
@@ -291,7 +292,7 @@ Set `skip_utf8_bom=False` to include the initial BOM in first-line content. Late
 
 ## Progress logging
 
-Indexing emits standard INFO records from `archive_line_index.scanner`, reporting cumulative uncompressed bytes in the original indexed byte space, including a skipped BOM. The scanner checks at chunk boundaries and emits periodic updates only after five seconds have elapsed; it adds an exact final count after validated EOF and offset checks. It performs no per-line logging. Short or empty scans may emit only the final count, and a blocked read does not produce a timer heartbeat. A scan-complete message does not mean SQLite/raw publication has succeeded.
+Indexing emits standard INFO records from `archive_stream.scanner`, reporting cumulative uncompressed bytes in the original indexed byte space, including a skipped BOM. The scanner checks at chunk boundaries and emits periodic updates only after five seconds have elapsed; it adds an exact final count after validated EOF and offset checks. It performs no per-line logging. Short or empty scans may emit only the final count, and a blocked read does not produce a timer heartbeat. A scan-complete message does not mean SQLite/raw publication has succeeded.
 
 Library use stays quiet unless the application enables INFO logging. Configure it in the application before indexing, for example:
 
@@ -300,7 +301,7 @@ import logging
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from archive_line_index import build_line_index
+from archive_stream import build_line_index
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 with TemporaryDirectory() as directory:
@@ -321,7 +322,7 @@ Calling `read()` with a negative size explicitly materializes all remaining cont
 
 ## Line-boundary scanning
 
-`scan_line_offsets` reads bounded byte blocks (1 MiB by default) and searches each block with repeated `bytes.find` calls. The core loop in [`scanner.py`](src/archive_line_index/scanner.py), shown below as an implementation excerpt, records the byte immediately after each LF; `position` is the block’s starting offset:
+`scan_line_offsets` reads bounded byte blocks (1 MiB by default) and searches each block with repeated `bytes.find` calls. The core loop in [`scanner.py`](src/archive_stream/scanner.py), shown below as an implementation excerpt, records the byte immediately after each LF; `position` is the block’s starting offset:
 
 ```py
 start = 0
@@ -341,7 +342,7 @@ python -m pip install ".[dev,test]"
 python -m ruff check src tests scripts
 python -m ruff format --check src tests scripts
 python -m mypy
-python -m pytest --cov=archive_line_index --cov-report=term-missing
+python -m pytest --cov=archive_stream --cov-report=term-missing
 python -m build
 python scripts/check_release_artifacts.py --dist dist --tag v0.5.1 --write-checksums
 python scripts/check_release_artifacts.py --dist dist --tag v0.5.1
@@ -351,7 +352,7 @@ python -m scripts.prepare_release --output release --tag v0.5.1 --check
 
 From a checkout, build private native package inputs with `python -m build`.
 
-Each hosted bundle has a stable version-free name. The wheel bundle contains one ecosystem-valid wheel; the source bundle contains one source distribution, `archive_line_index-0.5.1.tar.gz`, which independently rebuilds that wheel. Version identity remains in package metadata, internal native filenames and the release tag.
+Each hosted bundle has a stable version-free name. `archive-stream-wheel.zip` contains one native wheel. `archive-stream-source.zip` contains one source distribution that independently rebuilds the wheel. Version identity remains in package metadata, internal native filenames and the release tag.
 
 Use clean `dist` and `release` directories: `dist` contains private native build inputs, while `release` is the complete hosted inventory of wheel/source ZIP bundles and SHA256SUMS. The native checker verifies package/tag/metadata agreement, safe contents and source/wheel equality. The release checker independently rejects versions in every hosted filename, validates the bundled native pair and verifies outer checksums; neither command publishes a release. The actual naming gate is tested against the shared notation vectors, including historical and single-component versions with matching faulty expected names. Installed integration tests build both artifacts, independently rebuild from the source distribution, and exercise clean runtimes outside the checkout. If mypy's native parser fails during container process discovery, `python -m mypy --no-native-parser` retains strict checking with its supported Python parser.
 

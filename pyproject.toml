@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "archive-line-index"
+name = "archive-stream"
 version = "0.5.1"
-description = "Sequential archive payload streaming and byte-line indexing."
+description = "Transparent payload streaming from plain files and archives, with byte-line indexing."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -44,7 +44,7 @@ test = [
 ]
 
 [project.scripts]
-archive-line-index = "archive_line_index.cli:main"
+archive-line-index = "archive_stream.cli:main"
 
 [tool.hatch.build]
 exclude = [
@@ -77,7 +77,7 @@ only-include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/archive_line_index"]
+packages = ["src/archive_stream"]
 
 [tool.pytest]
 required_plugins = ["pytest-asyncio", "pytest-timeout"]
@@ -95,7 +95,7 @@ markers = [
 
 [tool.coverage.run]
 branch = true
-source = ["archive_line_index"]
+source = ["archive_stream"]
 
 [tool.coverage.report]
 show_missing = true
@@ -170,7 +170,7 @@ unfixable = [
 
 [tool.ruff.lint.isort]
 # Keep imports stable across the repo; update if your top-level package differs.
-known-first-party = ["archive_line_index"]
+known-first-party = ["archive_stream"]
 combine-as-imports = true
 
 [tool.mypy]

@@ -8,13 +8,13 @@ import pytest
 from tests.helpers.sevenzip import make_7z
 from tests.integration.test_sevenzip_stream import owned_threads
 
-from archive_line_index import (
+from archive_stream import (
     ExtractionError,
     build_line_index,
     read_raw_index,
     read_sqlite_index,
 )
-from archive_line_index.cli import main
+from archive_stream.cli import main
 
 
 @pytest.mark.parametrize(
@@ -56,11 +56,11 @@ def test_late_7z_crc_failure_never_invokes_output_writers(tmp_path: Path) -> Non
         build_line_index(target, buffer_size=1)
     with (
         patch(
-            "archive_line_index.cli.write_sqlite_index",
+            "archive_stream.cli.write_sqlite_index",
             side_effect=AssertionError("premature SQLite"),
         ),
         patch(
-            "archive_line_index.cli.write_raw_index",
+            "archive_stream.cli.write_raw_index",
             side_effect=AssertionError("premature raw"),
         ),
     ):
@@ -73,7 +73,7 @@ def test_late_7z_crc_failure_never_invokes_output_writers(tmp_path: Path) -> Non
 def test_7z_raw_failure_retains_sqlite_after_worker_is_joined(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    import archive_line_index.cli as cli
+    import archive_stream.cli as cli
 
     target = make_7z(tmp_path / "payload.7z", [("data", b"a\nb")])
     before = owned_threads()
@@ -86,7 +86,7 @@ def test_7z_raw_failure_retains_sqlite_after_worker_is_joined(
     with (
         patch.object(cli, "write_sqlite_index", write_sqlite),
         patch(
-            "archive_line_index.persistence.raw._write_all",
+            "archive_stream.persistence.raw._write_all",
             side_effect=OSError("raw failure"),
         ),
     ):

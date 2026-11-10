@@ -2,7 +2,7 @@
 
 ## Ownership and consumers
 
-This document owns the public surface defined by [DECOMPOSITION](../DECOMPOSITION.md). External Python callers import library operations from `archive_line_index` and the CLI callable from `archive_line_index.cli`. Backend classes, internal messages, format detection and filesystem helpers are not public exports. The declarations below are design signatures, not implementation code; postponed annotations support Python 3.11.
+This document owns the public surface defined by [DECOMPOSITION](../DECOMPOSITION.md). External Python callers import library operations from `archive_stream` and the CLI callable from `archive_stream.cli`. Backend classes, internal messages, format detection and filesystem helpers are not public exports. The declarations below are design signatures, not implementation code; postponed annotations support Python 3.11.
 
 ## Input types and defaults
 
@@ -112,9 +112,9 @@ from collections.abc import Sequence
 def main(argv: Sequence[str] | None = None) -> int: ...
 ```
 
-`archive_line_index.cli.main` is a public submodule entry point. `None` selects command arguments from `sys.argv[1:]`; an explicit sequence supports in-process callers. The adapter returns a status for normal success, help, command errors and expected operational failures instead of raising `SystemExit`. It performs no parsing, I/O or process exit at import time. SPEC owns invocation syntax, destination selection, messages and status codes.
+`archive_stream.cli.main` is a public submodule entry point. `None` selects command arguments from `sys.argv[1:]`; an explicit sequence supports in-process callers. The adapter returns a status for normal success, help, command errors and expected operational failures instead of raising `SystemExit`. It performs no parsing, I/O or process exit at import time. SPEC owns invocation syntax, destination selection, messages and status codes.
 
-The installed console entry is `archive-line-index = "archive_line_index.cli:main"`. Module execution through `python -m archive_line_index` invokes that same callable and converts its return value into process exit status. Importing `archive_line_index.__main__` also has no execution side effect; the executable wrapper is guarded. No root-level `main` re-export or general CLI framework is part of the surface.
+The installed console entry is `archive-line-index = "archive_stream.cli:main"`. Module execution through `python -m archive_stream` invokes that same callable and converts its return value into process exit status. Importing `archive_stream.__main__` also has no execution side effect; the executable wrapper is guarded. No root-level `main` re-export or general CLI framework is part of the surface.
 
 ## Public errors and exports
 
@@ -136,4 +136,4 @@ The package-root export set is exactly `Source`, `ReadableBinary`, `DEFAULT_BUFF
 
 ## Progress logging surface
 
-Index construction emits INFO through archive_line_index.scanner, with five-second chunk-boundary uncompressed-byte observations and a final validated-scan total. Library callers opt in using standard logging configuration; no callback, constructor parameter or new root export is introduced. Direct scanning still borrows its reader; build_line_index still owns source cleanup. The CLI adds case-insensitive --log-level with INFO default and WARNING-or-higher suppression, preserving stdout summaries and exception/status ownership. [Progress contract](../spec/progress-logging.md) owns counts, timing, configuration restoration and the intentional informational stderr output.
+Index construction emits INFO through archive_stream.scanner, with five-second chunk-boundary uncompressed-byte observations and a final validated-scan total. Library callers opt in using standard logging configuration; no callback, constructor parameter or new root export is introduced. Direct scanning still borrows its reader; build_line_index still owns source cleanup. The CLI adds case-insensitive --log-level with INFO default and WARNING-or-higher suppression, preserving stdout summaries and exception/status ownership. [Progress contract](../spec/progress-logging.md) owns counts, timing, configuration restoration and the intentional informational stderr output.

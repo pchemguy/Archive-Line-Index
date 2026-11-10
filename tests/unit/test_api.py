@@ -7,8 +7,8 @@ from unittest.mock import patch
 import pytest
 from tests.helpers.readers import Reader
 
-import archive_line_index as ali
-from archive_line_index.api import build_line_index, open_content_stream
+import archive_stream as ali
+from archive_stream.api import build_line_index, open_content_stream
 
 
 @pytest.mark.parametrize(
@@ -70,8 +70,8 @@ def test_build_closes_reader_after_scanner_failure(tmp_path: Path) -> None:
     error = MemoryError("index allocation")
     r = Reader(b"data")
     with (
-        patch("archive_line_index.api.open_backend", return_value=r),
-        patch("archive_line_index.api.scan_line_offsets", side_effect=error),
+        patch("archive_stream.api.open_backend", return_value=r),
+        patch("archive_stream.api.scan_line_offsets", side_effect=error),
     ):
         with pytest.raises(MemoryError) as caught:
             build_line_index(path)
@@ -83,7 +83,7 @@ def test_successful_scan_does_not_hide_close_failure(tmp_path: Path) -> None:
     path.write_bytes(b"plain")
     r = Reader(b"data", close_failures=1)
     with (
-        patch("archive_line_index.api.open_backend", return_value=r),
+        patch("archive_stream.api.open_backend", return_value=r),
         pytest.raises(OSError, match="close fault"),
     ):
         build_line_index(path)
@@ -106,8 +106,8 @@ def test_build_preserves_scan_failure_when_close_also_fails(tmp_path: Path) -> N
     error = MemoryError("scan allocation")
     r = Reader(close_failures=1)
     with (
-        patch("archive_line_index.api.open_backend", return_value=r),
-        patch("archive_line_index.api.scan_line_offsets", side_effect=error),
+        patch("archive_stream.api.open_backend", return_value=r),
+        patch("archive_stream.api.scan_line_offsets", side_effect=error),
     ):
         with pytest.raises(MemoryError) as caught:
             build_line_index(path)

@@ -56,7 +56,7 @@ Use Python 3.11 or later. Run checks from the repository root with the selected 
 | Formatting | `python -m ruff format --check src tests scripts` |
 | Types | `python -m mypy` |
 | Tests | `python -m pytest` |
-| Coverage | `python -m pytest --cov=archive_line_index --cov-report=term-missing` |
+| Coverage | `python -m pytest --cov=archive_stream --cov-report=term-missing` |
 | Build | `python -m build` |
 
 Use Ruff to format Python, mypy for type checking, pytest for tests and Flowmark for Markdown formatting. Write Google-style Python docstrings. Do not hard-wrap any Markdown file unless the human explicitly requests it. Keep prose paragraphs and list items on single source lines.

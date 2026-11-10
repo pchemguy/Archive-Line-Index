@@ -11,8 +11,8 @@ from unittest.mock import patch
 
 import pytest
 
-from archive_line_index.errors import InvalidIndexError, PersistenceError
-from archive_line_index.persistence.sqlite import write_sqlite_index
+from archive_stream.errors import InvalidIndexError, PersistenceError
+from archive_stream.persistence.sqlite import write_sqlite_index
 
 
 @pytest.mark.parametrize(
@@ -55,7 +55,7 @@ def test_writer_invalid_inputs_do_not_allocate(
 ) -> None:
     with (
         patch(
-            "archive_line_index.persistence.sqlite.temporary_sibling",
+            "archive_stream.persistence.sqlite.temporary_sibling",
             side_effect=AssertionError("allocated"),
         ),
         pytest.raises(exc),
@@ -88,9 +88,7 @@ def test_engine_failure_keeps_previous_file_and_cause(tmp_path: Path) -> None:
     path.write_bytes(b"previous")
     error = sqlite3.OperationalError("engine fault")
     with (
-        patch(
-            "archive_line_index.persistence.sqlite.sqlite3.connect", side_effect=error
-        ),
+        patch("archive_stream.persistence.sqlite.sqlite3.connect", side_effect=error),
         pytest.raises(PersistenceError) as caught,
     ):
         write_sqlite_index(array("Q", [0]), path, overwrite=True)
@@ -103,7 +101,7 @@ def test_failure_after_transaction_commit_does_not_publish(tmp_path: Path) -> No
     path.write_bytes(b"previous")
     with (
         patch(
-            "archive_line_index.persistence.sqlite._check_integrity",
+            "archive_stream.persistence.sqlite._check_integrity",
             side_effect=InvalidIndexError("integrity fault"),
         ),
         pytest.raises(InvalidIndexError),
@@ -140,7 +138,7 @@ def test_sqlite_cleanup_failure_after_publication_is_explicit(tmp_path: Path) ->
 
 @pytest.mark.parametrize("values", [[0], [3], [0, 4, 7], [3, 8], list(range(10000))])
 def test_reader_roundtrip_is_read_only(tmp_path: Path, values: list[int]) -> None:
-    from archive_line_index.persistence.sqlite import read_sqlite_index
+    from archive_stream.persistence.sqlite import read_sqlite_index
 
     path = tmp_path / "name with # space.sqlite3"
     original = array("Q", values)
@@ -170,7 +168,7 @@ def test_reader_roundtrip_is_read_only(tmp_path: Path, values: list[int]) -> Non
 def test_reader_rejects_changed_schema_without_modification(
     tmp_path: Path, schema: str
 ) -> None:
-    from archive_line_index.persistence.sqlite import read_sqlite_index
+    from archive_stream.persistence.sqlite import read_sqlite_index
 
     path = tmp_path / "bad"
     connection = sqlite3.connect(path)
@@ -184,7 +182,7 @@ def test_reader_rejects_changed_schema_without_modification(
 
 @pytest.mark.parametrize("values", [[], [1], [-1, 0], [3, 7, 9]])
 def test_reader_validates_ordered_model(tmp_path: Path, values: list[int]) -> None:
-    from archive_line_index.persistence.sqlite import read_sqlite_index
+    from archive_stream.persistence.sqlite import read_sqlite_index
 
     path = tmp_path / "p"
     connection = sqlite3.connect(path)
@@ -204,7 +202,7 @@ def test_reader_validates_ordered_model(tmp_path: Path, values: list[int]) -> No
 def test_reader_corruption_missing_and_engine_failure_categories(
     tmp_path: Path,
 ) -> None:
-    from archive_line_index.persistence.sqlite import read_sqlite_index
+    from archive_stream.persistence.sqlite import read_sqlite_index
 
     path = tmp_path / "p"
     with pytest.raises(FileNotFoundError):
@@ -215,9 +213,7 @@ def test_reader_corruption_missing_and_engine_failure_categories(
     assert isinstance(caught.value.__cause__, sqlite3.Error)
     error = sqlite3.OperationalError("engine unavailable")
     with (
-        patch(
-            "archive_line_index.persistence.sqlite.sqlite3.connect", side_effect=error
-        ),
+        patch("archive_stream.persistence.sqlite.sqlite3.connect", side_effect=error),
         pytest.raises(PersistenceError) as caught,
     ):
         read_sqlite_index(path)
@@ -225,7 +221,7 @@ def test_reader_corruption_missing_and_engine_failure_categories(
 
 
 def test_user_object_resembling_internal_prefix_is_not_hidden(tmp_path: Path) -> None:
-    from archive_line_index.persistence.sqlite import read_sqlite_index
+    from archive_stream.persistence.sqlite import read_sqlite_index
 
     path = tmp_path / "p"
     write_sqlite_index(array("Q", [0, 9]), path)
@@ -255,7 +251,7 @@ def test_transaction_failure_keeps_primary_when_connection_cleanup_fails(
     destination = tmp_path / "p"
     destination.write_bytes(b"previous")
     with (
-        patch("archive_line_index.persistence.sqlite.sqlite3.connect", connect),
+        patch("archive_stream.persistence.sqlite.sqlite3.connect", connect),
         pytest.raises(PersistenceError) as caught,
     ):
         write_sqlite_index(array("Q", [0, 8]), destination, overwrite=True)
@@ -280,7 +276,7 @@ def test_sidecar_cleanup_is_owned_and_preserves_primary(tmp_path: Path) -> None:
 
     with (
         patch(
-            "archive_line_index.persistence.sqlite._check_integrity",
+            "archive_stream.persistence.sqlite._check_integrity",
             side_effect=primary,
         ),
         patch.object(Path, "unlink", fail_sidecar),
@@ -294,7 +290,7 @@ def test_sidecar_cleanup_is_owned_and_preserves_primary(tmp_path: Path) -> None:
 
 
 def test_reader_observes_committed_wal_without_modifying_data(tmp_path: Path) -> None:
-    from archive_line_index.persistence.sqlite import read_sqlite_index
+    from archive_stream.persistence.sqlite import read_sqlite_index
 
     path = tmp_path / "p"
     connection = sqlite3.connect(path)
@@ -320,8 +316,8 @@ def test_reader_observes_committed_wal_without_modifying_data(tmp_path: Path) ->
 def test_publication_sync_has_writable_descriptor(
     tmp_path: Path, overwrite: bool
 ) -> None:
-    from archive_line_index.persistence.fs import flush_file
-    from archive_line_index.persistence.sqlite import read_sqlite_index
+    from archive_stream.persistence.fs import flush_file
+    from archive_stream.persistence.sqlite import read_sqlite_index
 
     destination = tmp_path / "index.sqlite3"
     if overwrite:
@@ -335,7 +331,7 @@ def test_publication_sync_has_writable_descriptor(
         flush_file(handle)
 
     with patch(
-        "archive_line_index.persistence.sqlite.flush_file",
+        "archive_stream.persistence.sqlite.flush_file",
         side_effect=windows_sync_precondition,
     ):
         write_sqlite_index(offsets, destination, overwrite=overwrite)

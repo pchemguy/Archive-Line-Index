@@ -6,7 +6,7 @@ The CLI adapter in [DECOMPOSITION](../DECOMPOSITION.md) implements the callable 
 
 ```text
 archive-line-index TARGET [-o OUTPUT_STEM | --output OUTPUT_STEM] [--overwrite] [--log-level LEVEL]
-python -m archive_line_index TARGET [-o OUTPUT_STEM | --output OUTPUT_STEM] [--overwrite] [--log-level LEVEL]
+python -m archive_stream TARGET [-o OUTPUT_STEM | --output OUTPUT_STEM] [--overwrite] [--log-level LEVEL]
 ```
 
 Exactly one target is required. `-h`/`--help` displays usage and returns success without path inspection or indexing. Missing/extra positional targets, unknown options and a missing output-option value are usage errors. Standard `--` ends option parsing for a target whose name starts with a hyphen. Shell quoting and explicit argv elements preserve paths containing spaces.
@@ -28,7 +28,7 @@ Each output follows the independent [persistence contract](persistence.md). Ther
 ## Importable execution
 
 ```python
-from archive_line_index.cli import main
+from archive_stream.cli import main
 
 status = main(["data/events.zip"])
 ```

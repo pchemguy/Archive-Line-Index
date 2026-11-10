@@ -9,8 +9,8 @@ from unittest.mock import patch
 
 import pytest
 
-from archive_line_index.errors import InvalidIndexError
-from archive_line_index.persistence.raw import read_raw_index, write_raw_index
+from archive_stream.errors import InvalidIndexError
+from archive_stream.persistence.raw import read_raw_index, write_raw_index
 
 
 @pytest.mark.parametrize(
@@ -64,7 +64,7 @@ def test_invalid_inputs_before_allocation(
 ) -> None:
     with (
         patch(
-            "archive_line_index.persistence.raw.temporary_sibling",
+            "archive_stream.persistence.raw.temporary_sibling",
             side_effect=AssertionError("temporary allocated"),
         ),
         pytest.raises(exc),
@@ -78,7 +78,7 @@ def test_protection_replacement_and_prepublication_failure(tmp_path: Path) -> No
     path.write_bytes(b"previous")
     with (
         patch(
-            "archive_line_index.persistence.raw.temporary_sibling",
+            "archive_stream.persistence.raw.temporary_sibling",
             side_effect=AssertionError("temporary allocated"),
         ),
         pytest.raises(FileExistsError),
@@ -86,7 +86,7 @@ def test_protection_replacement_and_prepublication_failure(tmp_path: Path) -> No
         write_raw_index(array("Q", [0]), path)
     with (
         patch(
-            "archive_line_index.persistence.raw.publish_index_file",
+            "archive_stream.persistence.raw.publish_index_file",
             side_effect=OSError("publish fault"),
         ),
         pytest.raises(OSError, match="publish fault"),
@@ -122,7 +122,7 @@ def test_opposite_endian_conversion_preserves_input(tmp_path: Path) -> None:
 
     offsets = BigEndianArray("Q", [0, 3, 512])
     before = offsets.tolist()
-    with patch("archive_line_index.persistence.raw._BYTEORDER", "big"):
+    with patch("archive_stream.persistence.raw._BYTEORDER", "big"):
         write_raw_index(offsets, tmp_path / "p")
     assert (tmp_path / "p").read_bytes() == struct.pack("<QQQ", 0, 3, 512)
     assert offsets.tolist() == before
@@ -155,7 +155,7 @@ def test_write_error_remains_primary_when_file_close_also_fails(tmp_path: Path) 
 def test_partial_writes_are_completed_and_zero_progress_is_rejected() -> None:
     import io
 
-    from archive_line_index.persistence.raw import _write_all
+    from archive_stream.persistence.raw import _write_all
 
     class Short(io.BytesIO):
         def write(self, data: object) -> int:
@@ -182,8 +182,8 @@ def test_opposite_endian_reader_conversion(tmp_path: Path) -> None:
     path = tmp_path / "p"
     path.write_bytes(struct.pack("<QQQ", 0, 3, 512))
     with (
-        patch("archive_line_index.persistence.raw._BYTEORDER", "big"),
-        patch("archive_line_index.persistence.raw.array", BigNativeArray),
+        patch("archive_stream.persistence.raw._BYTEORDER", "big"),
+        patch("archive_stream.persistence.raw.array", BigNativeArray),
     ):
         assert read_raw_index(path).tolist() == [0, 3, 512]
 
@@ -200,7 +200,7 @@ def test_incomplete_stable_read_rejected_and_handle_closed(tmp_path: Path) -> No
     with (
         patch.object(Path, "open", return_value=handle),
         patch(
-            "archive_line_index.persistence.raw.os.fstat",
+            "archive_stream.persistence.raw.os.fstat",
             return_value=SimpleNamespace(st_size=16),
         ),
         pytest.raises(InvalidIndexError, match="Incomplete"),

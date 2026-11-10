@@ -1,4 +1,4 @@
-# Archive Line Index component design
+# Archive Stream component design
 
 ## Scope and document ownership
 
@@ -10,7 +10,7 @@ SPEC defines exact behavior, errors and acceptance against these interfaces. Phy
 
 | Component | Provides and owns | Requires and excludes |
 | --- | --- | --- |
-| CLI adapter and execution wrappers | Importable `archive_line_index.cli.main`, one-target argument parsing, destination choice, preflight, status messages and exit-code translation; console/module wrappers invoke the same callable | Uses the index-building facade and both persistence writers through their owning modules. Owns its completed array until persistence finishes; contains no scanning, decompression or storage implementation. Core modules do not import it. |
+| CLI adapter and execution wrappers | Importable `archive_stream.cli.main`, one-target argument parsing, destination choice, preflight, status messages and exit-code translation; console/module wrappers invoke the same callable | Uses the index-building facade and both persistence writers through their owning modules. Owns its completed array until persistence finishes; contains no scanning, decompression or storage implementation. Core modules do not import it. |
 | Public facade | Supported exports and the composition of source opening with scanning; validation before opening resources; ownership transfer to the returned stream | Uses source normalization, detection, backend selection, stream construction and scanning. It contains no decompression, LF scanning or persistence encoding. |
 | Source normalization | Filesystem-path validation and conversion to a `Path` | Uses normal filesystem path semantics; accepts no open stream or URL as an archive source. |
 | Format detection | Bounded content inspection and recognized-suffix claims, returned as one format candidate | Borrows a normalized path, owns only its short-lived inspection handle and performs no full extraction or line analysis. |
@@ -58,7 +58,7 @@ The adapter validates the selected member and starts one outer extraction thread
 
 ### Index a CLI target
 
-Console execution and `python -m archive_line_index` invoke the same `main(argv)` adapter available to Python callers. The adapter parses without indexing on import, resolves one target and its output choice, checks destination protection and source/destination aliasing, calls `build_line_index` once and passes the same completed array to the SQLite writer and then the raw writer. It emits a success summary only after both writes succeed and returns an integer status. If a later write fails, already published output is retained and identified in the failure diagnostic. It does not catch library errors inside core operations or terminate a process from the imported callable.
+Console execution and `python -m archive_stream` invoke the same `main(argv)` adapter available to Python callers. The adapter parses without indexing on import, resolves one target and its output choice, checks destination protection and source/destination aliasing, calls `build_line_index` once and passes the same completed array to the SQLite writer and then the raw writer. It emits a success summary only after both writes succeed and returns an integer status. If a later write fails, already published output is retained and identified in the failure diagnostic. It does not catch library errors inside core operations or terminate a process from the imported callable.
 
 ### Persist an index
 
@@ -74,6 +74,6 @@ Reader doubles exercise common-stream completion and size enforcement without co
 
 ## Progress ownership
 
-The scanner owns archive_line_index.scanner and operation-local timing/counter observations around processed chunks; no per-LF callback or additional readable interface is needed. Its final event follows validated exhaustion and offset validation, not persistence. Disabled INFO skips clock and record work. Public indexing function signatures and root exports remain unchanged.
+The scanner owns archive_stream.scanner and operation-local timing/counter observations around processed chunks; no per-LF callback or additional readable interface is needed. Its final event follows validated exhaustion and offset validation, not persistence. Disabled INFO skips clock and record work. Public indexing function signatures and root exports remain unchanged.
 
 The CLI owns --log-level and scoped invocation configuration on that emitting logger, including an application's explicitly configured child level. It restores the previous level, preserves propagation/disabled state and existing root/parent/handler configuration, and removes/closes only its own temporary stderr handler. Existing effective handlers control routing/formatting; no root configuration is performed. Shared errors, facade, adapters and persistence do not acquire progress responsibilities. Exact behavior is in the [progress contract](spec/progress-logging.md).

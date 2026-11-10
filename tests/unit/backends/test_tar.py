@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 from tests.helpers.archives import make_tar
 
-from archive_line_index.errors import ArchiveStructureError, InvalidArchiveError
+from archive_stream.errors import ArchiveStructureError, InvalidArchiveError
 
 
 @pytest.mark.parametrize(
@@ -19,7 +19,7 @@ from archive_line_index.errors import ArchiveStructureError, InvalidArchiveError
 def test_plain_tar_nested_empty_and_bounded_reads(
     tmp_path: Path, payload: bytes, format: int
 ) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
+    from archive_stream.backends.tar import open_tar_backend
 
     p = make_tar(
         tmp_path / "a.tar",
@@ -56,7 +56,7 @@ def test_plain_tar_nested_empty_and_bounded_reads(
 def test_special_entries_before_payload_are_rejected(
     tmp_path: Path, kind: bytes
 ) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
+    from archive_stream.backends.tar import open_tar_backend
 
     p = make_tar(
         tmp_path / "a.tar", [("special", b"", kind), ("data", b"x", tarfile.REGTYPE)]
@@ -67,7 +67,7 @@ def test_special_entries_before_payload_are_rejected(
 
 
 def test_no_regular_file_is_rejected(tmp_path: Path) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
+    from archive_stream.backends.tar import open_tar_backend
 
     p = make_tar(tmp_path / "a.tar", [("folder", b"", tarfile.DIRTYPE)])
     with pytest.raises(ArchiveStructureError):
@@ -75,7 +75,7 @@ def test_no_regular_file_is_rejected(tmp_path: Path) -> None:
 
 
 def test_tar_early_close_and_opening_failure_own_source(tmp_path: Path) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
+    from archive_stream.backends.tar import open_tar_backend
 
     p = make_tar(tmp_path / "a.tar", [("data", b"large" * 10000, tarfile.REGTYPE)])
     handle = p.open("rb")
@@ -96,7 +96,7 @@ def test_tar_early_close_and_opening_failure_own_source(tmp_path: Path) -> None:
 
 
 def test_tar_extension_headers_are_not_exposed_files(tmp_path: Path) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
+    from archive_stream.backends.tar import open_tar_backend
 
     p = make_tar(
         tmp_path / "a.tar", [("nested/" + "x" * 200, b"data", tarfile.REGTYPE)]
@@ -120,7 +120,7 @@ def test_tar_extension_headers_are_not_exposed_files(tmp_path: Path) -> None:
 def test_late_member_fails_after_payload_before_eof(
     tmp_path: Path, kind: bytes
 ) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
+    from archive_stream.backends.tar import open_tar_backend
 
     p = make_tar(
         tmp_path / "a.tar",
@@ -143,10 +143,10 @@ def test_late_member_fails_after_payload_before_eof(
 def test_malformed_trailing_structure_cannot_complete(
     tmp_path: Path, failure: str
 ) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
-    from archive_line_index.errors import ExtractionError
-    from archive_line_index.scanner import scan_line_offsets
-    from archive_line_index.stream import make_content_stream
+    from archive_stream.backends.tar import open_tar_backend
+    from archive_stream.errors import ExtractionError
+    from archive_stream.scanner import scan_line_offsets
+    from archive_stream.stream import make_content_stream
 
     p = make_tar(tmp_path / "a.tar", [("data", b"x\n" * 300, tarfile.REGTYPE)])
     raw = p.read_bytes()
@@ -171,7 +171,7 @@ def test_malformed_trailing_structure_cannot_complete(
 
 
 def test_trailing_directories_and_repeated_eof(tmp_path: Path) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
+    from archive_stream.backends.tar import open_tar_backend
 
     p = make_tar(
         tmp_path / "a.tar",
@@ -189,7 +189,7 @@ def test_trailing_directories_and_repeated_eof(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("mode", ["w:gz", "w:bz2", "w:xz"])
 def test_required_compressed_tar_exact_delivery(tmp_path: Path, mode: str) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
+    from archive_stream.backends.tar import open_tar_backend
 
     payload = b"\0a\n\xff" * 4000
     p = make_tar(
@@ -216,10 +216,10 @@ def test_compressed_non_tar_and_bad_trailer_cannot_succeed(
 ) -> None:
     import importlib
 
-    from archive_line_index.backends.tar import open_tar_backend
-    from archive_line_index.errors import ExtractionError
-    from archive_line_index.scanner import scan_line_offsets
-    from archive_line_index.stream import make_content_stream
+    from archive_stream.backends.tar import open_tar_backend
+    from archive_stream.errors import ExtractionError
+    from archive_stream.scanner import scan_line_offsets
+    from archive_stream.stream import make_content_stream
 
     compressor = importlib.import_module(codec).compress
     p = tmp_path / "compressed"
@@ -252,8 +252,8 @@ def test_compressed_non_tar_and_bad_trailer_cannot_succeed(
 def test_missing_selected_codec_is_unsupported(tmp_path: Path) -> None:
     import sys
 
-    from archive_line_index.backends.tar import open_tar_backend
-    from archive_line_index.errors import UnsupportedFormatError
+    from archive_stream.backends.tar import open_tar_backend
+    from archive_stream.errors import UnsupportedFormatError
 
     p = make_tar(tmp_path / "a.tar.xz", [("data", b"x", tarfile.REGTYPE)], mode="w:xz")
     handle = p.open("rb")
@@ -269,7 +269,7 @@ def test_missing_selected_codec_is_unsupported(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("mode", ["w", "w:gz", "w:bz2", "w:xz"])
 def test_tar_source_io_failure_remains_ordinary(tmp_path: Path, mode: str) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
+    from archive_stream.backends.tar import open_tar_backend
 
     # Exercise source failures during bounded delivery or the mandatory terminal drain.
     payload = bytes(range(256)) * 1024
@@ -293,8 +293,8 @@ def test_tar_source_io_failure_remains_ordinary(tmp_path: Path, mode: str) -> No
 def test_gzip_footer_is_validated_after_payload_delivery(tmp_path: Path) -> None:
     import gzip
 
-    from archive_line_index.backends.tar import open_tar_backend
-    from archive_line_index.errors import ExtractionError
+    from archive_stream.backends.tar import open_tar_backend
+    from archive_stream.errors import ExtractionError
 
     p = make_tar(tmp_path / "a", [("data", b"payload\n", tarfile.REGTYPE)])
     raw = bytearray(gzip.compress(p.read_bytes() + b"\0" * (128 * 1024)))
@@ -313,7 +313,7 @@ def test_gzip_footer_is_validated_after_payload_delivery(tmp_path: Path) -> None
 
 
 def test_negative_declared_tar_size_is_invalid_at_open(tmp_path: Path) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
+    from archive_stream.backends.tar import open_tar_backend
 
     info = tarfile.TarInfo("data")
     info.size = -1
@@ -325,7 +325,7 @@ def test_negative_declared_tar_size_is_invalid_at_open(tmp_path: Path) -> None:
 
 
 def test_tar_close_attempts_all_handles_and_retries(tmp_path: Path) -> None:
-    from archive_line_index.backends.tar import open_tar_backend
+    from archive_stream.backends.tar import open_tar_backend
 
     p = make_tar(
         tmp_path / "data", [("data", b"payload", tarfile.REGTYPE)], mode="w:gz"

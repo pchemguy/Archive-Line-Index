@@ -22,9 +22,11 @@ def test_real_bundles_and_independent_cli(
         repo / "pyproject.toml",
         "v" + project_version,
     )
-    assert sorted(p.name for p in (tmp_path / "release").iterdir()) == sorted(
-        ASSET_NAMES
-    )
+    assert {p.name for p in (tmp_path / "release").iterdir()} == {
+        "archive-stream-wheel.zip",
+        "archive-stream-source.zip",
+        "SHA256SUMS",
+    }
     assert (
         check_bundles(
             tmp_path / "release", repo / "pyproject.toml", "v" + project_version

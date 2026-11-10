@@ -4,8 +4,8 @@ from array import array
 
 import pytest
 
-from archive_line_index.errors import InvalidIndexError
-from archive_line_index.offsets import MAX_OFFSET, append_offset, validate_offsets
+from archive_stream.errors import InvalidIndexError
+from archive_stream.offsets import MAX_OFFSET, append_offset, validate_offsets
 
 
 @pytest.mark.parametrize("values", [[0], [3], [0, 1], [3, 4, 10], [0, MAX_OFFSET]])

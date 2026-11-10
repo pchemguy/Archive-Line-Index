@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from archive_line_index.formats import FormatKind, detect_format
+from archive_stream.formats import FormatKind, detect_format
 
 
 @pytest.mark.parametrize(

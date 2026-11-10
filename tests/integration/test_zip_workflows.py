@@ -7,7 +7,7 @@ from unittest.mock import patch
 import pytest
 from tests.helpers.archives import make_zip_with_size_metadata
 
-from archive_line_index import (
+from archive_stream import (
     ExtractionError,
     InvalidArchiveError,
     SizeLimitExceededError,
@@ -77,7 +77,7 @@ def test_late_zip_size_failure_is_retained(tmp_path: Path) -> None:
 def test_zip_size_failure_cannot_complete_or_publish(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    from archive_line_index import cli
+    from archive_stream import cli
 
     target = make_zip_with_size_metadata(tmp_path / "bad.zip", b"hello\n", 100)
     with pytest.raises(ExtractionError):

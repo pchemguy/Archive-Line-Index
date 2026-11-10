@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from archive_line_index.errors import (
+from archive_stream.errors import (
     ArchiveStructureError,
     InvalidArchiveError,
     UnsupportedFormatError,
@@ -26,7 +26,7 @@ def make_zip(path: Path, entries: list[tuple[str, bytes, int]]) -> Path:
 
 @pytest.mark.parametrize("payload", [b"", b"a\n\xff"])
 def test_sole_nested_regular_member(tmp_path: Path, payload: bytes) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
+    from archive_stream.backends.zip import open_zip_backend
 
     p = make_zip(
         tmp_path / "a.zip",
@@ -44,7 +44,7 @@ def test_sole_nested_regular_member(tmp_path: Path, payload: bytes) -> None:
     "names", [[], ["folder/"], ["a", "b"], ["a", "__MACOSX/metadata"]]
 )
 def test_invalid_member_counts(tmp_path: Path, names: list[str]) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
+    from archive_stream.backends.zip import open_zip_backend
 
     p = make_zip(
         tmp_path / "a.zip",
@@ -59,7 +59,7 @@ def test_invalid_member_counts(tmp_path: Path, names: list[str]) -> None:
     "kind", [stat.S_IFLNK, stat.S_IFIFO, stat.S_IFSOCK, stat.S_IFCHR, stat.S_IFBLK]
 )
 def test_special_metadata_is_not_a_regular_file(tmp_path: Path, kind: int) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
+    from archive_stream.backends.zip import open_zip_backend
 
     p = make_zip(tmp_path / "a.zip", [("special", b"target", kind)])
     with pytest.raises(ArchiveStructureError):
@@ -68,7 +68,7 @@ def test_special_metadata_is_not_a_regular_file(tmp_path: Path, kind: int) -> No
 
 
 def test_detected_encryption_is_unsupported(tmp_path: Path) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
+    from archive_stream.backends.zip import open_zip_backend
 
     p = make_zip(tmp_path / "a.zip", [("a", b"secret", stat.S_IFREG)])
     data = bytearray(p.read_bytes())
@@ -82,7 +82,7 @@ def test_detected_encryption_is_unsupported(tmp_path: Path) -> None:
 
 
 def test_invalid_open_preserves_cause_and_releases_source(tmp_path: Path) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
+    from archive_stream.backends.zip import open_zip_backend
 
     p = tmp_path / "bad.zip"
     p.write_bytes(b"not ZIP")
@@ -103,7 +103,7 @@ def test_invalid_open_preserves_cause_and_releases_source(tmp_path: Path) -> Non
 def test_bounded_delivery_and_terminal_validation(
     tmp_path: Path, compression: int
 ) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
+    from archive_stream.backends.zip import open_zip_backend
 
     p = tmp_path / "data.zip"
     payload = b"\0a\n\xff" * 4000
@@ -122,9 +122,9 @@ def test_bounded_delivery_and_terminal_validation(
 
 
 def test_crc_failure_is_extraction_error_not_eof(tmp_path: Path) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
-    from archive_line_index.errors import ExtractionError
-    from archive_line_index.stream import make_content_stream
+    from archive_stream.backends.zip import open_zip_backend
+    from archive_stream.errors import ExtractionError
+    from archive_stream.stream import make_content_stream
 
     p = make_zip(tmp_path / "bad.zip", [("data", b"unchanged\n", stat.S_IFREG)])
     raw = bytearray(p.read_bytes())
@@ -144,7 +144,7 @@ def test_crc_failure_is_extraction_error_not_eof(tmp_path: Path) -> None:
 
 
 def test_open_member_codec_failure_releases_all_handles(tmp_path: Path) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
+    from archive_stream.backends.zip import open_zip_backend
 
     p = make_zip(tmp_path / "a.zip", [("data", b"x", stat.S_IFREG)])
     handle = p.open("rb")
@@ -159,9 +159,9 @@ def test_open_member_codec_failure_releases_all_handles(tmp_path: Path) -> None:
 
 
 def test_declared_limit_and_invalid_read_sizes(tmp_path: Path) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
-    from archive_line_index.errors import SizeLimitExceededError
-    from archive_line_index.stream import make_content_stream
+    from archive_stream.backends.zip import open_zip_backend
+    from archive_stream.errors import SizeLimitExceededError
+    from archive_stream.stream import make_content_stream
 
     p = make_zip(tmp_path / "a.zip", [("data", b"1234", stat.S_IFREG)])
     reader = open_zip_backend(p)
@@ -178,7 +178,7 @@ def test_declared_limit_and_invalid_read_sizes(tmp_path: Path) -> None:
 
 
 def test_delivery_filesystem_failure_retains_original_type(tmp_path: Path) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
+    from archive_stream.backends.zip import open_zip_backend
 
     p = make_zip(tmp_path / "a.zip", [("data", b"data" * 10000, stat.S_IFREG)])
     handle = p.open("rb")
@@ -195,7 +195,7 @@ def test_delivery_filesystem_failure_retains_original_type(tmp_path: Path) -> No
 
 
 def test_close_attempts_all_resources_and_can_retry(tmp_path: Path) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
+    from archive_stream.backends.zip import open_zip_backend
 
     p = make_zip(tmp_path / "a.zip", [("data", b"x", stat.S_IFREG)])
     handle = p.open("rb")
@@ -215,8 +215,8 @@ def test_close_attempts_all_resources_and_can_retry(tmp_path: Path) -> None:
 def test_corrupt_compressed_member_cannot_complete(
     tmp_path: Path, compression: int
 ) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
-    from archive_line_index.errors import ExtractionError
+    from archive_stream.backends.zip import open_zip_backend
+    from archive_stream.errors import ExtractionError
 
     p = tmp_path / "bad.zip"
     with zipfile.ZipFile(p, "w", compression=compression) as archive:
@@ -236,7 +236,7 @@ def test_corrupt_compressed_member_cannot_complete(
 
 
 def test_delivery_position_io_failure_is_not_a_codec_error(tmp_path: Path) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
+    from archive_stream.backends.zip import open_zip_backend
 
     p = make_zip(tmp_path / "a.zip", [("data", b"x" * 10000, stat.S_IFREG)])
     handle = p.open("rb")
@@ -262,8 +262,8 @@ def test_mismatched_size_cannot_complete(
 ) -> None:
     from tests.helpers.archives import make_zip_with_size_metadata
 
-    from archive_line_index.backends.zip import open_zip_backend
-    from archive_line_index.errors import ExtractionError
+    from archive_stream.backends.zip import open_zip_backend
+    from archive_stream.errors import ExtractionError
 
     target = make_zip_with_size_metadata(
         tmp_path / "bad.zip", b"hello\n", declared, compression=compression
@@ -279,8 +279,8 @@ def test_mismatched_size_cannot_complete(
 
 
 def test_dependency_excess_bytes_are_rejected_before_delivery(tmp_path: Path) -> None:
-    from archive_line_index.backends.zip import open_zip_backend
-    from archive_line_index.errors import ExtractionError
+    from archive_stream.backends.zip import open_zip_backend
+    from archive_stream.errors import ExtractionError
 
     target = make_zip(tmp_path / "data.zip", [("data", b"x", stat.S_IFREG)])
     reader = open_zip_backend(target)

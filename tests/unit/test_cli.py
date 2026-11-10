@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 import pytest
 
-from archive_line_index.cli import main
-from archive_line_index.errors import ExtractionError
+from archive_stream.cli import main
+from archive_stream.errors import ExtractionError
 
 
 @pytest.mark.parametrize(
@@ -19,13 +19,13 @@ def test_one_scan_same_array_sqlite_then_raw(
     target = tmp_path / "payload.txt"
     events: list[str] = []
     with (
-        patch("archive_line_index.cli.build_line_index", return_value=offsets) as build,
+        patch("archive_stream.cli.build_line_index", return_value=offsets) as build,
         patch(
-            "archive_line_index.cli.write_sqlite_index",
+            "archive_stream.cli.write_sqlite_index",
             side_effect=lambda *a, **k: events.append("sqlite"),
         ) as sqlite,
         patch(
-            "archive_line_index.cli.write_raw_index",
+            "archive_stream.cli.write_raw_index",
             side_effect=lambda *a, **k: events.append("raw"),
         ) as raw,
     ):
@@ -55,7 +55,7 @@ def test_help_usage_return_without_io(
     with (
         patch.object(Path, "stat", side_effect=AssertionError("path inspected")),
         patch(
-            "archive_line_index.cli.build_line_index",
+            "archive_stream.cli.build_line_index",
             side_effect=AssertionError("indexed"),
         ),
     ):
@@ -88,9 +88,9 @@ def test_none_argv_uses_process_arguments(monkeypatch: pytest.MonkeyPatch) -> No
 )
 def test_default_final_suffix_stems(tmp_path: Path, name: str, stem: str) -> None:
     with (
-        patch("archive_line_index.cli.build_line_index", return_value=array("Q", [0])),
-        patch("archive_line_index.cli.write_sqlite_index") as sqlite,
-        patch("archive_line_index.cli.write_raw_index") as raw,
+        patch("archive_stream.cli.build_line_index", return_value=array("Q", [0])),
+        patch("archive_stream.cli.write_sqlite_index") as sqlite,
+        patch("archive_stream.cli.write_raw_index") as raw,
     ):
         assert main([str(tmp_path / name)]) == 0
     assert sqlite.call_args.args[1] == tmp_path / (stem + ".sqlite3")
@@ -103,10 +103,10 @@ def test_explicit_stem_is_appended_and_hyphen_target_after_separator(
     monkeypatch.chdir(tmp_path)
     with (
         patch(
-            "archive_line_index.cli.build_line_index", return_value=array("Q", [0])
+            "archive_stream.cli.build_line_index", return_value=array("Q", [0])
         ) as build,
-        patch("archive_line_index.cli.write_sqlite_index") as sqlite,
-        patch("archive_line_index.cli.write_raw_index") as raw,
+        patch("archive_stream.cli.write_sqlite_index") as sqlite,
+        patch("archive_stream.cli.write_raw_index") as raw,
     ):
         assert main(["-o", "results/custom.v1", "--", "-payload.txt"]) == 0
     build.assert_called_once_with(Path("-payload.txt"))
@@ -122,7 +122,7 @@ def test_either_existing_output_blocks_before_scan(
     output = tmp_path / ("payload" + suffix)
     output.write_bytes(b"protected")
     with patch(
-        "archive_line_index.cli.build_line_index", side_effect=AssertionError("scanned")
+        "archive_stream.cli.build_line_index", side_effect=AssertionError("scanned")
     ):
         assert main([str(tmp_path / "payload.txt")]) == 1
     out, err = capsys.readouterr()
@@ -137,7 +137,7 @@ def test_default_source_collision_rejected_even_overwrite(
     source = tmp_path / ("payload" + suffix)
     source.write_bytes(b"source")
     with patch(
-        "archive_line_index.cli.build_line_index", side_effect=AssertionError("scanned")
+        "archive_stream.cli.build_line_index", side_effect=AssertionError("scanned")
     ):
         assert main([str(source), "--overwrite"]) == 1
     assert source.read_bytes() == b"source"
@@ -158,7 +158,7 @@ def test_output_alias_and_dangling_protection(tmp_path: Path, kind: str) -> None
     except (OSError, NotImplementedError):
         pytest.skip("link creation unavailable")
     with patch(
-        "archive_line_index.cli.build_line_index", side_effect=AssertionError("scanned")
+        "archive_stream.cli.build_line_index", side_effect=AssertionError("scanned")
     ):
         argv = [str(source)] + ([] if kind == "dangling" else ["--overwrite"])
         assert main(argv) == 1
@@ -169,9 +169,9 @@ def test_explicit_overwrite_allows_distinct_outputs(tmp_path: Path) -> None:
     for suffix in (".sqlite3", ".u64"):
         (tmp_path / ("out" + suffix)).write_bytes(b"old")
     with (
-        patch("archive_line_index.cli.build_line_index", return_value=array("Q", [0])),
-        patch("archive_line_index.cli.write_sqlite_index") as sqlite,
-        patch("archive_line_index.cli.write_raw_index") as raw,
+        patch("archive_stream.cli.build_line_index", return_value=array("Q", [0])),
+        patch("archive_stream.cli.write_sqlite_index") as sqlite,
+        patch("archive_stream.cli.write_raw_index") as raw,
     ):
         assert (
             main(
@@ -199,16 +199,16 @@ def test_operational_failure_status_and_known_publications(
     values = array("Q", [0, 3])
     with (
         patch(
-            "archive_line_index.cli.build_line_index",
+            "archive_stream.cli.build_line_index",
             side_effect=error if stage == "build" else None,
             return_value=values,
         ),
         patch(
-            "archive_line_index.cli.write_sqlite_index",
+            "archive_stream.cli.write_sqlite_index",
             side_effect=error if stage == "sqlite" else None,
         ) as sqlite,
         patch(
-            "archive_line_index.cli.write_raw_index",
+            "archive_stream.cli.write_raw_index",
             side_effect=error if stage == "raw" else None,
         ) as raw,
     ):
@@ -227,9 +227,9 @@ def test_interruption_preserves_known_sqlite_publication(
     tmp_path: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:
     with (
-        patch("archive_line_index.cli.build_line_index", return_value=array("Q", [0])),
-        patch("archive_line_index.cli.write_sqlite_index"),
-        patch("archive_line_index.cli.write_raw_index", side_effect=KeyboardInterrupt),
+        patch("archive_stream.cli.build_line_index", return_value=array("Q", [0])),
+        patch("archive_stream.cli.write_sqlite_index"),
+        patch("archive_stream.cli.write_raw_index", side_effect=KeyboardInterrupt),
     ):
         assert main([str(tmp_path / "payload.txt")]) == 130
     out, err = capsys.readouterr()
@@ -239,7 +239,7 @@ def test_interruption_preserves_known_sqlite_publication(
 def test_unexpected_programming_error_propagates(tmp_path: Path) -> None:
     with (
         patch(
-            "archive_line_index.cli.build_line_index",
+            "archive_stream.cli.build_line_index",
             side_effect=RuntimeError("programming defect"),
         ),
         pytest.raises(RuntimeError, match="programming defect"),
@@ -253,7 +253,7 @@ def test_unexpected_programming_error_propagates(tmp_path: Path) -> None:
 def test_parser_resource_failure_returns_operational_status(
     error: BaseException, status: int, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    with patch("archive_line_index.cli._parser", side_effect=error):
+    with patch("archive_stream.cli._parser", side_effect=error):
         assert main(["payload.txt"]) == status
     out, err = capsys.readouterr()
     assert not out and err and "Traceback" not in err

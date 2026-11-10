@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from archive_line_index.sources import normalize_source
+from archive_stream.sources import normalize_source
 
 
 class BytesPath:

@@ -12,7 +12,7 @@ from tests.helpers.packaging import InstalledPackage
 from tests.helpers.sevenzip import make_7z
 from tests.integration.test_installed_cli import _invoke
 
-from archive_line_index import build_line_index, open_content_stream, scan_line_offsets
+from archive_stream import build_line_index, open_content_stream, scan_line_offsets
 
 pytestmark = [pytest.mark.integration, pytest.mark.timeout(300)]
 PAYLOAD = b"\xef\xbb\xbfalpha\r\n\nomega"
@@ -36,16 +36,16 @@ def test_actual_formats_report_payload_bytes_without_duplicate_stream_logging(
             [("nested/data", PAYLOAD, tarfile.REGTYPE)],
             mode={"tar": "w", "gz": "w:gz", "bz2": "w:bz2", "xz": "w:xz"}[kind],
         )
-    with caplog.at_level(logging.INFO, logger="archive_line_index.scanner"):
+    with caplog.at_level(logging.INFO, logger="archive_stream.scanner"):
         assert build_line_index(source, buffer_size=2).tolist() == [3, 10, 11, 16]
-        records = [r for r in caplog.records if r.name == "archive_line_index.scanner"]
+        records = [r for r in caplog.records if r.name == "archive_stream.scanner"]
         assert records[-1].getMessage() == "Scan complete: 16 uncompressed bytes"
         caplog.clear()
         with open_content_stream(source) as stream:
             assert stream.read() == PAYLOAD
-        assert not [r for r in caplog.records if r.name == "archive_line_index.scanner"]
+        assert not [r for r in caplog.records if r.name == "archive_stream.scanner"]
         assert scan_line_offsets(io.BytesIO(PAYLOAD)).tolist() == [3, 10, 11, 16]
-        assert [r for r in caplog.records if r.name == "archive_line_index.scanner"][
+        assert [r for r in caplog.records if r.name == "archive_stream.scanner"][
             -1
         ].args == (16,)
 
@@ -70,13 +70,13 @@ def test_installed_default_progress_suppression_and_invalid_level(
 import logging
 root = logging.getLogger()
 before = root.level, root.handlers[:]
-from archive_line_index import read_raw_index, read_sqlite_index
+from archive_stream import read_raw_index, read_sqlite_index
 assert (root.level, root.handlers) == before
 assert read_raw_index({str(source.with_suffix(".u64"))!r}).tolist() == [3, 10, 11, 16]
 assert read_sqlite_index({str(source.with_suffix(".sqlite3"))!r}).tolist() == [3, 10, 11, 16]
-from archive_line_index.cli import main
+from archive_stream.cli import main
 assert (root.level, root.handlers) == before
-logger = logging.getLogger("archive_line_index.scanner")
+logger = logging.getLogger("archive_stream.scanner")
 previous = logger.level, logger.handlers[:], logger.propagate
 assert main(["--overwrite", "--log-level", "WARNING", {str(source)!r}]) == 0
 assert (logger.level, logger.handlers, logger.propagate) == previous

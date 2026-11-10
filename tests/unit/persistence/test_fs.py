@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from archive_line_index.persistence.fs import publish_index_file, temporary_sibling
+from archive_stream.persistence.fs import publish_index_file, temporary_sibling
 
 
 def test_exclusive_publish_leaves_cleanup_to_outer_owner(tmp_path: Path) -> None:
@@ -62,11 +62,11 @@ def test_commit_time_race_and_unsupported_primitive_do_not_replace(
     with temporary_sibling(destination) as temporary:
         with (
             patch(
-                "archive_line_index.persistence.fs.os.link",
+                "archive_stream.persistence.fs.os.link",
                 side_effect=OSError(errno.ENOTSUP, "unavailable"),
             ),
             patch(
-                "archive_line_index.persistence.fs.os.replace",
+                "archive_stream.persistence.fs.os.replace",
                 side_effect=AssertionError("unsafe fallback"),
             ),
         ):

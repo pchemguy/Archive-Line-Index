@@ -8,8 +8,8 @@ from collections.abc import Callable
 import pytest
 from tests.helpers.readers import Reader
 
-from archive_line_index.errors import ExtractionError
-from archive_line_index.stream import ContentStream, make_content_stream
+from archive_stream.errors import ExtractionError
+from archive_stream.stream import ContentStream, make_content_stream
 
 
 def test_zero_short_and_terminal_reads() -> None:
@@ -197,7 +197,7 @@ def test_inclusive_actual_limits(data: bytes, limit: int) -> None:
 
 @pytest.mark.parametrize("operation", ["read", "readinto", "unbounded"])
 def test_crossing_actual_limit_returns_no_triggering_data(operation: str) -> None:
-    from archive_line_index.errors import SizeLimitExceededError
+    from archive_stream.errors import SizeLimitExceededError
 
     r = Reader(b"a", b"bc", declared_size=0)
     s = make_content_stream(r, max_uncompressed_size=2)
@@ -214,7 +214,7 @@ def test_crossing_actual_limit_returns_no_triggering_data(operation: str) -> Non
 
 
 def test_declared_oversize_rejects_before_delivery_and_cleans() -> None:
-    from archive_line_index.errors import SizeLimitExceededError
+    from archive_stream.errors import SizeLimitExceededError
 
     r = Reader(b"abc", declared_size=3)
     with pytest.raises(SizeLimitExceededError):
@@ -252,7 +252,7 @@ def test_context_cleanup_failure_without_body_is_raised() -> None:
 
 
 def test_construction_error_preserves_cleanup_failure_note() -> None:
-    from archive_line_index.errors import SizeLimitExceededError
+    from archive_stream.errors import SizeLimitExceededError
 
     r = Reader(declared_size=3, close_failures=1)
     with pytest.raises(SizeLimitExceededError) as caught:

@@ -5,8 +5,8 @@ from collections.abc import Mapping
 
 import pytest
 
-from archive_line_index.offsets import validate_offsets
-from archive_line_index.scanner import DEFAULT_BUFFER_SIZE, scan_line_offsets
+from archive_stream.offsets import validate_offsets
+from archive_stream.scanner import DEFAULT_BUFFER_SIZE, scan_line_offsets
 
 
 @pytest.mark.parametrize(
@@ -156,8 +156,8 @@ def test_random_legal_short_reads_preserve_exact_coordinates() -> None:
 def test_overflow_rejected_without_closing_borrowed_source(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from archive_line_index import offsets
-    from archive_line_index.errors import InvalidIndexError
+    from archive_stream import offsets
+    from archive_stream.errors import InvalidIndexError
 
     monkeypatch.setattr(offsets, "MAX_OFFSET", 5)
     source = io.BytesIO(b"abcdef")
@@ -171,8 +171,8 @@ def test_allocation_and_native_width_fail_before_reading(
 ) -> None:
     from array import array
 
-    from archive_line_index import scanner
-    from archive_line_index.errors import InvalidIndexError
+    from archive_stream import scanner
+    from archive_stream.errors import InvalidIndexError
 
     source = io.BytesIO(b"data")
 
@@ -192,7 +192,7 @@ def test_allocation_and_native_width_fail_before_reading(
 def test_append_allocation_failure_returns_no_partial_index(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from archive_line_index import scanner
+    from archive_stream import scanner
 
     source = io.BytesIO(b"line\nnext")
 

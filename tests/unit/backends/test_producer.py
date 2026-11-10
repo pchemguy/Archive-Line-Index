@@ -6,7 +6,7 @@ import pytest
 
 
 def test_endpoint_subdivides_and_keeps_terminal_separate() -> None:
-    from archive_line_index.backends.producer import DataBlock, Finished, _Endpoint
+    from archive_stream.backends.producer import DataBlock, Finished, _Endpoint
 
     endpoint = _Endpoint(queue_capacity=1, block_size=2)
     errors: list[BaseException] = []
@@ -34,7 +34,7 @@ def test_endpoint_subdivides_and_keeps_terminal_separate() -> None:
 
 
 def test_full_queue_cancellation_unblocks_sender() -> None:
-    from archive_line_index.backends.producer import _Cancelled, _Endpoint
+    from archive_stream.backends.producer import _Cancelled, _Endpoint
 
     endpoint = _Endpoint(queue_capacity=1, block_size=1)
     errors: list[BaseException] = []
@@ -62,7 +62,7 @@ def test_full_queue_cancellation_unblocks_sender() -> None:
 
 
 def test_terminal_failure_and_immutable_payload_snapshot() -> None:
-    from archive_line_index.backends.producer import DataBlock, Failed, _Endpoint
+    from archive_stream.backends.producer import DataBlock, Failed, _Endpoint
 
     endpoint = _Endpoint(queue_capacity=2, block_size=8)
     data = bytearray(b"abc")
@@ -90,14 +90,14 @@ def test_terminal_failure_and_immutable_payload_snapshot() -> None:
 def test_transport_settings_are_positive_finite_integers(
     capacity: object, block: object, error: type[Exception]
 ) -> None:
-    from archive_line_index.backends.producer import _Endpoint
+    from archive_stream.backends.producer import _Endpoint
 
     with pytest.raises(error):
         _Endpoint(queue_capacity=capacity, block_size=block)  # type: ignore[arg-type]
 
 
 def test_empty_send_and_cancel_check_do_not_invent_data() -> None:
-    from archive_line_index.backends.producer import Finished, _Cancelled, _Endpoint
+    from archive_stream.backends.producer import Finished, _Cancelled, _Endpoint
 
     endpoint = _Endpoint(queue_capacity=1, block_size=1)
     assert endpoint.send(b"") == 0
@@ -110,7 +110,7 @@ def test_empty_send_and_cancel_check_do_not_invent_data() -> None:
 
 
 def test_worker_reader_fifo_failure_and_non_daemon_lifecycle() -> None:
-    from archive_line_index.backends.producer import start_queue_reader
+    from archive_stream.backends.producer import start_queue_reader
 
     failure = ValueError("producer failed")
     workers: list[threading.Thread] = []
@@ -141,7 +141,7 @@ def test_worker_reader_fifo_failure_and_non_daemon_lifecycle() -> None:
 
 
 def test_full_queue_reader_close_joins_worker() -> None:
-    from archive_line_index.backends.producer import start_queue_reader
+    from archive_stream.backends.producer import start_queue_reader
 
     def produce(endpoint: object) -> None:
         while True:
@@ -159,7 +159,7 @@ def test_full_queue_reader_close_joins_worker() -> None:
 
 
 def test_empty_worker_success_and_invalid_sizes() -> None:
-    from archive_line_index.backends.producer import start_queue_reader
+    from archive_stream.backends.producer import start_queue_reader
 
     reader = start_queue_reader(
         lambda endpoint: None, declared_size=0, queue_capacity=1, block_size=1
@@ -183,7 +183,7 @@ def test_empty_worker_success_and_invalid_sizes() -> None:
 def test_start_failure_after_launch_cancels_and_joins(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from archive_line_index.backends.producer import start_queue_reader
+    from archive_stream.backends.producer import start_queue_reader
 
     original = threading.Thread.start
     launched: list[threading.Thread] = []
@@ -206,7 +206,7 @@ def test_start_failure_after_launch_cancels_and_joins(
 def test_join_failure_does_not_claim_closed_and_can_retry(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from archive_line_index.backends.producer import start_queue_reader
+    from archive_stream.backends.producer import start_queue_reader
 
     reader = start_queue_reader(
         lambda endpoint: endpoint.send(b"x"),
@@ -228,7 +228,7 @@ def test_join_failure_does_not_claim_closed_and_can_retry(
 def test_close_wakes_waiting_reader_and_joins_producer(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from archive_line_index.backends.producer import start_queue_reader
+    from archive_stream.backends.producer import start_queue_reader
 
     def produce(endpoint: object) -> None:
         while True:
@@ -272,7 +272,7 @@ def test_close_wakes_waiting_reader_and_joins_producer(
 def test_invalid_declared_size_does_not_start_worker(
     declared: object, error: type[Exception], monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from archive_line_index.backends.producer import start_queue_reader
+    from archive_stream.backends.producer import start_queue_reader
 
     def forbidden(thread: threading.Thread) -> None:
         raise AssertionError("started with invalid options")

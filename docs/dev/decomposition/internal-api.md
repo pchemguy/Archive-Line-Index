@@ -139,6 +139,6 @@ The caller can therefore distinguish a publication failure from a cleanup failur
 
 ## Progress observation and invocation configuration
 
-Scanner-local observation consumes the existing processed-byte position, retains per-operation monotonic interval state and emits through archive_line_index.scanner. It does not require a new cross-component protocol, payload callback or worker. Exact private helper shape remains implementation-owned; disabled observation performs no clock/record work and the LF-search provider has no logging call.
+Scanner-local observation consumes the existing processed-byte position, retains per-operation monotonic interval state and emits through archive_stream.scanner. It does not require a new cross-component protocol, payload callback or worker. Exact private helper shape remains implementation-owned; disabled observation performs no clock/record work and the LF-search provider has no logging call.
 
 The CLI configures the emitting scanner logger through Python logging, not a private scanner method. It snapshots/restores that logger's explicit level and owns a temporary current-stderr handler only if no effective handler exists. Existing application handlers and root/parent/propagation/disabled settings remain untouched. Selecting the actual emitting logger ensures suppression even when it had an explicit INFO level. Repeated configuration is serialized by the embedding application. No persistence or adapter contract changes.

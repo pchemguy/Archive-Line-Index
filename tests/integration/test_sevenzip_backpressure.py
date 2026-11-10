@@ -10,8 +10,8 @@ import pytest
 from tests.helpers.sevenzip import make_7z
 from tests.integration.test_sevenzip_stream import owned_threads
 
-from archive_line_index import ExtractionError, InvalidArchiveError, open_content_stream
-from archive_line_index.backends.producer import _Endpoint
+from archive_stream import ExtractionError, InvalidArchiveError, open_content_stream
+from archive_stream.backends.producer import _Endpoint
 
 
 @pytest.mark.timeout(30)
