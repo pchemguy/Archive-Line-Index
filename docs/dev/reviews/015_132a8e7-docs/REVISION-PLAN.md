@@ -3,7 +3,7 @@
 | Field | Value |
 | --- | --- |
 | Campaign | `015_132a8e7` |
-| Status | Open |
+| Status | Closed |
 | Working branch | `revision/015_132a8e7-docs` |
 | Creation parent and integration target | `main` |
 | Baseline and branch-off commit | `132a8e73fac4a846c03094b34586c55141cbdcfa` |

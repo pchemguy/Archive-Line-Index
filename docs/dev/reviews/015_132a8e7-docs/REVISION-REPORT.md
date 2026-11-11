@@ -15,3 +15,9 @@ The stream example now uses a bounded `readinto` loop inside the context manager
 Separated the opener parameters from the stream method calls so their arguments and defaults are scoped to the correct callable. Checked the tables against the live signatures.
 
 Simplified the stream reference to the two inputs needed for bounded reading. The source goes to `open_content_stream` and the block size goes to `stream.read`. Verified the documented 1 MiB size against a ZIP with two full blocks and a short tail.
+
+## Final verification
+
+The final reference shows separate 1 MiB examples for `read()` and `readinto()` and describes the stream as read-only and sequential. Both examples passed against ZIP payloads larger than a block, shorter than a block, and empty. The README link and linked contracts resolve, and all 774 configured tests passed on Linux.
+
+The integration target is `main` at baseline `132a8e73fac4a846c03094b34586c55141cbdcfa`. The final documentation was verified at `1eee9dc00b471c9c11acbaffedd9e2020dd4bce6`.
