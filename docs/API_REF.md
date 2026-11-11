@@ -8,19 +8,40 @@ Import these operations from `archive_stream`. A source path may be a string or 
 
 ### Stream a payload
 
+#### Read a block with `read()`
+
 ```python
 from archive_stream import open_content_stream
 
+block_size = 1_048_576
+
 with open_content_stream(source="data/events.zip", max_uncompressed_size=None) as stream:
-    block = stream.read(1_048_576)
+    block = stream.read(block_size)
 ```
+
+`read(block_size)` returns up to `block_size` bytes as a `bytes` object. Repeat the read for more blocks. With a positive block size, `b""` signals validated EOF.
+
+#### Read a block into a reusable buffer with `readinto()`
+
+```python
+from archive_stream import open_content_stream
+
+block_size = 1_048_576
+with memoryview(bytearray(block_size)) as buffer:
+    with open_content_stream(source="data/events.zip", max_uncompressed_size=None) as stream:
+        count = stream.readinto(buffer)
+        block = buffer[:count]
+        # Use block before the next readinto(buffer) overwrites its bytes.
+```
+
+`readinto(buffer)` returns the number of bytes written. With a nonempty buffer, zero signals validated EOF. Allocate the buffer once and reuse it for subsequent reads. `buffer[:count]` is a view of the bytes written by the current read.
 
 | Parameter | Meaning |
 | --- | --- |
 | `source` | Required path to a plain file or a supported archive. |
 | `max_uncompressed_size=None` | Inclusive limit in payload bytes. `None` applies no size limit. |
-| `size` in `read(1_048_576)` | Positional-only byte limit. This example reads up to 1 MiB. Repeat the read to stream more blocks. An empty result with a positive size signals validated EOF. |
-| `buffer` in `readinto(buffer)` | Required positional-only writable contiguous buffer. Returns the number of bytes copied and leaves the unused suffix unchanged. |
+| `size` in `read(block_size)` | Positional-only maximum number of bytes to read. Both examples use a 1 MiB block size. |
+| `buffer` in `readinto(buffer)` | Required positional-only writable contiguous buffer. Any unused suffix is left unchanged. |
 
 The context manager closes the stream. For manual ownership, call `stream.close()`. Use `stream.closed`, `stream.readable()`, `stream.writable()`, and `stream.seekable()` to inspect its state and capabilities. [Content stream contract](dev/spec/content-stream.md)
 
