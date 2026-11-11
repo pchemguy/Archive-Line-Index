@@ -1,6 +1,6 @@
 # Archive Stream API reference
 
-The indexing and CLI examples show their defaults explicitly. Example values supply required inputs.
+Optional arguments are shown at their defaults where applicable. The streaming example supplies a positive block size.
 
 ## Python library
 
@@ -11,20 +11,20 @@ Import these operations from `archive_stream`. A source path may be a string or 
 ```python
 from archive_stream import open_content_stream
 
-source = "data/events.zip"
-block_size = 1_048_576
-
-with open_content_stream(source) as stream:
-    while block := stream.read(block_size):
-        print(len(block))
+with open_content_stream(source="data/events.zip", max_uncompressed_size=None) as stream:
+    block = stream.read(1_048_576)
 ```
 
-| Input | Meaning |
-| --- | --- |
-| `source` | Path to a plain file or supported archive. |
-| `block_size` | Maximum uncompressed bytes per read. Choose a positive integer. This example uses 1 MiB. |
+For bounded reads into reusable storage, allocate `buffer = bytearray(65536)` once and call `stream.readinto(buffer)` on an open stream.
 
-Each read returns up to `block_size` bytes. An empty result signals validated EOF. [Content stream contract](dev/spec/content-stream.md)
+| Parameter | Meaning |
+| --- | --- |
+| `source` | Required path to a plain file or a supported archive. |
+| `max_uncompressed_size=None` | Inclusive limit in payload bytes. `None` applies no size limit. |
+| `size` in `read(1_048_576)` | Positional-only byte limit. This example reads up to 1 MiB. Repeat the read to stream more blocks. An empty result with a positive size signals validated EOF. |
+| `buffer` in `readinto(buffer)` | Required positional-only writable contiguous buffer. Returns the number of bytes copied and leaves the unused suffix unchanged. |
+
+The context manager closes the stream. For manual ownership, call `stream.close()`. Use `stream.closed`, `stream.readable()`, `stream.writable()`, and `stream.seekable()` to inspect its state and capabilities. [Content stream contract](dev/spec/content-stream.md)
 
 ### Build an index
 
