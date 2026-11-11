@@ -43,7 +43,7 @@ with memoryview(bytearray(block_size)) as buffer:
 | `size` in `read(block_size)` | Positional-only maximum number of bytes to read. Both examples use a 1 MiB block size. |
 | `buffer` in `readinto(buffer)` | Required positional-only writable contiguous buffer. Any unused suffix is left unchanged. |
 
-The context manager closes the stream. For manual ownership, call `stream.close()`. Use `stream.closed`, `stream.readable()`, `stream.writable()`, and `stream.seekable()` to inspect its state and capabilities. [Content stream contract](dev/spec/content-stream.md)
+The context manager closes the stream. For manual ownership, call `stream.close()`. The stream is read-only and sequential. [Content stream contract](dev/spec/content-stream.md)
 
 ### Build an index
 
