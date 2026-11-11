@@ -1,5 +1,7 @@
 # Project handoff
 
+Documentation revision campaign `015_132a8e7` delivered the [API reference](../API_REF.md) and README link. The [revision report](reviews/015_132a8e7-docs/REVISION-REPORT.md) records the 774 passing tests and streaming example checks.
+
 The [v0.5.3 prerelease campaign](reviews/014_39132c2-prerelease/REVISION-REPORT.md) closed at nested merge `40e89e1ccdda9f97b27316a9eaf194dc5303bc28`. The [CLI logging parent campaign](reviews/013_833560e-cli-logging/REVISION-REPORT.md) closed on `main` at merge `3e346fce534c0ef7b57ecb31646023d96a9de20f`. F-002 is verified by the current README and the matching public v0.5.3 downloads.
 
 [Archive Stream v0.5.3](https://github.com/pchemguy/Archive-Stream/releases/tag/v0.5.3) is published stable and verified as latest. Release ID `440264432` and lightweight tag `v0.5.3` identify `d5f5e344750515e4145785cdcc6c11ad247a7f6a` on remote `main` first-parent history. The release commit body, [retained notes](../../RELEASE-NOTES.md), and hosted release body match byte-for-byte.
