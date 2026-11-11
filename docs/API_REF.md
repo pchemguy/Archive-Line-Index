@@ -15,8 +15,6 @@ with open_content_stream(source="data/events.zip", max_uncompressed_size=None) a
     block = stream.read(1_048_576)
 ```
 
-For bounded reads into reusable storage, allocate `buffer = bytearray(65536)` once and call `stream.readinto(buffer)` on an open stream.
-
 | Parameter | Meaning |
 | --- | --- |
 | `source` | Required path to a plain file or a supported archive. |
